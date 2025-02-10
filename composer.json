@@ -1,0 +1,79 @@
+{
+    "name": "awcodes/mason",
+    "description": "TODO make a description",
+    "keywords": [
+        "awcodes",
+        "laravel",
+        "filamentphp",
+        "mason"
+    ],
+    "homepage": "https://github.com/awcodes/mason",
+    "support": {
+        "issues": "https://github.com/awcodes/mason/issues",
+        "source": "https://github.com/awcodes/mason"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adam Weston",
+            "email": "awcodes1@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "filament/filament": "^3.2.189",
+        "spatie/laravel-package-tools": "^1.15.0",
+        "ueberdosis/tiptap-php": "^1.4"
+    },
+    "require-dev": {
+        "larastan/larastan": "^2.0",
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^8.0",
+        "orchestra/testbench": "^9.0",
+        "pestphp/pest": "^2.1",
+        "pestphp/pest-plugin-arch": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.0",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "spatie/laravel-ray": "^1.26"
+    },
+    "autoload": {
+        "psr-4": {
+            "Awcodes\\Mason\\": "src/",
+            "Awcodes\\Mason\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Awcodes\\Mason\\Tests\\": "tests/src"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Awcodes\\Mason\\MasonServiceProvider"
+            ],
+            "aliases": {
+                "Mason": "Awcodes\\Mason\\Facades\\Mason"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
