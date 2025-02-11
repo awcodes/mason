@@ -66,7 +66,6 @@ export default function mason({
     state,
     statePath,
     placeholder = null,
-    suggestions = [],
 }) {
     let editor = null;
 
@@ -210,7 +209,7 @@ export default function mason({
                 DragAndDrop,
                 Dropcursor.configure({
                     color: 'var(--mason-primary)',
-                    width: 2,
+                    width: 4,
                     class: 'mason-drop-cursor',
                 }),
                 Gapcursor,

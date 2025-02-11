@@ -21,7 +21,7 @@
             livewireId: @js($this->getId()),
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
             statePath: @js($statePath),
-            placeholder: @js($getPlaceholder()),
+            placeholder: @js($getPlaceholder())
         })"
         x-cloak
         id="{{ 'mason-wrapper-' . $statePath }}"
