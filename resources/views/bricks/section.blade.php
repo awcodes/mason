@@ -3,7 +3,6 @@
     'background_color' => 'white',
     'image_position' => null,
     'image_alignment' => null,
-    'image_flush' => false,
     'image_rounded' => false,
     'image_shadow' => false,
     'text' => null,
@@ -30,18 +29,19 @@
         <div
             @class([
                 'grid gap-6 md:grid-cols-3',
-                'items-center' => ! $image_flush,
-                'items-end' => $image_alignment === 'bottom' && $image_flush,
-                'items-start' => $image_alignment === 'top' && $image_flush,
+                'items-center' => $image_alignment === 'middle',
+                'items-end' => $image_alignment === 'bottom',
+                'items-start' => $image_alignment === 'top',
             ])
         >
             @if (filled($image))
                 <div
                     @class([
+                        'not-prose',
                         'order-0' => $image_position === 'start',
                         'order-1' => $image_position === 'end',
-                        'items-end' => $image_alignment === 'bottom' && $image_flush,
-                        'items-start' => $image_alignment === 'top' && $image_flush,
+                        'items-end' => $image_alignment === 'bottom',
+                        'items-start' => $image_alignment === 'top',
                     ])
                 >
                     <img
@@ -50,8 +50,6 @@
                         @class([
                         'rounded-lg' => $image_rounded,
                         'shadow-md' => $image_shadow,
-                        'md:-mb-12' => $image_alignment === 'bottom' && $image_flush,
-                        'md:-mt-12' => $image_alignment === 'top' && $image_flush,
                     ]) />
                 </div>
             @endif

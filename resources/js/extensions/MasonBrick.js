@@ -25,6 +25,9 @@ export default Node.create({
             values: {
                 default: {}
             },
+            path: {
+                default: null,
+            },
             view: {
                 default: null
             }
@@ -86,7 +89,9 @@ export default Node.create({
                             </svg>
                         </button>
                     </div>
-                    ${node.attrs.view}
+                    <div class="mason-brick-rendered">
+                        ${node.attrs.view}
+                    </div>
                 </div>
             `
 

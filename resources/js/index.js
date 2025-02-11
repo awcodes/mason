@@ -85,6 +85,27 @@ export default function mason({
                 extensions: this.getExtensions(),
                 content: this.state ?? '',
                 editorProps: {
+                    handlePaste(view, event, slice) {
+                        slice.content.descendants(node => {
+                            if (node.type.name === 'masonBrick') {
+                                const parser = new DOMParser()
+                                const doc = parser.parseFromString(node.attrs.view, 'text/html')
+                                node.attrs.view = doc.documentElement.textContent
+
+                                for (const key in node.attrs.values) {
+                                    if (
+                                        typeof node.attrs.values[key] === 'string'
+                                        &&  /&amp;|&lt;|&gt;|&quot;|&#039;/.test(node.attrs.values[key])
+                                    ) {
+                                        node.attrs.values[key] = (() => {
+                                            const value = parser.parseFromString(node.attrs.values[key], 'text/html')
+                                            return value.documentElement.textContent
+                                        })()
+                                    }
+                                }
+                            }
+                        });
+                    },
                     handleKeyDown: (view, event) => {
                         if (event.key === 'Backspace') {
                             return false;

@@ -7,6 +7,7 @@ use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Blade;
 use Livewire\Features\SupportTesting\Testable;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -40,6 +41,8 @@ class MasonServiceProvider extends PackageServiceProvider
                 ], 'mason-stubs');
             }
         }
+
+        Blade::directive('mason', fn ($expression) => "<?php echo (new Awcodes\Mason\Support\Converter({$expression}))->toHtml(); ?>");
 
         // Testing
         Testable::mixin(new TestsMason);

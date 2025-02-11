@@ -22,7 +22,7 @@
     ],
     "require": {
         "php": "^8.3",
-        "filament/filament": "^3.2.189",
+        "filament/filament": "^3.2.139",
         "spatie/laravel-package-tools": "^1.15.0",
         "ueberdosis/tiptap-php": "^1.4"
     },
@@ -40,9 +40,11 @@
         "spatie/laravel-ray": "^1.26"
     },
     "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
         "psr-4": {
-            "Awcodes\\Mason\\": "src/",
-            "Awcodes\\Mason\\Database\\Factories\\": "database/factories/"
+            "Awcodes\\Mason\\": "src/"
         }
     },
     "autoload-dev": {

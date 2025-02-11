@@ -42,6 +42,7 @@
             color="gray"
             x-on:click="toggleViewport('mobile')"
             size="sm"
+            x-bind:class="{'active': viewport === 'mobile'}"
         >
             Mobile
         </x-filament::icon-button>
@@ -50,6 +51,7 @@
             color="gray"
             x-on:click="toggleViewport('tablet')"
             size="sm"
+            x-bind:class="{'active': viewport === 'tablet'}"
         >
             Tablet
         </x-filament::icon-button>
@@ -58,6 +60,7 @@
             color="gray"
             x-on:click="toggleViewport('desktop')"
             size="sm"
+            x-bind:class="{'active': viewport === 'desktop'}"
         >
             Desktop
         </x-filament::icon-button>

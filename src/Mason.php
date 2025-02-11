@@ -2,15 +2,16 @@
 
 namespace Awcodes\Mason;
 
-use Awcodes\Mason\Actions\Batman;
 use Awcodes\Mason\Actions\Section;
 use Awcodes\Mason\Concerns\HasSidebar;
+use Awcodes\Mason\Support\Helpers;
 use Closure;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Contracts\CanBeLengthConstrained;
 use Filament\Forms\Components\Field;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Concerns\HasPlaceholder;
+use Livewire\Component;
 
 class Mason extends Field implements CanBeLengthConstrained
 {
@@ -24,13 +25,36 @@ class Mason extends Field implements CanBeLengthConstrained
 
     protected bool | Closure $isJson = false;
 
+    protected array | Closure | null $bricks = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->afterStateHydrated(function (Mason $component, $state) {
+            if (! $state) {
+                return null;
+            }
+
+            $state = Helpers::renderBricks($state, $component);
+
+            $component->state($state);
+        });
+
+        $this->afterStateUpdated(function (Mason $component, Component $livewire): void {
+            $livewire->validateOnly($component->getStatePath());
+        });
+
+        $this->dehydrateStateUsing(function ($state) {
+            if (! $state) {
+                return null;
+            }
+
+            return Helpers::sanitizeBricks($state);
+        });
+
         $this->registerActions([
-            Batman::make(),
-            Section::make(),
+            fn () => $this->getBricks(),
         ]);
     }
 
@@ -63,5 +87,19 @@ class Mason extends Field implements CanBeLengthConstrained
     public function isJson(): bool
     {
         return (bool) $this->evaluate($this->isJson);
+    }
+
+    public function bricks(array | Closure $bricks): static
+    {
+        $this->bricks = $bricks;
+
+        return $this;
+    }
+
+    public function getBricks(): array
+    {
+        return $this->evaluate($this->bricks) ?? [
+            Section::make(),
+        ];
     }
 }

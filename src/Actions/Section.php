@@ -25,7 +25,6 @@ class Section
                 'background_color' => $arguments['background_color'] ?? 'white',
                 'image_position' => $arguments['image_position'] ?? null,
                 'image_alignment' => $arguments['image_alignment'] ?? null,
-                'image_flush' => $arguments['image_flush'] ?? null,
                 'image_rounded' => $arguments['image_rounded'] ?? null,
                 'image_shadow' => $arguments['image_shadow'] ?? null,
                 'text' => $arguments['text'] ?? null,
@@ -38,7 +37,7 @@ class Section
                     ->options([
                         'white' => 'White',
                         'gray' => 'Gray',
-                        'primary' => 'primary',
+                        'primary' => 'Primary',
                     ])
                     ->inline()
                     ->inlineLabel(false),
@@ -58,12 +57,6 @@ class Section
                                     'top' => 'Top',
                                     'middle' => 'Middle',
                                     'bottom' => 'Bottom',
-                                ])
-                                ->grouped(),
-                            ToggleButtons::make('image_flush')
-                                ->options([
-                                    false => 'No',
-                                    true => 'Yes',
                                 ])
                                 ->grouped(),
                             ToggleButtons::make('image_rounded')
@@ -90,6 +83,7 @@ class Section
                             arguments: [[
                                 'identifier' => 'section',
                                 'values' => $data,
+                                'path' => 'mason::bricks.section',
                                 'view' => view('mason::bricks.section', $data)->toHtml(),
                             ]],
                         ),
