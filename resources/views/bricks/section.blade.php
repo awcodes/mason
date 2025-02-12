@@ -13,7 +13,7 @@
 
 <section
     @class([
-        'font-body branded py-8 lg:py-12',
+        'font-body branded @container',
         match ($background_color) {
             'primary' => 'bg-primary-500 text-white',
             'secondary' => 'bg-secondary-500 text-white',
@@ -25,10 +25,10 @@
         },
     ])
 >
-    <div class="mx-auto w-full max-w-5xl px-6">
+    <div class="mx-auto w-full max-w-5xl px-6 py-8 @3xl:py-12">
         <div
             @class([
-                'grid gap-6 md:grid-cols-3',
+                'grid gap-6 @3xl:grid-cols-3',
                 'items-center' => $image_alignment === 'middle',
                 'items-end' => $image_alignment === 'bottom',
                 'items-start' => $image_alignment === 'top',
@@ -56,12 +56,12 @@
 
             <div
                 @class([
-                    'md:col-span-2' => filled($image),
-                    'md:col-span-3' => ! filled($image),
+                    '@3xl:col-span-2' => filled($image),
+                    '@3xl:col-span-3' => ! filled($image),
                 ])
             >
                 @if ($text)
-                    <div class="prose max-w-none">
+                    <div class="prose max-w-none prose-headings:font-display">
                         {!! $text !!}
                     </div>
                 @endif

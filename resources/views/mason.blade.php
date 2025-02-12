@@ -23,7 +23,6 @@
             statePath: @js($statePath),
             placeholder: @js($getPlaceholder())
         })"
-        x-cloak
         id="{{ 'mason-wrapper-' . $statePath }}"
         class="mason-wrapper"
         x-bind:class="{
