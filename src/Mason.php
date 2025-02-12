@@ -36,7 +36,9 @@ class Mason extends Field implements CanBeLengthConstrained
                 return null;
             }
 
-            $state = Helpers::renderBricks($state, $component);
+//            $state = Helpers::renderBricks($state, $component);
+
+//            dd($state);
 
             $component->state($state);
         });

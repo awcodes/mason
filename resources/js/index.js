@@ -60,7 +60,7 @@ document.addEventListener('livewire:init', () => {
     })
 })
 
-export default function mason({
+export default function masonComponent({
     key,
     livewireId,
     state,
@@ -80,6 +80,20 @@ export default function mason({
         shouldUpdateState: true,
         editorSelection: { type: 'text', anchor: 0, head: 0 },
         init: function () {
+
+            if (this.state.content.length > 0) {
+                const renderer = document.querySelector('#mason-brick-renderer').getAttribute('wire:id')
+
+                this.state.content.forEach(async (node) => {
+                    node.attrs.view = await window.Livewire
+                        .find(renderer)
+                        .call('getView', node.attrs.path, node.attrs.values)
+                        .then(e => {
+                            return e
+                        })
+                })
+            }
+
             editor = new Editor({
                 element: this.$refs.editor,
                 extensions: this.getExtensions(),
@@ -284,8 +298,9 @@ export default function mason({
 
             commandChain.run()
         },
-        handleBlockUpdate: function (identifier, data) {
-            this.$wire.mountFormComponentAction(this.statePath, identifier, { ...data, editorSelection: this.editorSelection }, this.key)
+        handleBlockUpdate: function (identifier) {
+            const data = editor.getAttributes('masonBrick')
+            this.$wire.mountFormComponentAction(this.statePath, identifier, { ...data.values, editorSelection: this.editorSelection }, this.key)
         },
         handleBrickDrop: function (event) {
             let pos = event.detail.coordinates.pos

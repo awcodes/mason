@@ -16,7 +16,7 @@
             x-load
         @endif
         x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('mason', 'awcodes/mason') }}"
-        x-data="mason({
+        x-data="masonComponent({
             key: @js($key),
             livewireId: @js($this->getId()),
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
