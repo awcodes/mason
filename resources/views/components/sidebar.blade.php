@@ -81,7 +81,7 @@
         </x-filament::icon-button>
     </div>
     <div
-        class="mason-brick-actions"
+        class="mason-actions"
         wire:ignore
         x-data="{
             actions: @js(array_keys($actions)),
@@ -104,26 +104,28 @@
                 ></x-filament::input>
             </x-filament::input.wrapper>
         </div>
-        @if ($actions)
-            @foreach ($actions as $action)
-                <div
-                    draggable="true"
-                    x-on:dragstart="$event?.dataTransfer?.setData('brickIdentifier', @js($action->getName()))"
-                    class="mason-brick-action"
-                    x-bind:class="{
-                        'filtered': ! filterActions().includes(@js($action->getName())),
-                    }"
-                >
-                    @if ($action->getIcon())
-                        <x-filament::icon
-                            :icon="$action->getIcon()"
-                            class="h-5 w-5"
-                        />
-                    @endif
+        <div class="mason-actions-bricks">
+            @if ($actions)
+                @foreach ($actions as $action)
+                    <div
+                        draggable="true"
+                        x-on:dragstart="$event?.dataTransfer?.setData('brickIdentifier', @js($action->getName()))"
+                        class="mason-actions-brick"
+                        x-bind:class="{
+                            'filtered': ! filterActions().includes(@js($action->getName())),
+                        }"
+                    >
+                        @if ($action->getIcon())
+                            <x-filament::icon
+                                :icon="$action->getIcon()"
+                                class="h-5 w-5"
+                            />
+                        @endif
 
-                    {{ $action->getLabel() }}
-                </div>
-            @endforeach
-        @endif
+                        {{ $action->getLabel() }}
+                    </div>
+                @endforeach
+            @endif
+        </div>
     </div>
 </div>

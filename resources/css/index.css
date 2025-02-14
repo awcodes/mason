@@ -7,13 +7,13 @@
         @apply overflow-hidden;
 
         .fi-input-wrp-input {
-            @apply flex;
+            @apply flex max-h-[40rem];
 
             .mason-editor-wrapper {
                 @apply flex-1;
 
                 .mason-editor {
-                    @apply min-h-full max-h-[40rem] overflow-y-auto flex-1 h-full;
+                    @apply min-h-full overflow-y-auto flex-1 h-full;
 
                     .tiptap {
                         @apply min-h-full;
@@ -93,10 +93,11 @@
             }
 
             .mason-sidebar {
-                @apply hidden shrink-0 divide-y divide-gray-950/10 min-w-[10rem] max-w-sm md:flex flex-col h-full border-s border-gray-950/10 bg-gray-50 dark:border-white/5 dark:bg-gray-950/20 divide-white/5;
+                @apply hidden shrink-0 divide-y divide-gray-950/10 min-w-[10rem] max-w-sm md:flex flex-col h-full border-s border-gray-950/10 bg-gray-50 dark:border-white/5 dark:bg-gray-950/20 dark:divide-white/5;
 
                 .mason-controls,
-                .mason-brick-actions {
+                .mason-actions-search,
+                .mason-actions-bricks {
                     @apply p-2 gap-2;
                 }
 
@@ -112,14 +113,18 @@
                     }
                 }
 
-                .mason-brick-actions {
-                    @apply grid;
+                .mason-actions {
+                    @apply overflow-hidden flex-1 flex flex-col divide-y divide-gray-950/10 dark:divide-white/5;
+                    
+                    .mason-actions-bricks {
+                        @apply flex-1 overflow-y-auto flex flex-col gap-2;
 
-                    .mason-brick-action {
-                        @apply cursor-move flex items-center gap-2 rounded border text-xs ps-3 pe-4 py-2 bg-white dark:bg-gray-800 dark:border-gray-700;
+                        .mason-actions-brick {
+                            @apply cursor-move flex items-center gap-2 rounded border text-xs ps-3 pe-4 py-2 bg-white dark:bg-gray-800 dark:border-gray-700;
 
-                        &.filtered {
-                            display: none !important;
+                            &.filtered {
+                                display: none !important;
+                            }
                         }
                     }
                 }
