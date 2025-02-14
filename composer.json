@@ -50,15 +50,21 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Awcodes\\Mason\\Tests\\": "tests/src"
+            "Awcodes\\Mason\\Tests\\": "tests/src",
+            "Awcodes\\Mason\\Tests\\Database\\Factories\\": "tests/database/factories/"
         }
     },
     "scripts": {
         "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
-        "analyse": "vendor/bin/phpstan analyse",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+        "lint": "pint",
+        "test:lint": "pint --test",
+        "test:types": "phpstan analyse",
+        "test:unit": "pest",
+        "test": [
+            "@test:lint",
+            "@test:types",
+            "@test:unit"
+        ]
     },
     "config": {
         "sort-packages": true,
