@@ -160,6 +160,12 @@ export default function masonComponent({
                 this.state = editor.getJSON()
 
                 this.shouldUpdateState = false
+
+                const currentBrick = this.$el.querySelector('.ProseMirror-selectednode')
+
+                if (currentBrick) {
+                    currentBrick.scrollIntoView({behavior: 'auto'})
+                }
             })
 
             editor.on('selectionUpdate', ({ editor, transaction }) => {
@@ -297,7 +303,7 @@ export default function masonComponent({
 
             this.setEditorSelection(editorSelection)
 
-            let commandChain = editor.chain()
+            let commandChain = editor.chain().focus()
 
             commands.forEach(
                 (command) =>
