@@ -36,10 +36,6 @@ class Mason extends Field implements CanBeLengthConstrained
                 return null;
             }
 
-            //            $state = Helpers::renderBricks($state, $component);
-
-            //            dd($state);
-
             $component->state($state);
         });
 
@@ -69,9 +65,11 @@ class Mason extends Field implements CanBeLengthConstrained
         $key = $this->getKey();
         $livewire = $this->getLivewire();
 
+        /** @phpstan-ignore-next-line  */
         $livewire->dispatch(
-            'run-mason-commands',
+            event: 'run-mason-commands',
             awaitMasonComponent: $key,
+            /** @phpstan-ignore-next-line  */
             livewireId: $livewire->getId(),
             key: $key,
             editorSelection: $editorSelection,
