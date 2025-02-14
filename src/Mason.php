@@ -2,7 +2,7 @@
 
 namespace Awcodes\Mason;
 
-use Awcodes\Mason\Actions\Section;
+use Awcodes\Mason\Bricks\Section;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\Helpers;
 use Closure;

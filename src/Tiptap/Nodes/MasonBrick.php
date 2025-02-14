@@ -2,7 +2,7 @@
 
 namespace Awcodes\Mason\Tiptap\Nodes;
 
-use Awcodes\Mason\Actions\Section;
+use Awcodes\Mason\Bricks\Section;
 use Tiptap\Core\Node;
 
 class MasonBrick extends Node

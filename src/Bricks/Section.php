@@ -1,6 +1,6 @@
 <?php
 
-namespace Awcodes\Mason\Actions;
+namespace Awcodes\Mason\Bricks;
 
 use Awcodes\Mason\Brick;
 use Awcodes\Mason\EditorCommand;
