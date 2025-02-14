@@ -1,7 +1,6 @@
 import { Dropcursor } from '@tiptap/extension-dropcursor'
 import { Document } from '@tiptap/extension-document'
 import { Editor } from '@tiptap/core'
-import { Gapcursor } from '@tiptap/extension-gapcursor'
 import { History } from '@tiptap/extension-history'
 import { Paragraph } from '@tiptap/extension-paragraph'
 import { Placeholder } from '@tiptap/extension-placeholder'
@@ -81,7 +80,7 @@ export default function masonComponent({
         editorSelection: { type: 'text', anchor: 0, head: 0 },
         init: function () {
 
-            if (this.state.content.length > 0) {
+            if (this.state?.content?.length > 0) {
                 const renderer = document.querySelector('#mason-brick-renderer').getAttribute('wire:id')
 
                 this.state.content.forEach(async (node) => {
@@ -125,12 +124,19 @@ export default function masonComponent({
                             return false;
                         }
 
+                        if (view.state.selection.$head.parent.type.name === 'doc') {
+                            if (event.key === ' ') {
+                                event.preventDefault()
+                                return true;
+                            }
+                        }
+
                         if (view.state.selection.$head.parent.type.name === 'paragraph') {
                             const modifiers = {
                                 alt: event.altKey,
                                 shift: event.shiftKey,
                                 ctrl: event.ctrlKey,
-                                meta: event.metaKey
+                                meta: event.metaKey,
                             }
 
                             if (Object.values(modifiers).every((mod) => !mod)) {
@@ -159,6 +165,11 @@ export default function masonComponent({
             editor.on('selectionUpdate', ({ editor, transaction }) => {
                 this.editorUpdatedAt = Date.now()
                 this.editorSelection = transaction.selection.toJSON()
+            })
+
+            editor.on('focus', ({ editor }) => {
+                this.isFocused = true
+                this.editorUpdatedAt = Date.now()
             })
 
             this.$watch('isFocused', (value) => {
@@ -247,7 +258,6 @@ export default function masonComponent({
                     width: 4,
                     class: 'mason-drop-cursor',
                 }),
-                Gapcursor,
                 History,
                 StatePath.configure({
                     statePath: statePath

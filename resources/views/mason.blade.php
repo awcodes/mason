@@ -27,6 +27,7 @@
         class="mason-wrapper"
         x-bind:class="{
             'fullscreen': fullscreen,
+            'is-focused': isFocused,
             'display-mobile': viewport === 'mobile',
             'display-tablet': viewport === 'tablet',
             'display-desktop': viewport === 'desktop',

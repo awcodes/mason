@@ -20,15 +20,13 @@ class PageFactory extends Factory
                     path: 'mason::bricks.section',
                     values: [
                         'background_color' => 'white',
+                        'image' => null,
                         'image_position' => 'start',
                         'image_alignment' => 'top',
                         'image_flush' => false,
                         'image_rounded' => true,
                         'image_shadow' => true,
                         'text' => '<h2>This is a heading</h2><p>Just some random text for a paragraph</p>',
-                        'image' => null,
-                        'actions' => [],
-                        'actions_alignment' => null,
                     ]
                 )->asJson(),
         ];
