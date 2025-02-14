@@ -5,6 +5,7 @@ namespace Awcodes\Mason\Support;
 use Awcodes\Mason\Tiptap\Nodes\MasonBrick;
 use Filament\Support\Concerns\EvaluatesClosures;
 use stdClass;
+use Stevebauman\Hypertext\Transformer;
 use Tiptap\Editor;
 use Tiptap\Nodes\Document;
 use Tiptap\Nodes\Paragraph;
@@ -14,12 +15,10 @@ class Converter
 {
     use EvaluatesClosures;
 
-    protected Editor $editor;
-
-    protected ?array $bricks = null;
-
     public function __construct(
-        public string | array | stdClass | null $content = null,
+        public string | array | stdClass $content,
+        protected ?Editor $editor = null,
+        protected ?array $bricks = null
     ) {
         if ($this->content instanceof stdClass) {
             $this->content = json_decode(json_encode($this->content), true);
@@ -60,7 +59,7 @@ class Converter
 
     public function toHtml(): string
     {
-        if (blank($this->content) || $this->content === '') {
+        if ($this->validateContent()) {
             return '';
         }
 
@@ -71,7 +70,7 @@ class Converter
 
     public function toJson(): array
     {
-        if (blank($this->content) || $this->content === '') {
+        if ($this->validateContent()) {
             return [];
         }
 
@@ -84,10 +83,31 @@ class Converter
 
     public function toText(): string
     {
-        if (blank($this->content) || $this->content === '') {
+        if ($this->validateContent()) {
             return '';
         }
 
-        return $this->getEditor()->setContent($this->content)->getText();
+        return $this->getEditor()->setContent($this->content)
+            ->descendants(function (&$node) {
+                if ($node->type !== 'masonBrick') {
+                    return;
+                }
+
+                $node->content = [];
+
+                $brickData = json_decode(json_encode($node->attrs->values), true);
+                $view = view($node->attrs->path, $brickData)->toHtml();
+
+                $content = new stdClass;
+                $content->type = 'text';
+                $content->text = (new Transformer)->toText($view);
+                $node->content[] = $content;
+            })
+            ->getText();
+    }
+
+    private function validateContent(): bool
+    {
+        return blank($this->content) || $this->content === '';
     }
 }

@@ -85,4 +85,15 @@ class Helpers
             ->squish()
             ->toHtmlString();
     }
+
+    public static function isHTML($text): bool
+    {
+        $processed = htmlentities($text);
+
+        if ($processed == $text) {
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -98,7 +98,7 @@
                 <x-filament::input
                     x-ref="search"
                     x-on:input.debounce.300ms="filterActions()"
-                    placeholder="Search for bricks..."
+                    placeholder="{{ trans('mason::mason.brick_search_placeholder') }}"
                     type="search"
                     x-model="search"
                 ></x-filament::input>

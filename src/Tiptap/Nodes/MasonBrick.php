@@ -50,11 +50,12 @@ class MasonBrick extends Node
     {
         $data = $HTMLAttributes;
         $view = null;
+        $brickData = json_decode(json_encode($data), true);
 
         if ($data) {
             foreach ($this->getBricks() as $brick) {
                 if ($brick->getName() === $data['identifier']) {
-                    $view = view($data['path'], (array) $data['values'])->toHtml();
+                    $view = view($data['path'], $brickData['values'])->toHtml();
                 }
             }
         }

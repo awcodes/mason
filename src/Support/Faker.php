@@ -2,33 +2,40 @@
 
 namespace Awcodes\Mason\Support;
 
-use Faker\Factory;
-use Faker\Generator;
-
 class Faker
 {
-    protected Generator $faker;
+    protected array $output = [];
 
-    protected string $output = '';
-
-    public static function make(): static
+    public function __construct()
     {
-        $static = new static;
-        $static->faker = Factory::create();
+        $this->output = [
+            'type' => 'doc',
+            'content' => [],
+        ];
+    }
 
-        return $static;
+    public static function make(): self
+    {
+        return new self;
     }
 
     public function brick(string $identifier, string $path, ?array $values = []): static
     {
-        $this->output .= '<mason-brick>' . json_encode(['identifier' => $identifier, 'path' => $path, 'values' => $values]) . '</mason-brick>';
+        $this->output['content'][] = [
+            'type' => 'masonBrick',
+            'attrs' => [
+                'identifier' => $identifier,
+                'path' => $path,
+                'values' => $values,
+            ],
+        ];
 
         return $this;
     }
 
     public function asHtml(): string
     {
-        return $this->output;
+        return (new Converter($this->output))->toHtml();
     }
 
     public function asJson(): array
