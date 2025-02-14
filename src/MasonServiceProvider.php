@@ -2,6 +2,7 @@
 
 namespace Awcodes\Mason;
 
+use Awcodes\Mason\Commands\MakeBrickCommand;
 use Awcodes\Mason\Livewire\Renderer;
 use Awcodes\Mason\Support\Helpers;
 use Awcodes\Mason\Testing\TestsMason;
@@ -23,8 +24,12 @@ class MasonServiceProvider extends PackageServiceProvider
     public function configurePackage(Package $package): void
     {
         $package->name(static::$name)
+            ->hasConfigFile()
             ->hasViews()
-            ->hasTranslations();
+            ->hasTranslations()
+            ->hasCommands([
+                MakeBrickCommand::class,
+            ]);
     }
 
     public function packageRegistered(): void {}

@@ -1,0 +1,41 @@
+<?php
+
+namespace {{ namespace }};
+
+use Awcodes\Mason\Brick;
+use Awcodes\Mason\EditorCommand;
+use Awcodes\Mason\Mason;
+
+class {{ class_name }}
+{
+    public static function make(): Brick
+    {
+        return Brick::make('{{ brick_name }}')
+            ->label('{{ brick_label }}')
+            ->modalHeading('{{ brick_label }} Settings')
+            ->icon('heroicon-o-cube-transparent')
+            ->slideOver()
+            ->fillForm(fn (array $arguments): array => [
+                //
+            ])
+            ->form([
+                //
+            ])
+            ->action(function (array $arguments, array $data, Mason $component) {
+                $component->runCommands(
+                    [
+                        new EditorCommand(
+                            name: 'setBrick',
+                            arguments: [[
+                                'identifier' => '{{ brick_name }}',
+                                'values' => $data,
+                                'path' => '{{ path }}',
+                                'view' => view('{{ path }}', $data)->toHtml(),
+                            ]],
+                        ),
+                    ],
+                    editorSelection: $arguments['editorSelection'],
+                );
+            });
+    }
+}
