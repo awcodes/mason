@@ -30,11 +30,12 @@
             'is-focused': isFocused,
             'display-mobile': viewport === 'mobile',
             'display-tablet': viewport === 'tablet',
-            'display-desktop': viewport === 'desktop',
+            'display-desktop': viewport === 'desktop'
         }"
         x-on:click.away="blurEditor()"
         x-on:focus-editor.window="focusEditor($event)"
         x-on:dragged-brick.stop="handleBrickDrop($event)"
+        x-on:keydown.escape.window="fullscreen = false"
     >
         <x-filament::input.wrapper
             :valid="! $errors->has($statePath)"

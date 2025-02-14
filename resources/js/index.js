@@ -216,22 +216,22 @@ export default function masonComponent({
                 this.viewport = 'desktop'
             }
 
-            this.updatedAt = Date.now()
+            this.editorUpdatedAt = Date.now()
         },
         toggleViewport: function (viewport) {
             this.viewport = viewport
 
-            this.updatedAt = Date.now()
+            this.editorUpdatedAt = Date.now()
         },
         toggleSidebar: function () {
             this.sidebarOpen = ! this.sidebarOpen
             editor.commands.focus()
-            this.updatedAt = Date.now()
+            this.editorUpdatedAt = Date.now()
         },
         focusEditor: function (event) {
             if (event.detail.statePath === this.editor().commands.getStatePath()) {
                 setTimeout(() => this.editor().commands.focus(), 200)
-                this.updatedAt = Date.now()
+                this.editorUpdatedAt = Date.now()
             }
         },
         blurEditor: function () {
@@ -243,7 +243,7 @@ export default function masonComponent({
             }
 
             this.isFocused = false
-            this.updatedAt = Date.now()
+            this.editorUpdatedAt = Date.now()
         },
         getExtensions: function () {
             const coreExtensions = [
