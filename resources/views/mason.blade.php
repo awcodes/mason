@@ -41,7 +41,10 @@
             :valid="! $errors->has($statePath)"
             :attributes="
                 \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
-                    ->class(['mason-input-wrapper'])
+                    ->class([
+                        'mason-input-wrapper',
+                        'sidebar-start' => $getSidebarPosition() === \Awcodes\Mason\Enums\SidebarPosition::Start,
+                    ])
             "
         >
             <div class="mason-editor-wrapper">

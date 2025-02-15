@@ -114,6 +114,10 @@
                 }
             }
         }
+
+        &.sidebar-start .fi-input-wrp-input {
+            @apply flex-row-reverse;
+        }
     }
 
     &.is-focused {
