@@ -1,6 +1,6 @@
 import { Dropcursor } from '@tiptap/extension-dropcursor'
 import { Document } from '@tiptap/extension-document'
-import { Editor } from '@tiptap/core'
+import { Editor, NodePos } from '@tiptap/core'
 import { History } from '@tiptap/extension-history'
 import { Paragraph } from '@tiptap/extension-paragraph'
 import { Placeholder } from '@tiptap/extension-placeholder'
@@ -161,11 +161,7 @@ export default function masonComponent({
 
                 this.shouldUpdateState = false
 
-                const currentBrick = this.$el.querySelector('.ProseMirror-selectednode')
-
-                if (currentBrick) {
-                    currentBrick.scrollIntoView({behavior: 'auto'})
-                }
+                this.scrollToCurrentBrick()
             })
 
             editor.on('selectionUpdate', ({ editor, transaction }) => {
@@ -329,6 +325,52 @@ export default function masonComponent({
 
             this.$nextTick(() => {
                 this.handleBlockUpdate(event.detail.name)
+            })
+        },
+        moveNode: function (direction) {
+            const { state, view } = editor;
+            const { selection, tr } = state;
+            const { $from, $to, node } = selection;
+
+            if (direction === 'up') {
+                const currentNode = node;
+                const { nodeBefore } = view.state.doc.resolve($from.pos);
+
+                if (nodeBefore) {
+                    const moveNodeUp = view.state.tr
+                        .replaceWith($from.pos, $to.pos, nodeBefore)
+                        .replaceWith($from.pos - 1, $to.pos - 1, currentNode)
+
+                    view.dispatch(moveNodeUp);
+
+                    editor.commands.setNodeSelection($from.pos - 1)
+                }
+            } else {
+                const currentNode = node;
+                const { nodeAfter } = view.state.doc.resolve($to.pos);
+
+                if (nodeAfter) {
+                    const moveNodeDown = view.state.tr
+                        .replaceWith($from.pos, $to.pos, nodeAfter)
+                        .replaceWith($from.pos + 1, $to.pos + 1, currentNode)
+
+                    view.dispatch(moveNodeDown);
+
+                    editor.commands.setNodeSelection($from.pos + 1)
+                }
+            }
+
+            this.editorUpdatedAt = Date.now()
+            
+            this.scrollToCurrentBrick()
+        },
+        scrollToCurrentBrick: function () {
+            this.$nextTick(() => {
+                const currentBrick = this.$el.querySelector('.ProseMirror-selectednode')
+
+                if (currentBrick) {
+                    currentBrick.scrollIntoView({behavior: 'auto'})
+                }
             })
         }
     }

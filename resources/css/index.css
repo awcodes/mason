@@ -70,6 +70,22 @@
                                         @apply opacity-50;
                                     }
                                 }
+
+                                button.no-values {
+                                    @apply hidden;
+                                }
+                            }
+
+                            &:first-of-type {
+                                [data-move-up-button] {
+                                    @apply hidden;
+                                }
+                            }
+
+                            &:last-of-type {
+                                [data-move-down-button] {
+                                    @apply hidden;
+                                }
                             }
                         }
                     }
