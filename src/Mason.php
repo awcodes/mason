@@ -2,6 +2,7 @@
 
 namespace Awcodes\Mason;
 
+use Awcodes\Mason\Actions\InsertBrick;
 use Awcodes\Mason\Bricks\Section;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\Helpers;
@@ -52,6 +53,7 @@ class Mason extends Field implements CanBeLengthConstrained
         });
 
         $this->registerActions([
+            fn () => InsertBrick::make(),
             fn () => $this->getBricks(),
         ]);
     }

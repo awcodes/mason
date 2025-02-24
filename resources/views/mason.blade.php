@@ -5,7 +5,7 @@
     $key = $getKey();
     $statePath = $getStatePath();
     $isDisabled = $isDisabled();
-    $actions = $getActions();
+    $actions = collect($getActions())->filter(fn ($action) => $action->getName() !== 'insertBrick')->toArray();
 @endphp
 
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
@@ -35,6 +35,7 @@
         x-on:click.away="blurEditor()"
         x-on:focus-editor.window="focusEditor($event)"
         x-on:dragged-brick.stop="handleBrickDrop($event)"
+        x-on:handle-insert-brick.window="handleInsertBrick($event)"
         x-on:keydown.escape.window="fullscreen = false"
     >
         <x-filament::input.wrapper

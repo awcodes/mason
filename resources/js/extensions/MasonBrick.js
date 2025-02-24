@@ -1,4 +1,4 @@
-import { Node, NodePos } from '@tiptap/core'
+import { Node } from '@tiptap/core'
 
 export default Node.create({
     name: 'masonBrick',
@@ -16,6 +16,8 @@ export default Node.create({
     selectable: true,
 
     isolating: true,
+
+    atom: true,
 
     addAttributes() {
         return {
@@ -52,53 +54,33 @@ export default Node.create({
     addCommands() {
         return {
             setBrick: (attributes) => {
-                return ({ chain, state }) => {
+                return ({ chain, state, tr }) => {
                     const currentChain = chain()
-
                     const { selection } = state
                     const { $from, $to } = selection
 
-                    if (! [null, undefined].includes(attributes.coordinates?.pos)) {
-                        currentChain.insertContentAt(attributes.coordinates.pos, { type: this.name, attrs: attributes })
+                    if ($to.nodeBefore && $to.nodeBefore.type.name === 'paragraph') {
+                        return currentChain
+                            .insertContentAt(0, { type: this.name, attrs: attributes })
+                            .setNodeSelection(1)
+                            .deleteSelection()
                     }
 
-                    const range = $from.blockRange($to)
+                    let insertAt = $from.pos
 
-                    if (!range) {
-                        currentChain.insertContentAt($to.pos, { type: this.name, attrs: attributes })
-                    } else {
-                        currentChain.insertContentAt({ from: range.start, to: range.end }, { type: this.name, attrs: attributes })
+                    if (tr.getMeta('isUpdatingBrick')) {
+                        insertAt = {from: $from.pos, to: $to.pos}
                     }
-                }
-            },
-            moveBrickUp: () => {
-                return ({chain, state}) => {
-                    const { selection } = state
-                    const { $from, $to } = selection
 
-                    const { pos } = $from
-
-                    console.log(pos)
-                }
-            },
-            moveBrickDown: (node) => {
-                return ({editor, chain, state, view}) => {
-                    const { selection } = state
-                    const { $anchor, $head } = selection
-
-                    const node = selection.node;
-                    const { nodeAfter } = view.state.doc.resolve($head.pos);
-
-                    console.log(node)
-                    console.log(nodeAfter)
-                    if (nodeAfter) {
-                        const newPos = $anchor.pos + nodeAfter.nodeSize;
-                        console.log(newPos)
-                        const moveNodeDown = view.state.tr
-                            .replace($anchor.pos, $head.pos + node.nodeSize)
-                            .insert(newPos, node);
-                        view.dispatch(moveNodeDown);
+                    if (tr.getMeta('isInsertingBrick')) {
+                        insertAt = tr.getMeta('isInsertingBrickPosition') === 'before'
+                            ? $from.pos
+                            : $to.pos
                     }
+
+                    return currentChain
+                        .insertContentAt(insertAt, { type: this.name, attrs: attributes })
+
                 }
             }
         }
@@ -113,12 +95,17 @@ export default Node.create({
             let controls = `
                 <div class="mason-brick-wrapper" x-data="{hasValues: ${node.attrs.values ? 'true' : 'false'}}">
                     <div class="mason-brick-controls">
-                        <button type="button" data-move-up-button x-on:click="moveNode('up')">
+                        <button type="button" data-insert-brick-below x-on:click="insertBrick">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z" />
+                            </svg>
+                        </button>
+                        <button type="button" data-move-up-button x-on:click="moveBrick('up')">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
                             </svg>
                         </button>
-                        <button type="button" data-move-down-button x-on:click="moveNode('down')">
+                        <button type="button" data-move-down-button x-on:click="moveBrick('down')">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
                             </svg>
