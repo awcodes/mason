@@ -91,6 +91,10 @@
                                     @apply hidden;
                                 }
                             }
+
+                            [data-delete-brick-button] {
+                                @apply text-danger-400 dark:text-danger-400;
+                            }
                         }
                     }
                 }

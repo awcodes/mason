@@ -44,7 +44,7 @@ class InsertBrick
                     'statePath' => $component->getStatePath(),
                 ];
 
-                $livewire->dispatch('handle-insert-brick', ...$data);
+                $livewire->dispatch('handle-brick-insert', ...$data);
             });
     }
 }

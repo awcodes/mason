@@ -360,7 +360,7 @@ export default function masonComponent({
 
             commandChain.run()
         },
-        handleBlockUpdate: function (identifier) {
+        handleBrickUpdate: function (identifier) {
             if (! this.isUpdatingBrick) {
                 this.isUpdatingBrick = true
             }
@@ -383,6 +383,30 @@ export default function masonComponent({
                     this.key
                 )
             })
+        },
+        handleBrickInsert: function (event) {
+            if (this.statePath !== event.detail.statePath) {
+                return
+            }
+
+            let anchor = event.detail.editorSelection.anchor
+
+            if (! this.isInsertingBrick) {
+                this.isInsertingBrick = true
+                this.isInsertingBrickPosition = event.detail.position
+            }
+
+            this.$nextTick(() => {
+                this.$wire.mountFormComponentAction(
+                    this.statePath,
+                    event.detail.name,
+                    { editorSelection: {type: 'node', anchor: anchor, head: anchor} },
+                    this.key
+                )
+            })
+        },
+        handleBrickDelete: function () {
+            editor.commands.deleteSelection()
         },
         moveBrick: function (direction) {
             const { state, view } = editor;
@@ -428,27 +452,6 @@ export default function masonComponent({
                 { editorSelection: this.editorSelection },
                 this.key
             )
-        },
-        handleInsertBrick: function (event) {
-            if (this.statePath !== event.detail.statePath) {
-                return
-            }
-
-            let anchor = event.detail.editorSelection.anchor
-
-            if (! this.isInsertingBrick) {
-                this.isInsertingBrick = true
-                this.isInsertingBrickPosition = event.detail.position
-            }
-
-            this.$nextTick(() => {
-                this.$wire.mountFormComponentAction(
-                    this.statePath,
-                    event.detail.name,
-                    { editorSelection: {type: 'node', anchor: anchor, head: anchor} },
-                    this.key
-                )
-            })
         },
         scrollToCurrentBrick: function () {
             this.$nextTick(() => {
