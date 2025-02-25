@@ -4,8 +4,10 @@ namespace Awcodes\Mason\Actions;
 
 use Awcodes\Mason\Mason;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\ToggleButtons;
+use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\MaxWidth;
 use Livewire\Component;
 
 class InsertBrick
@@ -14,6 +16,8 @@ class InsertBrick
     {
         return Action::make('insertBrick')
             ->label(fn (): string => trans('mason::mason.insert_brick'))
+            ->modalWidth(MaxWidth::Small)
+            ->modalFooterActionsAlignment(Alignment::Center)
             ->form(function (Mason $component) {
                 return [
                     Select::make('name')
@@ -26,15 +30,16 @@ class InsertBrick
                         })
                         ->searchable()
                         ->rules('required'),
-                    ToggleButtons::make('position')
+                    Radio::make('position')
                         ->label('Position')
                         ->options([
                             'before' => 'Before',
                             'after' => 'After',
                         ])
-                        ->grouped()
+                        ->inline()
                         ->default('after')
-                        ->rules('required'),
+                        ->rules('required')
+                        ->extraAttributes(['style' => 'margin-bottom: 1rem;']),
                 ];
             })
             ->action(function (Mason $component, Component $livewire, array $data, array $arguments) {

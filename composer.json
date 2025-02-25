@@ -77,10 +77,7 @@
         "laravel": {
             "providers": [
                 "Awcodes\\Mason\\MasonServiceProvider"
-            ],
-            "aliases": {
-                "Mason": "Awcodes\\Mason\\Facades\\Mason"
-            }
+            ]
         }
     },
     "minimum-stability": "dev",

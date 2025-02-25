@@ -3,10 +3,9 @@
 namespace Awcodes\Mason;
 
 use Awcodes\Mason\Actions\InsertBrick;
-use Awcodes\Mason\Bricks\Section;
+use Awcodes\Mason\Concerns\HasBricks;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\Helpers;
-use Closure;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Contracts\CanBeLengthConstrained;
 use Filament\Forms\Components\Field;
@@ -21,12 +20,9 @@ class Mason extends Field implements CanBeLengthConstrained
     use HasExtraInputAttributes;
     use HasPlaceholder;
     use HasSidebar;
+    use HasBricks;
 
     protected string $view = 'mason::mason';
-
-    protected bool | Closure $isJson = false;
-
-    protected array | Closure | null $bricks = null;
 
     protected function setUp(): void
     {
@@ -77,31 +73,5 @@ class Mason extends Field implements CanBeLengthConstrained
             editorSelection: $editorSelection,
             commands: array_map(fn (EditorCommand $command): array => $command->toArray(), $commands),
         );
-    }
-
-    public function json(bool | Closure $condition = true): static
-    {
-        $this->isJson = $condition;
-
-        return $this;
-    }
-
-    public function isJson(): bool
-    {
-        return (bool) $this->evaluate($this->isJson);
-    }
-
-    public function bricks(array | Closure $bricks): static
-    {
-        $this->bricks = $bricks;
-
-        return $this;
-    }
-
-    public function getBricks(): array
-    {
-        return $this->evaluate($this->bricks) ?? [
-            Section::make(),
-        ];
     }
 }
