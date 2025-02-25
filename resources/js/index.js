@@ -79,7 +79,7 @@ export default function masonComponent({
         isUpdatingBrick: false,
         isInsertingBrick: false,
         isInsertingBrickPosition: null,
-        editorSelection: { type: 'text', anchor: 0, head: 0 },
+        editorSelection: { type: 'text', anchor: 0, head: 1 },
         init: function () {
 
             if (this.state?.content?.length > 0) {
