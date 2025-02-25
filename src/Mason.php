@@ -16,11 +16,11 @@ use Livewire\Component;
 class Mason extends Field implements CanBeLengthConstrained
 {
     use \Filament\Forms\Components\Concerns\CanBeLengthConstrained;
+    use HasBricks;
     use HasExtraAlpineAttributes;
     use HasExtraInputAttributes;
     use HasPlaceholder;
     use HasSidebar;
-    use HasBricks;
 
     protected string $view = 'mason::mason';
 
