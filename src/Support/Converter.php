@@ -2,6 +2,7 @@
 
 namespace Awcodes\Mason\Support;
 
+use Awcodes\Mason\Concerns\HasBricks;
 use Awcodes\Mason\Tiptap\Nodes\MasonBrick;
 use Filament\Support\Concerns\EvaluatesClosures;
 use stdClass;
@@ -14,11 +15,11 @@ use Tiptap\Nodes\Text;
 class Converter
 {
     use EvaluatesClosures;
+    use HasBricks;
 
     public function __construct(
         public string | array | stdClass $content,
         protected ?Editor $editor = null,
-        protected ?array $bricks = null
     ) {
         if ($this->content instanceof stdClass) {
             $this->content = json_decode(json_encode($this->content), true);
@@ -32,16 +33,9 @@ class Converter
                 new Document(['options' => ['content' => 'block*']]),
                 new Text,
                 new Paragraph,
-                new MasonBrick(['bricks' => $this->bricks]),
+                new MasonBrick(['bricks' => $this->getBricks()]),
             ],
         ]);
-    }
-
-    public function bricks(array $bricks): static
-    {
-        $this->bricks = $bricks;
-
-        return $this;
     }
 
     public function sanitizeBricks(Editor $editor): Editor

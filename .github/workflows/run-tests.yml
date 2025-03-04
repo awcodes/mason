@@ -1,10 +1,17 @@
 name: run-tests
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+    paths:
+      - '**.php'
+      - '.github/workflows/tests.yml'
+      - 'phpunit.xml.dist'
+      - 'composer.json'
+      - 'composer.lock'
 
 jobs:
   test:
@@ -12,20 +19,17 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        php: [8.3, 8.2, 8.1]
-        laravel: [11.*, 10.*]
-        stability: [prefer-lowest, prefer-stable]
+        os: [ubuntu-latest]
+        php: [8.3, 8.2]
+        laravel: [12.*, 11.*]
+        stability: [prefer-stable]
         include:
-          - laravel: 10.*
-            testbench: 8.*
-            carbon: 2.*
           - laravel: 11.*
             testbench: 9.*
             carbon: 3.*
-        exclude:
-          - laravel: 11.*
-            php: 8.1
+          - laravel: 12.*
+            testbench: 10.*
+            carbon: 3.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -37,7 +41,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, intl, fileinfo
           coverage: none
 
       - name: Setup problem matchers

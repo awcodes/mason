@@ -19,14 +19,18 @@
                         @apply min-h-full;
 
                         p.is-empty {
-                            @apply py-1 px-2;
+                           @apply h-0;
 
-                            &:first-child::before {
-                                @apply text-gray-400 dark:text-gray-600;
-                                content: attr(data-placeholder);
-                                float: left;
-                                height: 0;
-                                pointer-events: none;
+                            &:first-child {
+                                @apply py-1 px-2 h-auto;
+
+                                &::before {
+                                    @apply text-gray-400 dark:text-gray-600;
+                                    content: attr(data-placeholder);
+                                    float: left;
+                                    height: 0;
+                                    pointer-events: none;
+                                }
                             }
                         }
 
@@ -63,13 +67,33 @@
                                     @apply text-white block rounded p-1 hover:text-primary-500 hover:bg-gray-800;
 
                                     svg {
-                                        @apply w-4 h-4;
+                                        @apply w-6 h-6 lg:w-4 lg:h-4;
                                     }
 
                                     &:disabled {
                                         @apply opacity-50;
                                     }
                                 }
+
+                                button.no-values {
+                                    @apply hidden;
+                                }
+                            }
+
+                            &:first-of-type {
+                                [data-move-up-button] {
+                                    @apply hidden;
+                                }
+                            }
+
+                            &:last-of-type {
+                                [data-move-down-button] {
+                                    @apply hidden;
+                                }
+                            }
+
+                            [data-delete-brick-button] {
+                                @apply text-danger-400 dark:text-danger-400;
                             }
                         }
                     }

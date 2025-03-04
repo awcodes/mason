@@ -40,7 +40,7 @@ class MasonBrick extends Node
             [
                 'tag' => 'mason-brick',
                 'getAttrs' => function ($DOMNode) {
-                    return json_decode($DOMNode->nodeValue, true);
+                    return json_decode($DOMNode->nodeValue, associative: true);
                 },
             ],
         ];
@@ -50,7 +50,7 @@ class MasonBrick extends Node
     {
         $data = $HTMLAttributes;
         $view = null;
-        $brickData = json_decode(json_encode($data), true);
+        $brickData = json_decode(json_encode($data), associative: true);
 
         if ($data) {
             foreach ($this->getBricks() as $brick) {

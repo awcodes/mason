@@ -1,5 +1,4 @@
 @props([
-    'id' => null,
     'background_color' => 'white',
     'image_position' => null,
     'image_alignment' => null,
@@ -7,8 +6,6 @@
     'image_shadow' => false,
     'text' => null,
     'image' => null,
-    'actions' => [],
-    'actions_alignment' => null,
 ])
 
 <section
@@ -48,9 +45,10 @@
                         src="{{ \Illuminate\Support\Facades\Storage::url($image) }}"
                         alt=""
                         @class([
-                        'rounded-lg' => $image_rounded,
-                        'shadow-md' => $image_shadow,
-                    ]) />
+                            'rounded-lg' => $image_rounded,
+                            'shadow-md' => $image_shadow,
+                        ])
+                    />
                 </div>
             @endif
 
@@ -65,13 +63,6 @@
                         {!! $text !!}
                     </div>
                 @endif
-
-                {{--            @if ($actions)--}}
-                {{--                <x-blocks.actions--}}
-                {{--                    :actions="$actions"--}}
-                {{--                    :actions_alignment="$actions_alignment"--}}
-                {{--                />--}}
-                {{--            @endif--}}
             </div>
         </div>
     </div>

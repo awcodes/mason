@@ -30,8 +30,6 @@ class Section
                 'image_shadow' => $arguments['image_shadow'] ?? null,
                 'text' => $arguments['text'] ?? null,
                 'image' => $arguments['image'] ?? null,
-                'actions' => [],
-                'actions_alignment' => null,
             ])
             ->form([
                 Radio::make('background_color')

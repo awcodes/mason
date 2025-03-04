@@ -10,10 +10,12 @@ use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
+use ReflectionException;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -34,35 +36,38 @@ class MasonServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void {}
 
+    /**
+     * @throws ReflectionException
+     */
     public function packageBooted(): void
     {
-        // Asset Registration
         FilamentAsset::register(
             $this->getAssets(),
             $this->getAssetPackageName()
         );
 
-        // Handle Stubs
         if (app()->runningInConsole()) {
-            foreach (app(Filesystem::class)->files(__DIR__ . '/../stubs/') as $file) {
+            foreach (app(abstract: Filesystem::class)->files(directory: __DIR__ . '/../stubs/') as $file) {
                 $this->publishes([
-                    $file->getRealPath() => base_path("stubs/mason/{$file->getFilename()}"),
-                ], 'mason-stubs');
+                    $file->getRealPath() => base_path(path: "stubs/mason/{$file->getFilename()}"),
+                ], groups: 'mason-stubs');
             }
         }
 
-        Blade::directive('mason', fn ($expression) => "<?php echo (new Awcodes\Mason\Support\Converter({$expression}))->toHtml(); ?>");
+        Blade::directive(
+            name: 'mason',
+            handler: fn ($expression) => "<?php echo (new Awcodes\Mason\Support\Converter({$expression}))->toHtml(); ?>"
+        );
 
-        Livewire::component('mason.renderer', Renderer::class);
+        Livewire::component(name: 'mason.renderer', class: Renderer::class);
 
         if (! Helpers::isAuthRoute()) {
             FilamentView::registerRenderHook(
-                name: 'panels::body.end',
-                hook: fn (): string => Blade::render('@livewire("mason.renderer")')
+                name: PanelsRenderHook::BODY_END,
+                hook: fn (): string => Blade::render(string: '@livewire("mason.renderer")')
             );
         }
 
-        // Testing
         Testable::mixin(new TestsMason);
     }
 
@@ -77,7 +82,7 @@ class MasonServiceProvider extends PackageServiceProvider
     protected function getAssets(): array
     {
         return [
-            AlpineComponent::make('mason', __DIR__ . '/../resources/dist/mason.js'),
+            AlpineComponent::make(id: 'mason', path: __DIR__ . '/../resources/dist/mason.js'),
         ];
     }
 }

@@ -10,8 +10,6 @@ trait HasSidebar
 {
     protected array | Closure | null $sidebarActions = null;
 
-    protected bool | Closure | null $isSidebarHidden = null;
-
     protected SidebarPosition | Closure | null $sidebarPosition = null;
 
     /**
@@ -20,13 +18,6 @@ trait HasSidebar
     public function sidebar(array | Closure $actions): static
     {
         $this->sidebarActions = $actions;
-
-        return $this;
-    }
-
-    public function hiddenSidebar(bool | Closure $condition = true): static
-    {
-        $this->isSidebarHidden = $condition;
 
         return $this;
     }
@@ -49,10 +40,5 @@ trait HasSidebar
     public function getSidebarPosition(): SidebarPosition
     {
         return $this->evaluate($this->sidebarPosition) ?? SidebarPosition::End;
-    }
-
-    public function isSidebarHidden(): bool
-    {
-        return $this->evaluate($this->isSidebarHidden) ?? false;
     }
 }

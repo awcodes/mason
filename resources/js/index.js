@@ -7,7 +7,6 @@ import { Placeholder } from '@tiptap/extension-placeholder'
 import { Text } from '@tiptap/extension-text'
 import MasonBrick from './extensions/MasonBrick'
 import Customizations from './extensions/Customizations'
-import DragAndDrop from './extensions/DragAndDrop'
 import StatePath from './extensions/StatePath'
 import { Selection } from '@tiptap/pm/state'
 
@@ -77,7 +76,10 @@ export default function masonComponent({
         isFocused: false,
         sidebarOpen: true,
         shouldUpdateState: true,
-        editorSelection: { type: 'text', anchor: 0, head: 0 },
+        isUpdatingBrick: false,
+        isInsertingBrick: false,
+        isInsertingBrickPosition: null,
+        editorSelection: { type: 'text', anchor: 0, head: 1 },
         init: function () {
 
             if (this.state?.content?.length > 0) {
@@ -96,7 +98,7 @@ export default function masonComponent({
             editor = new Editor({
                 element: this.$refs.editor,
                 extensions: this.getExtensions(),
-                content: this.state ?? '',
+                content: this.state ?? null,
                 editorProps: {
                     handlePaste(view, event, slice) {
                         slice.content.descendants(node => {
@@ -161,11 +163,7 @@ export default function masonComponent({
 
                 this.shouldUpdateState = false
 
-                const currentBrick = this.$el.querySelector('.ProseMirror-selectednode')
-
-                if (currentBrick) {
-                    currentBrick.scrollIntoView({behavior: 'auto'})
-                }
+                // this.scrollToCurrentBrick()
             })
 
             editor.on('selectionUpdate', ({ editor, transaction }) => {
@@ -176,6 +174,32 @@ export default function masonComponent({
             editor.on('focus', ({ editor }) => {
                 this.isFocused = true
                 this.editorUpdatedAt = Date.now()
+            })
+
+            editor.on('drop', ({editor, event}) => {
+                if (event.dataTransfer.getData('brickIdentifier')) {
+                    event.preventDefault()
+
+                    const coordinates = editor.view.posAtCoords({
+                        left: event.clientX,
+                        top: event.clientY,
+                    })
+
+                    if (editor.isEmpty) {
+                        coordinates.pos = 0
+                    }
+
+                    event.target.dispatchEvent(new CustomEvent('dragged-brick', {
+                        detail: {
+                            name: event.dataTransfer.getData('brickIdentifier'),
+                            coordinates,
+                        },
+                        bubbles: true,
+                    }))
+                    return false
+                }
+
+                return false;
             })
 
             this.$watch('isFocused', (value) => {
@@ -191,7 +215,11 @@ export default function masonComponent({
                     return
                 }
 
-                editor.commands.setContent(this.state)
+                if (this.state === undefined) {
+                    return
+                }
+
+                editor.chain().setContent(this.state).setNodeSelection(this.editorSelection.anchor).run()
             });
 
             window.addEventListener('run-mason-commands', (event) => {
@@ -212,6 +240,32 @@ export default function masonComponent({
         },
         getEditor: function () {
             return editor;
+        },
+        getExtensions: function () {
+            const coreExtensions = [
+                Document.configure({
+                    content: '(inline|block)+'
+                }),
+                MasonBrick,
+                Customizations,
+                Dropcursor.configure({
+                    color: 'var(--mason-primary)',
+                    width: 4,
+                    class: 'mason-drop-cursor',
+                }),
+                History,
+                StatePath.configure({
+                    statePath: statePath
+                }),
+                Text,
+                Paragraph,
+            ];
+
+            if (placeholder) {
+                coreExtensions.push(Placeholder.configure({placeholder: placeholder}))
+            }
+
+            return coreExtensions;
         },
         toggleFullscreen: function () {
             this.fullscreen = !this.fullscreen
@@ -251,39 +305,19 @@ export default function masonComponent({
             this.isFocused = false
             this.editorUpdatedAt = Date.now()
         },
-        getExtensions: function () {
-            const coreExtensions = [
-                Document.configure({
-                    content: 'block+'
-                }),
-                MasonBrick,
-                Customizations,
-                DragAndDrop,
-                Dropcursor.configure({
-                    color: 'var(--mason-primary)',
-                    width: 4,
-                    class: 'mason-drop-cursor',
-                }),
-                History,
-                StatePath.configure({
-                    statePath: statePath
-                }),
-                Text,
-                Paragraph,
-            ];
-
-            if (placeholder) {
-                coreExtensions.push(Placeholder.configure({placeholder: placeholder}))
-            }
-
-            return coreExtensions;
-        },
         setEditorSelection: function (selection) {
             if (!selection) {
                 return
             }
 
             this.editorSelection = selection
+
+            const { $to } = editor.state.selection
+            const lastPos = (editor.state.doc.content.size - editor.state.doc.lastChild.nodeSize) + 1
+
+            if (($to.nodeBefore && $to.nodeBefore.type.name !== 'paragraph') && lastPos === this.editorSelection.anchor) {
+                editor.commands.insertContentAt(this.editorSelection.anchor, { type: 'paragraph' })
+            }
 
             editor
                 .chain()
@@ -305,6 +339,18 @@ export default function masonComponent({
 
             let commandChain = editor.chain().focus()
 
+            if (this.isUpdatingBrick) {
+                commandChain.setMeta('isUpdatingBrick', true)
+                this.isUpdatingBrick = false
+            }
+
+            if (this.isInsertingBrick) {
+                commandChain.setMeta('isInsertingBrick', true)
+                commandChain.setMeta('isInsertingBrickPosition', this.isInsertingBrickPosition)
+                this.isInsertingBrick = false
+                this.isInsertingBrickPosition = null
+            }
+
             commands.forEach(
                 (command) =>
                     (commandChain = commandChain[command.name](
@@ -314,21 +360,106 @@ export default function masonComponent({
 
             commandChain.run()
         },
-        handleBlockUpdate: function (identifier) {
+        handleBrickUpdate: function (identifier) {
+            if (! this.isUpdatingBrick) {
+                this.isUpdatingBrick = true
+            }
             const data = editor.getAttributes('masonBrick')
-            this.$wire.mountFormComponentAction(this.statePath, identifier, { ...data.values, editorSelection: this.editorSelection }, this.key)
+            this.$wire.mountFormComponentAction(
+                this.statePath,
+                identifier,
+                { ...data.values, editorSelection: this.editorSelection },
+                this.key
+            )
         },
         handleBrickDrop: function (event) {
             let pos = event.detail.coordinates.pos
 
-            if (editor.isEmpty && pos !== 1) {
-                pos = pos - 1
+            this.$nextTick(() => {
+                this.$wire.mountFormComponentAction(
+                    this.statePath,
+                    event.detail.name,
+                    { editorSelection: { type: 'node', anchor: pos, head: pos } },
+                    this.key
+                )
+            })
+        },
+        handleBrickInsert: function (event) {
+            if (this.statePath !== event.detail.statePath) {
+                return
             }
 
-            this.setEditorSelection({ type: 'text', anchor: pos, head: pos})
+            let anchor = event.detail.editorSelection.anchor
+
+            if (! this.isInsertingBrick) {
+                this.isInsertingBrick = true
+                this.isInsertingBrickPosition = event.detail.position
+            }
 
             this.$nextTick(() => {
-                this.handleBlockUpdate(event.detail.name)
+                this.$wire.mountFormComponentAction(
+                    this.statePath,
+                    event.detail.name,
+                    { editorSelection: {type: 'node', anchor: anchor, head: anchor} },
+                    this.key
+                )
+            })
+        },
+        handleBrickDelete: function () {
+            editor.commands.deleteSelection()
+        },
+        moveBrick: function (direction) {
+            const { state, view } = editor;
+            const { selection } = state;
+            const { $from, $to, node } = selection;
+
+            if (direction === 'up') {
+                const currentNode = node;
+                const { nodeBefore } = view.state.doc.resolve($from.pos);
+
+                if (nodeBefore) {
+                    const moveNodeUp = view.state.tr
+                        .replaceWith($from.pos, $to.pos, nodeBefore)
+                        .replaceWith($from.pos - 1, $to.pos - 1, currentNode)
+
+                    view.dispatch(moveNodeUp);
+
+                    editor.commands.setNodeSelection($from.pos - 1)
+                }
+            } else {
+                const currentNode = node;
+                const { nodeAfter } = view.state.doc.resolve($to.pos);
+
+                if (nodeAfter) {
+                    const moveNodeDown = view.state.tr
+                        .replaceWith($from.pos, $to.pos, nodeAfter)
+                        .replaceWith($from.pos + 1, $to.pos + 1, currentNode)
+
+                    view.dispatch(moveNodeDown);
+
+                    editor.commands.setNodeSelection($from.pos + 1)
+                }
+            }
+
+            this.editorUpdatedAt = Date.now()
+
+            // this.scrollToCurrentBrick()
+        },
+        insertBrick: function () {
+            this.$wire.mountFormComponentAction(
+                this.statePath,
+                'insertBrick',
+                { editorSelection: this.editorSelection },
+                this.key
+            )
+        },
+        scrollToCurrentBrick: function () {
+            this.$nextTick(() => {
+                const currentBrick = this.$el.querySelector('.ProseMirror-selectednode')
+
+                if (currentBrick) {
+                    currentBrick.scrollIntoView({behavior: 'auto'})
+                }
             })
         }
     }
