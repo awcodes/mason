@@ -1,6 +1,6 @@
 {
     "name": "awcodes/mason",
-    "description": "TODO make a description",
+    "description": "A simple block based drag and drop page / document builder field for Filament.",
     "keywords": [
         "awcodes",
         "laravel",
