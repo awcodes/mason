@@ -1,6 +1,7 @@
 name: "Fix PHP Code Styling"
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - '**.php'
