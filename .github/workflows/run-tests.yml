@@ -23,6 +23,13 @@ jobs:
         php: [8.3, 8.2]
         laravel: [12.*, 11.*]
         stability: [prefer-stable]
+        include:
+          - laravel: 11.*
+            testbench: 9.*
+            carbon: 3.*
+          - laravel: 12.*
+            testbench: 9.*
+            carbon: 3.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
