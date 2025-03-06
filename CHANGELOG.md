@@ -2,6 +2,18 @@
 
 All notable changes to `mason` will be documented in this file.
 
+## v0.1.1 - 2025-03-06
+
+### What's Changed
+
+* Allow directories for make command by @martin-ro in https://github.com/awcodes/mason/pull/7
+
+### New Contributors
+
+* @martin-ro made their first contribution in https://github.com/awcodes/mason/pull/7
+
+**Full Changelog**: https://github.com/awcodes/mason/compare/v0.1.0...v0.1.1
+
 ## v0.1.0 - 2025-03-04
 
 ### Initial Release
