@@ -2,6 +2,14 @@
 
 All notable changes to `mason` will be documented in this file.
 
+## v0.1.2 - 2025-03-11
+
+### What's Changed
+
+* Consistent icons in sidebar by @martin-ro in https://github.com/awcodes/mason/pull/8
+
+**Full Changelog**: https://github.com/awcodes/mason/compare/v0.1.1...v0.1.2
+
 ## v0.1.1 - 2025-03-06
 
 ### What's Changed
