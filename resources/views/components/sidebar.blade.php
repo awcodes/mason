@@ -118,7 +118,7 @@
                         @if ($action->getIcon())
                             <x-filament::icon
                                 :icon="$action->getIcon()"
-                                class="h-5 w-5"
+                                class="h-5 w-5 shrink-0"
                             />
                         @endif
 
