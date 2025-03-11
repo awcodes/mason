@@ -57,7 +57,9 @@
             </div>
 
             @if (! $isDisabled && filled($actions))
-                <x-mason::sidebar :actions="$actions" />
+                <div wire:key="sidebar-{{ hash('sha256', json_encode($actions)) }}">
+                    <x-mason::sidebar :actions="$actions" />
+                </div>
             @endif
         </x-filament::input.wrapper>
     </div>
