@@ -2,6 +2,18 @@
 
 All notable changes to `mason` will be documented in this file.
 
+## v0.1.3 - 2025-03-22
+
+### What's Changed
+
+* Fix sidebar not re-rendering when brick collection change by @jayson-temporas in https://github.com/awcodes/mason/pull/9
+
+### New Contributors
+
+* @jayson-temporas made their first contribution in https://github.com/awcodes/mason/pull/9
+
+**Full Changelog**: https://github.com/awcodes/mason/compare/v0.1.2...v0.1.3
+
 ## v0.1.2 - 2025-03-11
 
 ### What's Changed
