@@ -121,7 +121,7 @@ export default Node.create({
                             </svg>
                         </button>
                     </div>
-                    <div class="mason-brick-rendered">
+                    <div class="mason-brick-rendered" x-on:dblclick="handleBrickUpdate('${node.attrs.identifier}')">
                         ${view}
                     </div>
                 </div>

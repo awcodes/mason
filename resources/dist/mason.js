@@ -115,7 +115,7 @@ img.ProseMirror-separator {
                             </svg>
                         </button>
                     </div>
-                    <div class="mason-brick-rendered">
+                    <div class="mason-brick-rendered" x-on:dblclick="handleBrickUpdate('${n.attrs.identifier}')">
                         ${t}
                     </div>
                 </div>
