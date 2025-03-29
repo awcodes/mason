@@ -2,6 +2,14 @@
 
 All notable changes to `mason` will be documented in this file.
 
+## v0.1.4 - 2025-03-29
+
+### What's Changed
+
+* Fix path for stubs by @martin-ro in https://github.com/awcodes/mason/pull/11
+
+**Full Changelog**: https://github.com/awcodes/mason/compare/v0.1.3...v0.1.4
+
 ## v0.1.3 - 2025-03-22
 
 ### What's Changed
