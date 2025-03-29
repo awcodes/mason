@@ -49,7 +49,7 @@ class MasonServiceProvider extends PackageServiceProvider
         if (app()->runningInConsole()) {
             foreach (app(abstract: Filesystem::class)->files(directory: __DIR__ . '/../stubs/') as $file) {
                 $this->publishes([
-                    $file->getRealPath() => base_path(path: "stubs/mason/{$file->getFilename()}"),
+                    $file->getRealPath() => base_path(path: "stubs/filament/mason/{$file->getFilename()}"),
                 ], groups: 'mason-stubs');
             }
         }
