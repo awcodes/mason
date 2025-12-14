@@ -3,11 +3,11 @@
 namespace Awcodes\Mason\Actions;
 
 use Awcodes\Mason\Mason;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Support\Enums\Alignment;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Livewire\Component;
 
 class InsertBrick
@@ -16,7 +16,7 @@ class InsertBrick
     {
         return Action::make('insertBrick')
             ->label(fn (): string => trans('mason::mason.insert_brick'))
-            ->modalWidth(MaxWidth::Small)
+            ->modalWidth(Width::Small)
             ->modalFooterActionsAlignment(Alignment::Center)
             ->form(function (Mason $component) {
                 return [

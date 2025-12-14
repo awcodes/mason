@@ -4,7 +4,7 @@ namespace Awcodes\Mason\Concerns;
 
 use Awcodes\Mason\Enums\SidebarPosition;
 use Closure;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
 
 trait HasSidebar
 {

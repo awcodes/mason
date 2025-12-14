@@ -109,20 +109,20 @@
                 @foreach ($actions as $action)
                     <div
                         draggable="true"
-                        x-on:dragstart="$event?.dataTransfer?.setData('brickIdentifier', @js($action->getName()))"
+                        x-on:dragstart="$event?.dataTransfer?.setData('brickIdentifier', @js($action['name']))"
                         class="mason-actions-brick"
                         x-bind:class="{
-                            'filtered': ! filterActions().includes(@js($action->getName())),
+                            'filtered': ! filterActions().includes(@js($action['name'])),
                         }"
                     >
-                        @if ($action->getIcon())
+                        @if (filled($action['icon']))
                             <x-filament::icon
-                                :icon="$action->getIcon()"
+                                :icon="$action['icon']"
                                 class="h-5 w-5 shrink-0"
                             />
                         @endif
 
-                        {{ $action->getLabel() }}
+                        {{ $action['label'] }}
                     </div>
                 @endforeach
             @endif

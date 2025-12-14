@@ -6,7 +6,7 @@
     .mason-input-wrapper {
         @apply overflow-hidden;
 
-        .fi-input-wrp-input {
+        .fi-input-wrp-content-ctn {
             @apply flex max-h-[40rem];
 
             .mason-editor-wrapper {

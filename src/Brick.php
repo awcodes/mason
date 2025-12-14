@@ -3,7 +3,7 @@
 namespace Awcodes\Mason;
 
 use Exception;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
 use Illuminate\Support\Js;
 
 class Brick extends Action

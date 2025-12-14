@@ -6,11 +6,11 @@ use Awcodes\Mason\Brick;
 use Awcodes\Mason\EditorCommand;
 use Awcodes\Mason\Mason;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section as FilamentSection;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section as FilamentSection;
 use Illuminate\Support\HtmlString;
 
 class Section
@@ -31,7 +31,7 @@ class Section
                 'text' => $arguments['text'] ?? null,
                 'image' => $arguments['image'] ?? null,
             ])
-            ->form([
+            ->schema([
                 Radio::make('background_color')
                     ->options([
                         'white' => 'White',

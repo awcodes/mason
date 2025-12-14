@@ -365,9 +365,9 @@ export default function masonComponent({
                 this.isUpdatingBrick = true
             }
             const data = editor.getAttributes('masonBrick')
-            this.$wire.mountFormComponentAction(
-                this.statePath,
+            this.$wire.mountAction(
                 identifier,
+                this.statePath,
                 { ...data.values, editorSelection: this.editorSelection },
                 this.key
             )
@@ -376,9 +376,9 @@ export default function masonComponent({
             let pos = event.detail.coordinates.pos
 
             this.$nextTick(() => {
-                this.$wire.mountFormComponentAction(
-                    this.statePath,
+                this.$wire.mountAction(
                     event.detail.name,
+                    this.statePath,
                     { editorSelection: { type: 'node', anchor: pos, head: pos } },
                     this.key
                 )
@@ -397,9 +397,9 @@ export default function masonComponent({
             }
 
             this.$nextTick(() => {
-                this.$wire.mountFormComponentAction(
-                    this.statePath,
+                this.$wire.mountAction(
                     event.detail.name,
+                    this.statePath,
                     { editorSelection: {type: 'node', anchor: anchor, head: anchor} },
                     this.key
                 )
@@ -446,9 +446,9 @@ export default function masonComponent({
             // this.scrollToCurrentBrick()
         },
         insertBrick: function () {
-            this.$wire.mountFormComponentAction(
-                this.statePath,
+            this.$wire.mountAction(
                 'insertBrick',
+                this.statePath,
                 { editorSelection: this.editorSelection },
                 this.key
             )
