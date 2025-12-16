@@ -136,15 +136,13 @@ export default function masonComponent({
                 this.isFocused = true
             })
 
-            if (isLiveOnBlur) {
-                editor.on('blur', () => {
-                    this.isFocused = false
+            editor.on('blur', () => {
+                this.isFocused = false
 
-                    if (!isDestroyed) {
-                        this.$wire.commit()
-                    }
-                })
-            }
+                if (isLiveOnBlur && !isDestroyed) {
+                    this.$wire.commit()
+                }
+            })
 
             this.$watch('state', () => {
                 if (isDestroyed) return
@@ -258,23 +256,6 @@ export default function masonComponent({
         toggleSidebar() {
             this.sidebarOpen = ! this.sidebarOpen
             editor.commands.focus()
-            this.editorUpdatedAt = Date.now()
-        },
-        focusEditor(event) {
-            if (event.detail.statePath === this.editor().commands.getStatePath()) {
-                setTimeout(() => this.editor().commands.focus(), 200)
-                this.editorUpdatedAt = Date.now()
-            }
-        },
-        blurEditor() {
-            const tippy = this.$el.querySelectorAll('[data-tippy-content]')
-            this.$el.querySelectorAll('.is-active')?.forEach((item) => item.classList.remove('is-active'))
-
-            if (tippy) {
-                tippy.forEach((item) => item.destroy())
-            }
-
-            this.isFocused = false
             this.editorUpdatedAt = Date.now()
         },
         setEditorSelection(selection) {

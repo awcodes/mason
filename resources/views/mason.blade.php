@@ -34,10 +34,6 @@
             'display-tablet': viewport === 'tablet',
             'display-desktop': viewport === 'desktop'
         }"
-        x-on:click.away="blurEditor()"
-        x-on:focus-editor.window="focusEditor($event)"
-        x-on:dragged-brick.stop="handleBrickDrop($event)"
-        x-on:handle-brick-insert.window="handleBrickInsert($event)"
         x-on:keydown.escape.window="fullscreen = false"
     >
         <x-filament::input.wrapper
