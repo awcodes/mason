@@ -2,17 +2,43 @@
 
 namespace Awcodes\Mason;
 
-use Exception;
 use Filament\Actions\Action;
-use Illuminate\Support\Js;
+use Filament\Support\Icons\Heroicon;
 
-class Brick extends Action
+abstract class Brick
 {
-    /**
-     * @throws Exception
-     */
-    public function getAlpineClickHandler(): ?string
+    abstract public static function getId(): string;
+
+    public static function getLabel(): string
     {
-        return $this->evaluate($this->alpineClickHandler) ?? '$wire.mountFormComponentAction(\'' . $this->component->getStatePath() . '\', \'' . $this->getName() . '\', { ...getEditor().getAttributes(\'' . $this->getName() . '\'), editorSelection }, ' . Js::from(['schemaComponent' => $this->component->getKey()]) . ')';
+        return (string) str(static::getId())
+            ->kebab()
+            ->replace('-', ' ')
+            ->ucwords();
+    }
+
+    public static function getIcon(): string | Heroicon | null
+    {
+        return null;
+    }
+
+    public static function toHtml(array $config, array $data): ?string
+    {
+        return null;
+    }
+
+    public static function getPreviewLabel(array $config): string
+    {
+        return static::getLabel();
+    }
+
+    public static function toPreviewHtml(array $config): ?string
+    {
+        return null;
+    }
+
+    public static function configureBrickAction(Action $action): Action
+    {
+        return $action->modalHidden();
     }
 }

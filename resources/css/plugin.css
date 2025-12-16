@@ -34,8 +34,9 @@
                             }
                         }
 
-                        [data-mason-brick] {
+                        [data-type="brick"] {
                             min-height: 2rem;
+                            position: relative;
 
                             .mason-brick-loader {
                                 @apply animate-spin m-4 h-5 w-5 text-gray-950 dark:text-white;
@@ -58,12 +59,9 @@
                             }
 
                             .mason-brick-controls {
-                                @apply hidden transition absolute p-1 rounded-bl-md items-center bg-gray-700 dark:bg-gray-950;
-                                z-index: 1;
-                                top: 2px;
-                                right: 2px;
+                                @apply hidden transition z-[1] top-0.5 right-0.5 absolute p-2 rounded-bl-md items-center bg-gray-700 dark:bg-gray-950;
 
-                                button {
+                                .mason-icon-btn {
                                     @apply text-white block rounded p-1 hover:text-primary-500 hover:bg-gray-800;
 
                                     svg {
@@ -73,10 +71,6 @@
                                     &:disabled {
                                         @apply opacity-50;
                                     }
-                                }
-
-                                button.no-values {
-                                    @apply hidden;
                                 }
                             }
 
@@ -92,7 +86,7 @@
                                 }
                             }
 
-                            [data-delete-brick-button] {
+                            .mason-delete-brick-btn .mason-icon-btn {
                                 @apply text-danger-400 dark:text-danger-400;
                             }
                         }
@@ -156,13 +150,13 @@
     }
 
     &.fullscreen {
-        @apply fixed inset-0 bg-white dark:bg-gray-900 z-20;
+        @apply fixed inset-0 bg-white dark:bg-gray-900 z-30;
 
         .mason-input-wrapper {
             @apply h-full rounded-none;
 
-            .fi-input-wrp-input {
-                @apply max-h-full;
+            .fi-input-wrp-content-ctn {
+                @apply h-full max-h-full;
             }
         }
 

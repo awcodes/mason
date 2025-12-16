@@ -5,7 +5,7 @@
     $key = $getKey();
     $statePath = $getStatePath();
     $isDisabled = $isDisabled();
-    $actions = collect($getActions())->filter(fn ($action) => $action->getName() !== 'insertBrick')->toArray();
+    $bricks = $getBricks();
 @endphp
 
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
@@ -21,7 +21,9 @@
             livewireId: @js($this->getId()),
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
             statePath: @js($statePath),
-            placeholder: @js($getPlaceholder())
+            placeholder: @js($getPlaceholder()),
+            deleteBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::Trash, alias: \Filament\Forms\View\FormsIconAlias::COMPONENTS_RICH_EDITOR_PANELS_CUSTOM_BLOCK_DELETE_BUTTON)->toHtml()),
+            editBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::PencilSquare, alias: \Filament\Forms\View\FormsIconAlias::COMPONENTS_RICH_EDITOR_PANELS_CUSTOM_BLOCK_EDIT_BUTTON)->toHtml()),
         })"
         id="{{ 'mason-wrapper-' . $statePath }}"
         class="mason-wrapper"
@@ -56,9 +58,9 @@
                 ></div>
             </div>
 
-            @if (! $isDisabled && filled($actions))
-                <div wire:key="sidebar-{{ hash('sha256', json_encode($actions)) }}">
-                    <x-mason::sidebar :actions="$actions" />
+            @if (! $isDisabled && filled($bricks))
+                <div wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}">
+                    <x-mason::sidebar :bricks="$bricks" />
                 </div>
             @endif
         </x-filament::input.wrapper>

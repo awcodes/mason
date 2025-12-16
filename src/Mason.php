@@ -2,6 +2,7 @@
 
 namespace Awcodes\Mason;
 
+use Awcodes\Mason\Actions\BrickAction;
 use Awcodes\Mason\Actions\InsertBrick;
 use Awcodes\Mason\Concerns\HasBricks;
 use Awcodes\Mason\Concerns\HasSidebar;
@@ -47,18 +48,20 @@ class Mason extends Field implements CanBeLengthConstrained
 
             return Helpers::sanitizeBricks($state);
         });
+    }
 
-        $this->registerActions([
-            fn () => InsertBrick::make(),
-            fn () => $this->getBricks(),
-        ]);
+    public function getDefaultActions(): array
+    {
+        return [
+            BrickAction::make(),
+        ];
     }
 
     /**
      * @param  array<EditorCommand>  $commands
-     * @param  array<string, mixed>  $editorSelection
+     * @param  ?array<string, mixed>  $editorSelection
      */
-    public function runCommands(array $commands, array $editorSelection): void
+    public function runCommands(array $commands, ?array $editorSelection = null): void
     {
         $key = $this->getKey();
         $livewire = $this->getLivewire();

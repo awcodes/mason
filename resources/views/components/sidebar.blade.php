@@ -1,5 +1,5 @@
 @props([
-    'actions' => null,
+    'bricks' => [],
 ])
 
 <div class="mason-sidebar">
@@ -84,7 +84,7 @@
         class="mason-actions"
         wire:ignore
         x-data="{
-            actions: @js(array_keys($actions)),
+            actions: @js($bricks),
             search: '',
             filterActions: function() {
                 return this.actions.filter(
@@ -105,27 +105,27 @@
             </x-filament::input.wrapper>
         </div>
         <div class="mason-actions-bricks">
-            @if ($actions)
-                @foreach ($actions as $action)
-                    <div
-                        draggable="true"
-                        x-on:dragstart="$event?.dataTransfer?.setData('brickIdentifier', @js($action['name']))"
-                        class="mason-actions-brick"
-                        x-bind:class="{
-                            'filtered': ! filterActions().includes(@js($action['name'])),
-                        }"
-                    >
-                        @if (filled($action['icon']))
-                            <x-filament::icon
-                                :icon="$action['icon']"
-                                class="h-5 w-5 shrink-0"
-                            />
-                        @endif
+            @foreach ($bricks as $brick)
+                <div
+                    draggable="true"
+                    x-on:dragstart="$event.dataTransfer.setData('brick', @js($brick::getId()))"
+                    class="mason-actions-brick"
+                    x-on:open-modal.window="isLoading = false"
+                    x-on:run-mason-commands.window="isLoading = false"
+                    x-bind:class="{
+                        'filtered': ! filterActions().includes(@js($brick)),
+                    }"
+                >
+                    @if (filled($brick::getIcon()))
+                        <x-filament::icon
+                            :icon="$brick::getIcon()"
+                            class="h-5 w-5 shrink-0"
+                        />
+                    @endif
 
-                        {{ $action['label'] }}
-                    </div>
-                @endforeach
-            @endif
+                    {{ $brick::getLabel() }}
+                </div>
+            @endforeach
         </div>
     </div>
 </div>
