@@ -1,6 +1,6 @@
 <?php
 
-namespace Awcodes\Mason;
+namespace Awcodes\Mason\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -12,7 +12,9 @@ readonly class EditorCommand implements Arrayable
     ) {}
 
     /**
-     * @param  array<mixed>  $arguments
+     * @param string $name
+     * @param array $arguments
+     * @return EditorCommand
      */
     public static function make(string $name, array $arguments = []): static
     {

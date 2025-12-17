@@ -22,8 +22,12 @@
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
             statePath: @js($statePath),
             placeholder: @js($getPlaceholder()),
-            deleteBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::Trash, alias: \Filament\Forms\View\FormsIconAlias::COMPONENTS_RICH_EDITOR_PANELS_CUSTOM_BLOCK_DELETE_BUTTON)->toHtml()),
-            editBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::PencilSquare, alias: \Filament\Forms\View\FormsIconAlias::COMPONENTS_RICH_EDITOR_PANELS_CUSTOM_BLOCK_EDIT_BUTTON)->toHtml()),
+            deleteBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::Trash, alias: 'mason::delete-brick-button')->toHtml()),
+            editBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::PencilSquare, alias: 'mason::edit-brick-button')->toHtml()),
+            insertAboveBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::BarsArrowUp, alias: 'mason::insert-brick-button')->toHtml()),
+            insertBelowBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::BarsArrowDown, alias: 'mason::insert-brick-button')->toHtml()),
+            moveBrickUpButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::ArrowUp, alias: 'mason::move-brick-up-button')->toHtml()),
+            moveBrickDownButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::ArrowDown, alias: 'mason::move-brick-down-button')->toHtml()),
         })"
         id="{{ 'mason-wrapper-' . $statePath }}"
         class="mason-wrapper"
@@ -42,23 +46,30 @@
                 \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
                     ->class([
                         'mason-input-wrapper',
-                        'sidebar-start' => $getSidebarPosition() === \Awcodes\Mason\Enums\SidebarPosition::Start,
+
                     ])
             "
         >
-            <div class="mason-editor-wrapper">
-                <div
-                    class="mason-editor"
-                    x-ref="editor"
-                    wire:ignore
-                ></div>
-            </div>
-
-            @if (! $isDisabled && filled($bricks))
-                <div wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}">
-                    <x-mason::sidebar :bricks="$bricks" />
+            <div
+                @class([
+                    'flex flex-1',
+                    'flex-row-reverse' => $getSidebarPosition() === \Awcodes\Mason\Enums\SidebarPosition::Start,
+                ])
+            >
+                <div class="mason-editor-wrapper">
+                    <div
+                        class="mason-editor"
+                        x-ref="editor"
+                        wire:ignore
+                    ></div>
                 </div>
-            @endif
+
+                @if (! $isDisabled && filled($bricks))
+                    <div wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}">
+                        <x-mason::sidebar :bricks="$bricks" />
+                    </div>
+                @endif
+            </div>
         </x-filament::input.wrapper>
     </div>
 </x-dynamic-component>

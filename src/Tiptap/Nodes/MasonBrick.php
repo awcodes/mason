@@ -4,6 +4,7 @@ namespace Awcodes\Mason\Tiptap\Nodes;
 
 use Awcodes\Mason\Bricks\Section;
 use Tiptap\Core\Node;
+use Tiptap\Utils\HTML;
 
 class MasonBrick extends Node
 {
@@ -19,17 +20,21 @@ class MasonBrick extends Node
     public function addAttributes(): array
     {
         return [
-            'identifier' => [
-                'default' => null,
+            'config' => [
+                'parseHTML' => fn ($DOMNode) => json_decode($DOMNode->getAttribute('data-config')) ?: null,
+                'renderHTML' => fn ($attributes) => ['data-config' => json_encode($attributes->config ?? null)],
             ],
-            'values' => [
-                'default' => [],
+            'id' => [
+                'parseHTML' => fn ($DOMNode) => $DOMNode->getAttribute('data-id') ?: null,
+                'renderHTML' => fn ($attributes) => ['data-id' => $attributes->id ?? null],
             ],
-            'path' => [
-                'default' => null,
+            'label' => [
+                'parseHTML' => fn ($DOMNode) => $DOMNode->getAttribute('data-label') ?: null,
+                'rendered' => false,
             ],
-            'view' => [
-                'default' => null,
+            'preview' => [
+                'parseHTML' => fn ($DOMNode) => base64_decode($DOMNode->getAttribute('data-preview') ?: null),
+                'rendered' => false,
             ],
         ];
     }
@@ -38,47 +43,19 @@ class MasonBrick extends Node
     {
         return [
             [
-                'tag' => 'mason-brick',
-                'getAttrs' => function ($DOMNode) {
-                    return json_decode($DOMNode->nodeValue, associative: true);
-                },
+                'tag' => 'div[data-type="brick"]',
             ],
         ];
     }
 
     public function renderHTML($node, $HTMLAttributes = []): array
     {
-        $data = $HTMLAttributes;
-        $view = null;
-        $brickData = json_decode(json_encode($data), associative: true);
-
-        if ($data) {
-            foreach ($this->getBricks() as $brick) {
-                if ($brick->getName() === $data['identifier']) {
-                    $view = view($data['path'], $brickData['values'])->toHtml();
-                }
-            }
-        }
-
         return [
-            'content' => '<div class="mason-brick">' . $view . '</div>',
+            'div',
+            HTML::mergeAttributes(
+                ['data-type' => self::$name],
+                $HTMLAttributes,
+            ),
         ];
-    }
-
-    public function getBricks(): array
-    {
-        $bricks = $this->options['bricks'] ?? null;
-
-        if (blank($bricks)) {
-            $bricks = [
-                Section::make(),
-            ];
-        }
-
-        return collect($bricks)
-            ->mapWithKeys(function ($brick) {
-                return [$brick->getName() => $brick];
-            })
-            ->all();
     }
 }

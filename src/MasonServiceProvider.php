@@ -3,14 +3,10 @@
 namespace Awcodes\Mason;
 
 use Awcodes\Mason\Commands\MakeBrickCommand;
-use Awcodes\Mason\Livewire\Renderer;
-use Awcodes\Mason\Support\Helpers;
 use Awcodes\Mason\Testing\TestsMason;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
-use Filament\Support\Facades\FilamentView;
-use Filament\View\PanelsRenderHook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Features\SupportTesting\Testable;
@@ -56,17 +52,8 @@ class MasonServiceProvider extends PackageServiceProvider
 
         Blade::directive(
             name: 'mason',
-            handler: fn ($expression) => "<?php echo (new Awcodes\Mason\Support\Converter({$expression}))->toHtml(); ?>"
+            handler: fn ($expression) => "<?php echo (new Awcodes\Mason\Support\MasonRenderer({$expression}))->toHtml(); ?>"
         );
-
-        Livewire::component(name: 'mason.renderer', class: Renderer::class);
-
-        if (! Helpers::isAuthRoute()) {
-            FilamentView::registerRenderHook(
-                name: PanelsRenderHook::BODY_END,
-                hook: fn (): string => Blade::render(string: '@livewire("mason.renderer")')
-            );
-        }
 
         Testable::mixin(new TestsMason);
     }

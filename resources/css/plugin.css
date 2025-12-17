@@ -22,15 +22,7 @@
                            @apply h-0;
 
                             &:first-child {
-                                @apply py-1 px-2 h-auto;
-
-                                &::before {
-                                    @apply text-gray-400 dark:text-gray-600;
-                                    content: attr(data-placeholder);
-                                    float: left;
-                                    height: 0;
-                                    pointer-events: none;
-                                }
+                                @apply py-1 px-2 h-auto before:float-left before:h-0 before:pointer-events-none text-gray-500 dark:text-gray-400 before:content-[attr(data-placeholder)];
                             }
                         }
 
@@ -98,7 +90,6 @@
                 @apply hidden shrink-0 divide-y divide-gray-950/10 max-w-[12rem] md:flex flex-col h-full border-s border-gray-950/10 bg-gray-50 dark:border-white/5 dark:bg-gray-950/20 dark:divide-white/5;
 
                 .mason-controls,
-                .mason-actions-search,
                 .mason-actions-bricks {
                     @apply p-2 gap-2;
                 }
@@ -118,11 +109,19 @@
                 .mason-actions {
                     @apply overflow-hidden flex-1 flex flex-col divide-y divide-gray-950/10 dark:divide-white/5;
 
+                    .mason-actions-search {
+                        @apply p-0;
+
+                        .fi-input-wrp {
+                            @apply ring-0 rounded-none bg-transparent;
+                        }
+                    }
+
                     .mason-actions-bricks {
                         @apply flex-1 overflow-y-auto flex flex-col gap-2;
 
                         .mason-actions-brick {
-                            @apply cursor-move flex items-center gap-2 rounded border text-xs ps-3 pe-4 py-2 bg-white dark:bg-gray-800 dark:border-gray-700;
+                            @apply cursor-move flex items-center gap-2 rounded border text-xs ps-3 pe-4 py-2 bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-700;
 
                             &.filtered {
                                 display: none !important;
@@ -138,7 +137,7 @@
         }
     }
 
-    &.is-focused {
+    &:focus-within {
         .ProseMirror-selectednode {
             outline-offset: -4px;
             outline: var(--mason-primary) solid 4px;

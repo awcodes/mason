@@ -3,7 +3,7 @@
 namespace {{ namespace }};
 
 use Awcodes\Mason\Brick;
-use Awcodes\Mason\EditorCommand;
+use Awcodes\Mason\Support\EditorCommand;
 use Awcodes\Mason\Mason;
 
 class {{ class_name }}

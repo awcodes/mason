@@ -22,6 +22,10 @@ export default function masonComponent({
     liveDebounce,
     deleteBrickButtonIconHtml,
     editBrickButtonIconHtml,
+    insertAboveBrickButtonIconHtml,
+    insertBelowBrickButtonIconHtml,
+    moveBrickUpButtonIconHtml,
+    moveBrickDownButtonIconHtml,
 }) {
     let editor = null
     let eventListeners = []
@@ -199,6 +203,10 @@ export default function masonComponent({
                 MasonBrick.configure({
                     deleteBrickButtonIconHtml,
                     editBrickButtonIconHtml,
+                    insertAboveBrickButtonIconHtml,
+                    insertBelowBrickButtonIconHtml,
+                    moveBrickUpButtonIconHtml,
+                    moveBrickDownButtonIconHtml,
                     editBrickUsing: (id, config) =>
                         this.$wire.mountAction(
                             'handleBrick',
@@ -237,6 +245,7 @@ export default function masonComponent({
 
             return coreExtensions;
         },
+
         toggleFullscreen() {
             this.fullscreen = !this.fullscreen
 
@@ -248,29 +257,25 @@ export default function masonComponent({
 
             this.editorUpdatedAt = Date.now()
         },
+
         toggleViewport(viewport) {
             this.viewport = viewport
 
             this.editorUpdatedAt = Date.now()
         },
+
         toggleSidebar() {
             this.sidebarOpen = ! this.sidebarOpen
             editor.commands.focus()
             this.editorUpdatedAt = Date.now()
         },
+
         setEditorSelection(selection) {
             if (!selection) {
                 return
             }
 
             this.editorSelection = selection
-
-            const { $to } = editor.state.selection
-            const lastPos = (editor.state.doc.content.size - editor.state.doc.lastChild.nodeSize) + 1
-
-            if (($to.nodeBefore && $to.nodeBefore.type.name !== 'paragraph') && lastPos === this.editorSelection.anchor) {
-                editor.commands.insertContentAt(this.editorSelection.anchor, { type: 'paragraph' })
-            }
 
             editor
                 .chain()
@@ -286,7 +291,12 @@ export default function masonComponent({
                 })
                 .run()
         },
+
         runEditorCommands({ commands, editorSelection }) {
+            if (editorSelection?.anchor < 0) {
+                editorSelection.anchor = 0
+            }
+
             this.setEditorSelection(editorSelection)
 
             let commandChain = editor.chain()
@@ -300,6 +310,7 @@ export default function masonComponent({
 
             commandChain.run()
         },
+
         scrollToCurrentBrick: function () {
             this.$nextTick(() => {
                 const currentBrick = this.$el.querySelector('.ProseMirror-selectednode')
@@ -309,6 +320,7 @@ export default function masonComponent({
                 }
             })
         },
+
         destroy() {
             isDestroyed = true
 

@@ -136,12 +136,7 @@ php artisan make:mason-brick Section
 This will create a new brick in the `App\Mason` namespace with the class `Section` and a blade template in the `resources/views/mason` directory. Bricks follow the same conventions as Filament actions. The important things to note are the `fillForm` method and the `action` method. These are how the action interacts with the editor. For bricks that do not have data you can remove the `fillForm` method and the `form` method from the brick and it will be inserted into the editor as is.
 
 ```php
-use Awcodes\Mason\Brick;
-use Awcodes\Mason\EditorCommand;
-use Awcodes\Mason\Mason;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\RichEditor;
+use Awcodes\Mason\Brick;use Awcodes\Mason\Mason;use Awcodes\Mason\Support\EditorCommand;use Filament\Forms\Components\FileUpload;use Filament\Forms\Components\Radio;use Filament\Forms\Components\RichEditor;
 
 class Section
 {

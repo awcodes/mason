@@ -19,14 +19,13 @@ class Faker
         return new self;
     }
 
-    public function brick(string $identifier, string $path, ?array $values = []): static
+    public function brick(string $id, array $config): static
     {
         $this->output['content'][] = [
             'type' => 'masonBrick',
             'attrs' => [
-                'identifier' => $identifier,
-                'path' => $path,
-                'values' => $values,
+                'config' => $config,
+                'id' => $id,
             ],
         ];
 
@@ -35,16 +34,16 @@ class Faker
 
     public function asHtml(): string
     {
-        return (new Converter($this->output))->toHtml();
+        return (new MasonRenderer($this->output))->toHtml();
     }
 
     public function asJson(): array
     {
-        return (new Converter($this->output))->toJson();
+        return (new MasonRenderer($this->output))->toJson();
     }
 
     public function asText(): string
     {
-        return (new Converter($this->output))->toText();
+        return (new MasonRenderer($this->output))->toText();
     }
 }

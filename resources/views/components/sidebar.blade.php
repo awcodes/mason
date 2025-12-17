@@ -2,6 +2,10 @@
     'bricks' => [],
 ])
 
+@php
+    $brickIds = array_map(fn ($brick) => $brick::getLabel(), $bricks);
+@endphp
+
 <div class="mason-sidebar">
     <div class="mason-controls">
         <x-filament::icon-button
@@ -84,7 +88,7 @@
         class="mason-actions"
         wire:ignore
         x-data="{
-            actions: @js($bricks),
+            actions: @js($brickIds),
             search: '',
             filterActions: function() {
                 return this.actions.filter(
@@ -113,7 +117,7 @@
                     x-on:open-modal.window="isLoading = false"
                     x-on:run-mason-commands.window="isLoading = false"
                     x-bind:class="{
-                        'filtered': ! filterActions().includes(@js($brick)),
+                        'filtered': ! filterActions().includes(@js($brick::getLabel())),
                     }"
                 >
                     @if (filled($brick::getIcon()))

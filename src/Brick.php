@@ -4,6 +4,7 @@ namespace Awcodes\Mason;
 
 use Filament\Actions\Action;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Contracts\Support\Htmlable;
 
 abstract class Brick
 {
@@ -17,7 +18,7 @@ abstract class Brick
             ->ucwords();
     }
 
-    public static function getIcon(): string | Heroicon | null
+    public static function getIcon(): string | Heroicon | Htmlable | null
     {
         return null;
     }

@@ -2,8 +2,8 @@
 
 namespace Awcodes\Mason\Actions;
 
-use Awcodes\Mason\EditorCommand;
 use Awcodes\Mason\Mason;
+use Awcodes\Mason\Support\EditorCommand;
 use Filament\Actions\Action;
 use Filament\Support\Enums\Width;
 
