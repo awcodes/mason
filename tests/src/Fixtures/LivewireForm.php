@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason\Tests\Fixtures;
 
 use Awcodes\Mason\Mason;
 use Awcodes\Mason\Tests\Models\Page;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
-class LivewireForm extends Component implements HasForms
+class LivewireForm extends Component implements HasSchemas
 {
-    use InteractsWithForms;
+    use InteractsWithSchemas;
 
     public ?Page $record = null;
 
@@ -24,9 +26,9 @@ class LivewireForm extends Component implements HasForms
         $this->form->fill();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->statePath('data')
             ->model(Page::class)
             ->schema([

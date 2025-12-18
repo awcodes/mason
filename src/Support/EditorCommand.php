@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
@@ -7,15 +9,10 @@ use Illuminate\Contracts\Support\Arrayable;
 readonly class EditorCommand implements Arrayable
 {
     public function __construct(
-        public readonly string $name,
-        public readonly array $arguments = [],
+        public string $name,
+        public array $arguments = [],
     ) {}
 
-    /**
-     * @param string $name
-     * @param array $arguments
-     * @return EditorCommand
-     */
     public static function make(string $name, array $arguments = []): static
     {
         return app(static::class, ['name' => $name, 'arguments' => $arguments]);

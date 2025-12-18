@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Awcodes\Mason\Support\MasonRenderer;
 use Illuminate\Support\Str;
 

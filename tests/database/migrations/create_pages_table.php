@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason\Tests\Database\Migrations;
 
 use Illuminate\Database\Migrations\Migration;

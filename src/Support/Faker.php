@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason\Support;
 
 class Faker
 {
-    protected array $output = [];
-
-    public function __construct()
-    {
-        $this->output = [
-            'type' => 'doc',
-            'content' => [],
-        ];
-    }
+    protected array $output = [
+        'type' => 'doc',
+        'content' => [],
+    ];
 
     public static function make(): self
     {
@@ -39,7 +36,7 @@ class Faker
 
     public function asJson(): array
     {
-        return (new MasonRenderer($this->output))->toJson();
+        return (new MasonRenderer($this->output))->toArray();
     }
 
     public function asText(): string

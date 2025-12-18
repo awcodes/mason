@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason\Tiptap\Nodes;
 
-use Awcodes\Mason\Bricks\Section;
 use Tiptap\Core\Node;
 use Tiptap\Utils\HTML;
 
@@ -21,19 +22,19 @@ class MasonBrick extends Node
     {
         return [
             'config' => [
-                'parseHTML' => fn ($DOMNode) => json_decode($DOMNode->getAttribute('data-config')) ?: null,
-                'renderHTML' => fn ($attributes) => ['data-config' => json_encode($attributes->config ?? null)],
+                'parseHTML' => fn ($DOMNode): mixed => json_decode((string) $DOMNode->getAttribute('data-config')) ?: null,
+                'renderHTML' => fn ($attributes): array => ['data-config' => json_encode($attributes->config ?? null)],
             ],
             'id' => [
                 'parseHTML' => fn ($DOMNode) => $DOMNode->getAttribute('data-id') ?: null,
-                'renderHTML' => fn ($attributes) => ['data-id' => $attributes->id ?? null],
+                'renderHTML' => fn ($attributes): array => ['data-id' => $attributes->id ?? null],
             ],
             'label' => [
                 'parseHTML' => fn ($DOMNode) => $DOMNode->getAttribute('data-label') ?: null,
                 'rendered' => false,
             ],
             'preview' => [
-                'parseHTML' => fn ($DOMNode) => base64_decode($DOMNode->getAttribute('data-preview') ?: null),
+                'parseHTML' => fn ($DOMNode): string => base64_decode((string) $DOMNode->getAttribute('data-preview') ?: ''),
                 'rendered' => false,
             ],
         ];

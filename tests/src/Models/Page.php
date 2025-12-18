@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason\Tests\Models;
 
 use Awcodes\Mason\Tests\Database\Factories\PageFactory;
@@ -10,14 +12,14 @@ class Page extends Model
 {
     use HasFactory;
 
-    protected static function newFactory(): PageFactory
-    {
-        return new PageFactory;
-    }
-
     protected $guarded = [];
 
     protected $casts = [
         'content' => 'array',
     ];
+
+    protected static function newFactory(): PageFactory
+    {
+        return new PageFactory;
+    }
 }

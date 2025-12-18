@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason\Tiptap\Nodes;
 
 use Tiptap\Core\Node;

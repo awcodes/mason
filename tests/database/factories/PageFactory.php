@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason\Tests\Database\Factories;
 
 use Awcodes\Mason\Support\Faker;
@@ -16,9 +18,8 @@ class PageFactory extends Factory
             'title' => $this->faker->sentence(),
             'content' => Faker::make()
                 ->brick(
-                    identifier: 'section',
-                    path: 'mason::bricks.section',
-                    values: [
+                    id: 'section',
+                    config: [
                         'background_color' => 'white',
                         'image' => null,
                         'image_position' => 'start',

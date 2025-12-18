@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // translations for Awcodes/Mason
 return [
     'brick_search_placeholder' => 'Search for bricks...',

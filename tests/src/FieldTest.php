@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Awcodes\Mason\Tests\Fixtures\LivewireForm;
 use Awcodes\Mason\Tests\Models\Page;
 use Livewire\Livewire;

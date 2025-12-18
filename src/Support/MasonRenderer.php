@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason\Support;
 
 use Awcodes\Mason\Concerns\HasBricks;
@@ -52,29 +54,6 @@ class MasonRenderer implements Htmlable
         $this->content = $content;
 
         return $this;
-    }
-
-    protected function processBricks(Editor $editor): void
-    {
-        if (blank($this->bricks)) {
-            return;
-        }
-
-        $editor->descendants(function (object &$node): void {
-            if ($node->type !== 'masonBrick') {
-                return;
-            }
-
-            if (blank($node->attrs->id ?? null)) {
-                return;
-            }
-
-            $nodeConfig = json_decode(json_encode($node->attrs->config ?? []), associative: true);
-
-            $node->type = 'renderedBrick';
-            $node->html = $this->getBrickHtml($node->attrs->id, $nodeConfig);
-            unset($node->attrs->config);
-        });
     }
 
     /**
@@ -140,7 +119,7 @@ class MasonRenderer implements Htmlable
      */
     public function toArray(): array
     {
-        if (empty($this->content)) {
+        if (in_array($this->content, ['', '0', []], true) || $this->content === null) {
             return [];
         }
 
@@ -158,11 +137,35 @@ class MasonRenderer implements Htmlable
         foreach ($this->bricks as $key => $brick) {
             if (is_string($key) && ($key::getId() === $id)) {
                 return $key::toHtml($config, data: value($brick) ?? []);
-            } elseif (is_string($brick) && ($brick::getId() === $id)) {
+            }
+            if (is_string($brick) && ($brick::getId() === $id)) {
                 return $brick::toHtml($config, data: []);
             }
         }
 
         return null;
+    }
+
+    protected function processBricks(Editor $editor): void
+    {
+        if (blank($this->bricks)) {
+            return;
+        }
+
+        $editor->descendants(function (object &$node): void {
+            if ($node->type !== 'masonBrick') {
+                return;
+            }
+
+            if (blank($node->attrs->id ?? null)) {
+                return;
+            }
+
+            $nodeConfig = json_decode(json_encode($node->attrs->config ?? []), associative: true);
+
+            $node->type = 'renderedBrick';
+            $node->html = $this->getBrickHtml($node->attrs->id, $nodeConfig);
+            unset($node->attrs->config);
+        });
     }
 }

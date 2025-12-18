@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Awcodes\Mason;
 
 use Awcodes\Mason\Commands\MakeBrickCommand;
@@ -10,7 +12,6 @@ use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Features\SupportTesting\Testable;
-use Livewire\Livewire;
 use ReflectionException;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -52,7 +53,7 @@ class MasonServiceProvider extends PackageServiceProvider
 
         Blade::directive(
             name: 'mason',
-            handler: fn ($expression) => "<?php echo (new Awcodes\Mason\Support\MasonRenderer({$expression}))->toHtml(); ?>"
+            handler: fn ($expression): string => "<?php echo (new Awcodes\Mason\Support\MasonRenderer({$expression}))->toHtml(); ?>"
         );
 
         Testable::mixin(new TestsMason);

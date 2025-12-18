@@ -3,39 +3,52 @@
 namespace {{ namespace }};
 
 use Awcodes\Mason\Brick;
-use Awcodes\Mason\Support\EditorCommand;
-use Awcodes\Mason\Mason;
+use Filament\Actions\Action;
+use Filament\Support\Icons\Heroicon;
+use Illuminate\Contracts\Support\Htmlable;
 
-class {{ class_name }}
+class {{ class_name }} extends Brick
 {
-    public static function make(): Brick
+    public static function getId(): string
     {
-        return Brick::make('{{ brick_name }}')
-            ->label('{{ brick_label }}')
-            ->modalHeading('{{ brick_label }} Settings')
-            ->icon('heroicon-o-cube-transparent')
-            ->slideOver()
-            ->fillForm(fn (array $arguments): array => [
+        return '{{ brick_name }}';
+    }
+
+    public static function getIcon(): string | Heroicon | Htmlable | null
+    {
+        return Heroicon::OutlinedCube;
+    }
+
+    public static function getLabel(): string
+    {
+        return parent::getLabel();
+    }
+
+    public static function getPreviewLabel(array $config): string
+    {
+        return static::getLabel();
+    }
+
+    public static function toPreviewHtml(array $config): ?string
+    {
+        return view('{{ preview_path }}', [
+           'config' => $config,
+       ]);
+    }
+
+    public static function toHtml(array $config, array $data): ?string
+    {
+        return view('{{ html_path }}', [
+            'config' => $config,
+            'data' => $data,
+        ]);
+    }
+
+    public static function configureBrickAction(Action $action): Action
+    {
+        return $action
+            ->schema([
                 //
-            ])
-            ->form([
-                //
-            ])
-            ->action(function (array $arguments, array $data, Mason $component) {
-                $component->runCommands(
-                    [
-                        new EditorCommand(
-                            name: 'setBrick',
-                            arguments: [[
-                                'identifier' => '{{ brick_name }}',
-                                'values' => $data,
-                                'path' => '{{ path }}',
-                                'view' => view('{{ path }}', $data)->toHtml(),
-                            ]],
-                        ),
-                    ],
-                    editorSelection: $arguments['editorSelection'],
-                );
-            });
+            ]);
     }
 }
