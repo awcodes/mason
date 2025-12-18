@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Awcodes\Mason;
 
 use Awcodes\Mason\Commands\MakeBrickCommand;
+use Awcodes\Mason\Commands\UpgradeBricksCommand;
 use Awcodes\Mason\Testing\TestsMason;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
@@ -28,6 +29,7 @@ class MasonServiceProvider extends PackageServiceProvider
             ->hasTranslations()
             ->hasCommands([
                 MakeBrickCommand::class,
+                UpgradeBricksCommand::class,
             ]);
     }
 

@@ -15,6 +15,10 @@ A simple block based drag and drop page / document builder field for Filament.
 | 0.x             | 3.x              |
 | 1.x             | 4.x              |
 
+## Upgrading
+
+Please see the [UPGRADE](UPGRADE.md) guide for instructions on upgrading from 0.x to 1.x as there are breaking changes.
+
 ## Installation
 
 You can install the package via composer:
