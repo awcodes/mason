@@ -49,6 +49,9 @@ class Mason extends Field implements CanBeLengthConstrained
                     $brick = $this->getBrick($node->attrs->id);
 
                     if (blank($brick)) {
+                        $node->attrs->label = 'Unknown Brick';
+                        $node->attrs->preview = base64_encode(view('mason::components.unregistered-brick', ['label' => $node->attrs->id])->render());
+
                         return;
                     }
 
