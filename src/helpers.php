@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Awcodes\Mason\Support\MasonRenderer;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Support\Htmlable;
 
 if (! function_exists(function: 'mason')) {
     function mason(string | array | stdClass | null $content, ?array $bricks = []): MasonRenderer
@@ -13,7 +14,7 @@ if (! function_exists(function: 'mason')) {
 }
 
 if (! function_exists(function: 'sanitize_livewire')) {
-    function sanitize_livewire(string $html): string
+    function sanitize_livewire(string | Htmlable $html): string | Htmlable
     {
         return Str::of($html)
             ->pipe(fn ($html) => $html->replaceMatches('/wire:ignore/', ''))
@@ -26,9 +27,11 @@ if (! function_exists(function: 'sanitize_livewire')) {
             ->pipe(fn ($html) => $html->replaceMatches('/wire:submit=".*?"/', ''))
             ->pipe(fn ($html) => $html->replaceMatches('/wire:model=".*?"/', ''))
             ->pipe(fn ($html) => $html->replace("\n", ''))
+            ->pipe(fn ($html) => $html->replace('type="submit"', ''))
             ->pipe(fn ($html) => $html->replace('<!--[if BLOCK]><![endif]-->', ''))
             ->pipe(fn ($html) => $html->replace('<!--[if ENDBLOCK]><![endif]-->', ''))
-            ->pipe(fn ($html) => $html->replace('form', 'div'))
+            ->pipe(fn ($html) => $html->replace('<form', '<div'))
+            ->pipe(fn ($html) => $html->replace('form>', 'div>'))
             ->squish()
             ->toHtmlString();
     }
