@@ -20,6 +20,7 @@ export default function masonComponent({
     isLiveDebounced,
     isLiveOnBlur,
     liveDebounce,
+    dblClickToEdit,
     deleteBrickButtonIconHtml,
     editBrickButtonIconHtml,
     insertAboveBrickButtonIconHtml,
@@ -207,6 +208,7 @@ export default function masonComponent({
                     insertBelowBrickButtonIconHtml,
                     moveBrickUpButtonIconHtml,
                     moveBrickDownButtonIconHtml,
+                    dblClickToEdit,
                     editBrickUsing: (id, config) =>
                         this.$wire.mountAction(
                             'handleBrick',

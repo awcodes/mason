@@ -78,7 +78,8 @@ use Awcodes\Mason\Bricks\Section;
             Section::class,
         ])
         // optional
-        ->placeholder('Drag and drop bricks to get started...'),
+        ->placeholder('Drag and drop bricks to get started...')
+        ->doubleClickToEdit(),
 ])
 ```
 

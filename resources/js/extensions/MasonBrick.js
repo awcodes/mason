@@ -28,6 +28,7 @@ export default Node.create({
             insertBelowBrickButtonIconHtml: null,
             moveBrickUpButtonIconHtml: null,
             moveBrickDownButtonIconHtml: null,
+            dblClickToEdit: false,
             editBrickUsing: () => {},
             insertBrickUsing: () => {},
         }
@@ -224,8 +225,6 @@ export default Node.create({
                 deleteButtonContainer.appendChild(deleteButton)
             }
 
-            /* TODO: Re-implement insert, move up, move down. */
-
             if (node.attrs.preview) {
                 const preview = document.createElement('div')
                 preview.className = 'mason-brick-rendered'
@@ -239,7 +238,8 @@ export default Node.create({
                     editor.isEditable &&
                     typeof node.attrs.config === 'object' &&
                     node.attrs.config !== null &&
-                    Object.keys(node.attrs.config).length > 0
+                    Object.keys(node.attrs.config).length > 0 &&
+                    extension.options.dblClickToEdit
                 ) {
                     preview.addEventListener('dblclick', () =>
                         extension.options.editBrickUsing(

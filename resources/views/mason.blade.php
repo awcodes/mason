@@ -1,5 +1,7 @@
 @php
     use Filament\Support\Facades\FilamentView;
+    use Filament\Support\Icons\Heroicon;
+    use function Filament\Support\generate_icon_html;
 
     $id = $getId();
     $key = $getKey();
@@ -22,12 +24,13 @@
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
             statePath: @js($statePath),
             placeholder: @js($getPlaceholder()),
-            deleteBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::Trash, alias: 'mason::delete-brick-button')->toHtml()),
-            editBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::PencilSquare, alias: 'mason::edit-brick-button')->toHtml()),
-            insertAboveBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::BarsArrowUp, alias: 'mason::insert-brick-button')->toHtml()),
-            insertBelowBrickButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::BarsArrowDown, alias: 'mason::insert-brick-button')->toHtml()),
-            moveBrickUpButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::ArrowUp, alias: 'mason::move-brick-up-button')->toHtml()),
-            moveBrickDownButtonIconHtml: @js(\Filament\Support\generate_icon_html(\Filament\Support\Icons\Heroicon::ArrowDown, alias: 'mason::move-brick-down-button')->toHtml()),
+            dblClickToEdit: @js($shouldDblClickToEdit()),
+            deleteBrickButtonIconHtml: @js(generate_icon_html(Heroicon::Trash, alias: 'mason::delete-brick-button')->toHtml()),
+            editBrickButtonIconHtml: @js(generate_icon_html(Heroicon::PencilSquare, alias: 'mason::edit-brick-button')->toHtml()),
+            insertAboveBrickButtonIconHtml: @js(generate_icon_html(Heroicon::BarsArrowUp, alias: 'mason::insert-brick-button')->toHtml()),
+            insertBelowBrickButtonIconHtml: @js(generate_icon_html(Heroicon::BarsArrowDown, alias: 'mason::insert-brick-button')->toHtml()),
+            moveBrickUpButtonIconHtml: @js(generate_icon_html(Heroicon::ArrowUp, alias: 'mason::move-brick-up-button')->toHtml()),
+            moveBrickDownButtonIconHtml: @js(generate_icon_html(Heroicon::ArrowDown, alias: 'mason::move-brick-down-button')->toHtml()),
         })"
         id="{{ 'mason-wrapper-' . $statePath }}"
         class="mason-wrapper"

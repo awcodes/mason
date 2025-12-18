@@ -31,6 +31,8 @@ class Mason extends Field implements CanBeLengthConstrained
 
     protected bool | Closure | null $isJson = null;
 
+    protected bool | Closure | null $shouldDblClickToEdit = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -116,5 +118,17 @@ class Mason extends Field implements CanBeLengthConstrained
     public function getTiptapEditor(): Editor
     {
         return MasonRenderer::make()->getEditor();
+    }
+
+    public function doubleClickToEdit(bool | Closure $condition = true): static
+    {
+        $this->shouldDblClickToEdit = $condition;
+
+        return $this;
+    }
+
+    public function shouldDblClickToEdit(): bool
+    {
+        return $this->evaluate($this->shouldDblClickToEdit) ?? false;
     }
 }
