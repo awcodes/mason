@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Awcodes\Mason\Support\MasonRenderer;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Str;
 
 if (! function_exists(function: 'mason')) {
     function mason(string | array | stdClass | null $content, ?array $bricks = []): MasonRenderer
