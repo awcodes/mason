@@ -64,6 +64,9 @@ return [
 > [!IMPORTANT]
 > Since Mason uses json to store its data in the database you will need to make sure your model's field is cast to 'array' or 'json'.
 
+> [!WARNING]
+> Due to an issue with Livewire and full page components, at the moment any Bricks that have Livewire components rendered in a blade view will not work properly inside the editor when loading a resource for editing. The only workaround at the moment is to have a dedicated preview blade that does not use either the `@livewire` or `<livewire:` directives. This only affects the editor view. The front end rendering will work as expected.
+
 ### Form Field
 
 In your Filament forms you should use the `Mason` component. The `Mason` component accepts a `name` prop which should be the name of the field in your model, and requires an array of actions that make up the 'bricks' available to the editor.
