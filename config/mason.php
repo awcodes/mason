@@ -13,4 +13,19 @@ return [
     'entry' => [
         'layout' => 'mason::iframe-entry', // Set to your layout view path, e.g., 'layouts.entry'
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Guard
+    |--------------------------------------------------------------------------
+    |
+    | This option controls which authentication guard Mason routes will use.
+    | If set to null, the default guard from auth.php will be used.
+    | This is useful when using Mason with Filament admin panels that use
+    | custom guards like 'admin', 'web', 'sanctum', etc.
+    |
+    | Example: 'admin' for Filament admin panel
+    |
+    */
+    'guard' => null,
 ];
