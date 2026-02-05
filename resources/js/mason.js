@@ -18,6 +18,7 @@ export default function masonComponent({
         state: state,
         statePath: statePath,
         fullscreen: false,
+        isFocused: false,
         viewport: 'desktop',
         sidebarOpen: true,
         colorMode: hasColorModeToggle
