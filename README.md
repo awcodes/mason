@@ -16,6 +16,8 @@ A simple block-based drag and drop page / document builder field for Filament.
 | 2.x             | 5.x              |
 | 3.x             | 4.x, 5.x         |
 
+<!-- [docs_start] -->
+
 ## Installation
 
 You can install the package via composer:
@@ -451,6 +453,8 @@ Faker::make()
     )
     ->asJson(),
 ```
+
+<!-- [docs_end] -->
 
 ## Testing
 
