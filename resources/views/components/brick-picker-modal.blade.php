@@ -3,7 +3,7 @@
 ])
 
 @php
-    $brickIds = array_map(fn ($brick) => $brick::getLabel(), $bricks);
+    $brickData = array_map(fn ($brick) => ['label' => $brick::getLabel(), 'tags' => $brick::getTags()], $bricks);
 @endphp
 
 <div
@@ -29,12 +29,16 @@
         x-transition:leave-end="scale-95 opacity-0"
         class="mason-brick-picker-modal"
         x-data="{
-            actions: @js($brickIds),
+            actions: @js($brickData),
             search: '',
             filterActions: function () {
-                return this.actions.filter((name) =>
-                    name.toLowerCase().includes(this.search.toLowerCase()),
-                )
+                const q = this.search.toLowerCase()
+                return this.actions
+                    .filter((brick) =>
+                        brick.label.toLowerCase().includes(q) ||
+                        brick.tags.some((tag) => tag.toLowerCase().includes(q)),
+                    )
+                    .map((brick) => brick.label)
             },
         }"
     >

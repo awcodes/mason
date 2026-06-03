@@ -34,6 +34,16 @@ describe('Brick', function () {
         });
     });
 
+    describe('getTags()', function () {
+        it('returns defined tags', function () {
+            expect(TestBrick::getTags())->toBe(['hero', 'banner', 'marketing']);
+        });
+
+        it('returns empty array when not overridden', function () {
+            expect(SimpleBrick::getTags())->toBe([]);
+        });
+    });
+
     describe('toHtml()', function () {
         it('renders HTML with config', function () {
             $html = TestBrick::toHtml(['title' => 'My Title', 'content' => 'My Content']);
