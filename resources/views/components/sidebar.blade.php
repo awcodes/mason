@@ -60,11 +60,11 @@
                     @if (filled($brick::getIcon()))
                         <x-filament::icon
                             :icon="$brick::getIcon()"
-                            class="h-5 w-5 shrink-0"
+                            class="h-5 w-5 shrink-0 mason-actions-brick-icon"
                         />
                     @endif
 
-                    {{ $brick::getLabel() }}
+                    <span class="mason-actions-brick-label">{{ $brick::getLabel() }}</span>
                 </div>
             @endforeach
         </div>
