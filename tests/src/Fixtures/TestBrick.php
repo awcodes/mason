@@ -20,6 +20,11 @@ class TestBrick extends Brick
         return 'heroicon-o-star';
     }
 
+    public static function getTags(): array
+    {
+        return ['hero', 'banner', 'marketing'];
+    }
+
     public static function toHtml(array $config, ?array $data = null): ?string
     {
         $title = $config['title'] ?? '';

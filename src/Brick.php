@@ -25,6 +25,14 @@ abstract class Brick
         return null;
     }
 
+    /**
+     * @return array<string>
+     */
+    public static function getTags(): array
+    {
+        return [];
+    }
+
     public static function toHtml(array $config, ?array $data = null): ?string
     {
         return null;
