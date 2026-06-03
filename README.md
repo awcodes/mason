@@ -282,6 +282,31 @@ Mason::make('content')
     ->bricks([...])
 ```
 
+### Grouping Bricks
+
+Bricks can be organized into labeled groups in the editor sidebar by wrapping them in a `BrickGroup`. Groups are collapsible, and searching by brick name or tag will automatically expand any group that contains a match.
+
+```php
+use Awcodes\Mason\BrickGroup;
+
+Mason::make('content')
+    ->bricks([
+        BrickGroup::make('Content')
+            ->bricks([
+                Section::class,
+                Grid::class,
+            ]),
+        BrickGroup::make('Marketing')
+            ->bricks([
+                Hero::class,
+                CallToAction::class,
+            ]),
+        LeadForm::class, // standalone bricks can sit alongside groups
+    ])
+```
+
+Groups and standalone bricks can be freely mixed in the same `bricks` array. `sortBricks()` applies to the top-level array and will sort groups alongside standalone bricks by their respective labels.
+
 ### Sorting Bricks
 
 By default, bricks are sorted in the order they are defined in the `bricks` array. If you would like to allow users to sort the bricks in the editor, you can chain the `sortBricks` method on the field.
