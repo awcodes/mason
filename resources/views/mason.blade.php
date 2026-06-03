@@ -8,6 +8,7 @@
     $statePath = $getStatePath();
     $isDisabled = $isDisabled();
     $bricks = $getBricks();
+    $flatBricks = $getFlatBricks();
     $defaultColorMode = $getDefaultColorMode();
     $hasColorModeToggle = $hasColorModeToggle();
 @endphp
@@ -28,7 +29,7 @@
                     placeholder: @js($getPlaceholder()),
                     disabled: @js($isDisabled),
                     dblClickToEdit: @js($shouldDblClickToEdit()),
-                    bricks: @js(array_map(fn ($brick) => is_string($brick) ? $brick : get_class($brick), $bricks)),
+                    bricks: @js($flatBricks),
                     previewLayout: @js($getPreviewLayout()),
                     defaultColorMode: @js($defaultColorMode),
                     hasColorModeToggle: @js($hasColorModeToggle),
@@ -90,7 +91,7 @@
                         :bricks="$bricks"
                         :has-grid-actions="$hasGridActions()"
                         :has-color-mode-toggle="$hasColorModeToggle"
-                        wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}"
+                        wire:key="sidebar-{{ hash('sha256', json_encode($flatBricks)) }}"
                     />
                 @endif
             </div>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Awcodes\Mason\Concerns;
 
 use Awcodes\Mason\Brick;
+use Awcodes\Mason\BrickGroup;
 use Awcodes\Mason\Bricks\Section;
 use Closure;
 
@@ -20,7 +21,7 @@ trait HasBricks
     protected array $cachedBricks;
 
     /**
-     * @param  array<class-string<Brick>> | Closure | null  $bricks
+     * @param  array<class-string<Brick>|BrickGroup> | Closure | null  $bricks
      */
     public function bricks(array | Closure | null $bricks): static
     {
@@ -42,7 +43,7 @@ trait HasBricks
     }
 
     /**
-     * @return array<class-string<Brick>>
+     * @return array<class-string<Brick>|BrickGroup>
      */
     public function getBricks(): array
     {
@@ -53,13 +54,40 @@ trait HasBricks
         if ($this->bricksSortDirection !== null) {
             usort(
                 $bricks,
-                fn ($a, $b): int => $this->bricksSortDirection === 'asc'
-                ? $a::getLabel() <=> $b::getLabel()
-                : $b::getLabel() <=> $a::getLabel()
+                function ($a, $b): int {
+                    $labelA = $a instanceof BrickGroup ? $a->getLabel() : $a::getLabel();
+                    $labelB = $b instanceof BrickGroup ? $b->getLabel() : $b::getLabel();
+
+                    return $this->bricksSortDirection === 'asc'
+                        ? $labelA <=> $labelB
+                        : $labelB <=> $labelA;
+                }
             );
         }
 
         return $bricks;
+    }
+
+    /**
+     * Returns a flat array of brick class names, unwrapping any BrickGroups.
+     *
+     * @return array<class-string<Brick>>
+     */
+    public function getFlatBricks(): array
+    {
+        $flat = [];
+
+        foreach ($this->getBricks() as $item) {
+            if ($item instanceof BrickGroup) {
+                foreach ($item->getBricks() as $brick) {
+                    $flat[] = $brick;
+                }
+            } else {
+                $flat[] = $item;
+            }
+        }
+
+        return $flat;
     }
 
     /**
@@ -71,8 +99,14 @@ trait HasBricks
             return $this->cachedBricks;
         }
 
-        foreach ($this->getBricks() as $brick) {
-            $this->cachedBricks[$brick::getId()] = $brick;
+        foreach ($this->getBricks() as $item) {
+            if ($item instanceof BrickGroup) {
+                foreach ($item->getBricks() as $brick) {
+                    $this->cachedBricks[$brick::getId()] = $brick;
+                }
+            } else {
+                $this->cachedBricks[$item::getId()] = $item;
+            }
         }
 
         return $this->cachedBricks;

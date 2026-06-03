@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Awcodes\Mason\BrickGroup;
 use Awcodes\Mason\Bricks\Section;
 use Awcodes\Mason\Mason;
 use Awcodes\Mason\Support\MasonRenderer;
@@ -108,6 +109,63 @@ describe('HasBricks trait', function () {
                 ->sortBricks();
 
             expect($field->getBricksSortDirection())->toBe('asc');
+        });
+
+        it('accepts BrickGroup instances alongside brick classes', function () {
+            $group = BrickGroup::make('Content')->bricks([Section::class]);
+
+            $field = Mason::make('content')
+                ->bricks([$group, TestBrick::class]);
+
+            $bricks = $field->getBricks();
+
+            expect($bricks[0])->toBeInstanceOf(BrickGroup::class)
+                ->and($bricks[1])->toBe(TestBrick::class);
+        });
+
+        it('caches bricks from groups by id', function () {
+            $group = BrickGroup::make('Content')->bricks([Section::class, TestBrick::class]);
+
+            $field = Mason::make('content')
+                ->bricks([$group, SimpleBrick::class]);
+
+            $cached = $field->getCachedBricks();
+
+            expect($cached)->toHaveKey('section')
+                ->and($cached)->toHaveKey('test-brick')
+                ->and($cached)->toHaveKey('simple-brick');
+        });
+
+        it('retrieves brick by id when brick is inside a group', function () {
+            $group = BrickGroup::make('Content')->bricks([Section::class]);
+
+            $field = Mason::make('content')
+                ->bricks([$group]);
+
+            expect($field->getBrick('section'))->toBe(Section::class);
+        });
+
+        it('returns flat bricks without groups', function () {
+            $group = BrickGroup::make('Content')->bricks([Section::class, TestBrick::class]);
+
+            $field = Mason::make('content')
+                ->bricks([$group, SimpleBrick::class]);
+
+            expect($field->getFlatBricks())->toBe([Section::class, TestBrick::class, SimpleBrick::class]);
+        });
+
+        it('sorts groups alongside standalone bricks by label', function () {
+            $group = BrickGroup::make('Alpha')->bricks([Section::class]);
+
+            $field = Mason::make('content')
+                ->bricks([$group, TestBrick::class])
+                ->sortBricks('asc');
+
+            $bricks = $field->getBricks();
+
+            expect($bricks[0])->toBeInstanceOf(BrickGroup::class)
+                ->and($bricks[0]->getLabel())->toBe('Alpha')
+                ->and($bricks[1])->toBe(TestBrick::class);
         });
     });
 
