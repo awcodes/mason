@@ -71,12 +71,11 @@
                 ])
             >
                 <div
-                    class="mason-editor-wrapper"
                     wire:key="{{ "mason-editor-" . $statePath }}"
                     wire:ignore
                     {{
                         \Filament\Support\prepare_inherited_attributes($getExtraInputAttributeBag())->class([
-                            "mason-input-wrapper",
+                            "mason-editor-wrapper",
                         ])
                     }}
                 >
