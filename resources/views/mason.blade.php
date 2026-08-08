@@ -71,18 +71,19 @@
                 ])
             >
                 <div
-                    class="mason-editor-wrapper"
+                    wire:key="{{ "mason-editor-" . $statePath }}"
+                    wire:ignore
                     {{
                         \Filament\Support\prepare_inherited_attributes($getExtraInputAttributeBag())->class([
-                            "mason-input-wrapper",
+                            "mason-editor-wrapper",
                         ])
                     }}
                 >
                     <iframe
                         x-ref="previewIframe"
+                        x-init="initPreviewIframe($el)"
                         name="{{ "mason-preview-iframe-" . $statePath }}"
                         class="mason-iframe"
-                        wire:ignore
                     ></iframe>
                 </div>
 

@@ -38,42 +38,6 @@ export default function masonComponent({
         isUndoRedoOperation: false,
 
         async init() {
-            // Wait for iframe to load
-            this.$nextTick(() => {
-                iframe = this.$refs.previewIframe
-
-                if (iframe) {
-                    // Load initial content via form submission
-                    this.updatePreview()
-
-                    iframe.addEventListener('load', () => {
-                        // Restore scroll position after iframe loads
-                        this.restoreScrollPosition()
-
-                        // Send postMessage once the iframe is loaded with config
-                        this.sendMessageToIframe({
-                            type: 'setContent',
-                            blocks: this.getBlocksFromState(),
-                            dblClickToEdit: dblClickToEdit,
-                            disabled: disabled,
-                        })
-
-                        // Send initial color mode to iframe
-                        this.sendMessageToIframe({
-                            type: 'setColorMode',
-                            mode: this.colorMode,
-                        })
-
-                        // Update move buttons after iframe loads
-                        setTimeout(() => {
-                            this.sendMessageToIframe({
-                                type: 'updateMoveButtons',
-                            })
-                        }, 100)
-                    })
-                }
-            })
-
             // Listen for messages from iframe
             const messageHandler = (event) => {
                 // Security: verify origin if needed
@@ -188,6 +152,47 @@ export default function masonComponent({
 
             // Handle drag and drop from the sidebar
             this.setupDragAndDrop()
+        },
+
+        // Called from x-init on the iframe itself, so that if the element is ever
+        // replaced (browser extensions injecting nodes can defeat Livewire's morph
+        // matching) the new element is bound instead of leaving a stale reference.
+        initPreviewIframe(el) {
+            if (isDestroyed || !el || el._masonPreviewBound) {
+                return
+            }
+
+            el._masonPreviewBound = true
+            iframe = el
+
+            el.addEventListener('load', () => {
+                // Restore scroll position after iframe loads
+                this.restoreScrollPosition()
+
+                // Send postMessage once the iframe is loaded with config
+                this.sendMessageToIframe({
+                    type: 'setContent',
+                    blocks: this.getBlocksFromState(),
+                    dblClickToEdit: dblClickToEdit,
+                    disabled: disabled,
+                })
+
+                // Send initial color mode to iframe
+                this.sendMessageToIframe({
+                    type: 'setColorMode',
+                    mode: this.colorMode,
+                })
+
+                // Update move buttons after iframe loads
+                setTimeout(() => {
+                    this.sendMessageToIframe({
+                        type: 'updateMoveButtons',
+                    })
+                }, 100)
+            })
+
+            // Load initial content via form submission
+            this.$nextTick(() => this.updatePreview())
         },
 
         getBlocksFromState() {
@@ -496,6 +501,10 @@ export default function masonComponent({
         },
 
         updatePreview() {
+            if (!iframe) {
+                return
+            }
+
             // Save scroll position before updating
             this.saveScrollPosition()
 
@@ -652,6 +661,11 @@ export default function masonComponent({
                 window.removeEventListener(eventName, handler)
             })
             eventListeners = []
+
+            if (iframe) {
+                // Allow a future init to rebind if the element outlives this component
+                delete iframe._masonPreviewBound
+            }
 
             iframe = null
         },
