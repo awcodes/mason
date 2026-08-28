@@ -1,0 +1,22 @@
+version: 1
+
+title: Mason
+
+navigation:
+  - index
+  - installation
+  - configuration
+
+  - label: Fields
+    children:
+      - fields/form
+      - fields/entry
+      - fields/customizing
+
+  - label: Bricks
+    children:
+      - bricks/creating
+      - bricks/organizing
+      - bricks/rendering
+
+  - faker
