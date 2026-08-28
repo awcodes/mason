@@ -84,7 +84,7 @@ By default, Mason uses the `web` and `auth` middleware for its routes internally
 
 ### Form Field
 
-In your Filament forms you should use the `Mason` component. The `Mason` component accepts a `name` prop which should be the name of the field in your model, and requires an array 'bricks' available to the editor.
+In your Filament forms you should use the `Mason` component. The `Mason` component accepts a `name` prop which should be the name of the field in your model, and takes an array of 'bricks' to make available to the editor. If you omit `bricks`, Mason falls back to its built-in `Section` brick.
 
 ```php
 use Awcodes\Mason\Mason;
@@ -163,7 +163,7 @@ Mason::make('content')
 
 ### Infolist Entry
 
-In your Filament infolists you should use the `MasonEntry` component. The `MasonEntry` component accepts a `name` prop which should be the name of the field in your model, and requires an array of 'bricks' available to the entry.
+In your Filament infolists you should use the `MasonEntry` component. The `MasonEntry` component accepts a `name` prop which should be the name of the field in your model, and takes an array of 'bricks' to make available to the entry. As with the field, omitting `bricks` falls back to the built-in `Section` brick.
 
 ```php
 use Awcodes\Mason\MasonEntry;
