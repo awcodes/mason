@@ -56,7 +56,10 @@ class MasonServiceProvider extends PackageServiceProvider
 
         Blade::directive(
             name: 'mason',
-            handler: fn ($expression): string => "<?php echo (new Awcodes\Mason\Support\MasonRenderer({$expression}))->toHtml(); ?>"
+            // Compiles to the mason() helper rather than the constructor: the
+            // constructor takes only $content, so @mason($content, $bricks)
+            // silently discarded the brick list and rendered nothing for it.
+            handler: fn ($expression): string => "<?php echo mason({$expression})->toHtml(); ?>"
         );
 
         Blade::directive(

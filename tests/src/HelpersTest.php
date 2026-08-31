@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use Awcodes\Mason\Bricks\Section;
 use Awcodes\Mason\Support\MasonRenderer;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
+use Illuminate\Support\Facades\Blade;
 
 describe('mason() helper function', function () {
     it('returns MasonRenderer instance', function () {
@@ -67,6 +69,10 @@ describe('mason() helper function', function () {
             ->and($text)->not->toContain('<');
     });
 
+    it('falls back to the default brick list when none is given', function () {
+        expect(mason([])->getBricks())->toBe([Section::class]);
+    });
+
     it('accepts content with wrapper', function () {
         $content = [
             'content' => [
@@ -77,5 +83,34 @@ describe('mason() helper function', function () {
 
         expect($renderer)->toBeInstanceOf(MasonRenderer::class)
             ->and($renderer->toArray())->toHaveCount(1);
+    });
+});
+
+describe('@mason directive', function () {
+    $doc = fn (string $id) => [
+        'type' => 'doc',
+        'content' => [
+            ['type' => 'masonBrick', 'attrs' => ['id' => $id, 'config' => ['title' => 'Hello']]],
+        ],
+    ];
+
+    it('renders a brick from the list passed as a second argument', function () use ($doc) {
+        $html = Blade::render(
+            '@mason($content, $bricks)',
+            ['content' => $doc('test-brick'), 'bricks' => [TestBrick::class]],
+        );
+
+        expect($html)->toContain('Hello');
+    });
+
+    it('still renders the default brick list when given content alone', function () {
+        $html = Blade::render(
+            '@mason($content)',
+            ['content' => ['type' => 'doc', 'content' => [
+                ['type' => 'masonBrick', 'attrs' => ['id' => 'section', 'config' => []]],
+            ]]],
+        );
+
+        expect($html)->not->toBeEmpty();
     });
 });

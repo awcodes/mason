@@ -159,7 +159,13 @@ To help with this migration, a new command has been added to the package:
 php artisan mason:upgrade-bricks
 ```
 
-This command will prompt you for the table and column you wish to update and will recursively find and update all Mason bricks in that column.
+This command will prompt you for the table and column you wish to update and will recursively find and update all Mason bricks in that column. You can pass them directly instead:
+
+```bash
+php artisan mason:upgrade-bricks --table=posts --column=content
+```
+
+The command is still shipped, and still converts the 0.x schema to the one the renderer reads — that shape has not changed since 1.0, so it remains the right tool whether you are upgrading to 1.x or straight to a later major.
 
 
 ## Dependency Updates

@@ -17,7 +17,7 @@ class UpgradeBricksCommand extends Command
 {
     public $signature = 'mason:upgrade-bricks {--table=} {--column=}';
 
-    public $description = 'Upgrade Mason brick schema from 0.x to 1.x';
+    public $description = 'Convert stored bricks from the legacy 0.x schema to the current one';
 
     public function handle(): int
     {
