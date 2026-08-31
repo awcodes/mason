@@ -106,14 +106,17 @@ class MasonRenderer implements Htmlable
      */
     public function getBrickHtml(string $id, array $config): string
     {
-        foreach ($this->getBricks() as $brick) {
-            if (is_string($brick) && ($brick::getId() === $id)) {
-                return $brick::toHtml($config, data: []);
-            }
+        // getBrick() resolves through getCachedBricks(), which unwraps BrickGroups.
+        // Walking getBricks() directly and filtering on is_string() skipped every
+        // brick registered inside a group, so grouped bricks rendered as nothing.
+        $brick = $this->getBrick($id);
+
+        if ($brick === null) {
+            // Missing bricks are silently ignored when rendering content directly
+            return '';
         }
 
-        // Missing bricks are silently ignored when rendering content directly
-        return '';
+        return $brick::toHtml($config, data: []);
     }
 
     /**

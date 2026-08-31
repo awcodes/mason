@@ -189,5 +189,58 @@ describe('HasBricks trait', function () {
 
             expect($renderer->getBrick('test-brick'))->toBe(TestBrick::class);
         });
+
+        it('gets a brick registered inside a BrickGroup', function () {
+            $renderer = MasonRenderer::make([])
+                ->bricks([BrickGroup::make('Content')->bricks([TestBrick::class])]);
+
+            expect($renderer->getBrick('test-brick'))->toBe(TestBrick::class);
+        });
+
+        it('returns null for an unknown brick rather than erroring on an empty list', function () {
+            $renderer = MasonRenderer::make([])->bricks([]);
+
+            expect($renderer->getBrick('test-brick'))->toBeNull();
+        });
+
+        it('caches an empty brick list instead of leaving the property uninitialised', function () {
+            $renderer = MasonRenderer::make([])->bricks([]);
+
+            expect($renderer->getCachedBricks())->toBe([])
+                ->and($renderer->getCachedBricks())->toBe([]);
+        });
+    });
+
+    describe('rendering', function () {
+        $doc = fn (string $id) => [
+            'type' => 'doc',
+            'content' => [
+                ['type' => 'masonBrick', 'attrs' => ['id' => $id, 'config' => []]],
+            ],
+        ];
+
+        it('renders a brick registered as a bare class', function () use ($doc) {
+            $html = MasonRenderer::make($doc('test-brick'))
+                ->bricks([TestBrick::class])
+                ->toUnsafeHtml();
+
+            expect($html)->toContain('test-brick');
+        });
+
+        it('renders a brick registered inside a BrickGroup', function () use ($doc) {
+            $html = MasonRenderer::make($doc('test-brick'))
+                ->bricks([BrickGroup::make('Content')->bricks([TestBrick::class])])
+                ->toUnsafeHtml();
+
+            expect($html)->toContain('test-brick');
+        });
+
+        it('renders nothing for a brick that is not registered', function () use ($doc) {
+            $html = MasonRenderer::make($doc('test-brick'))
+                ->bricks([SimpleBrick::class])
+                ->toUnsafeHtml();
+
+            expect($html)->toBe('');
+        });
     });
 });

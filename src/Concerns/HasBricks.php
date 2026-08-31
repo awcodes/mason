@@ -16,9 +16,9 @@ trait HasBricks
     protected ?string $bricksSortDirection = null;
 
     /**
-     * @var array<string, class-string<Brick>>
+     * @var array<string, class-string<Brick>>|null
      */
-    protected array $cachedBricks;
+    protected ?array $cachedBricks = null;
 
     /**
      * @param  array<class-string<Brick>|BrickGroup> | Closure | null  $bricks
@@ -95,21 +95,17 @@ trait HasBricks
      */
     public function getCachedBricks(): array
     {
-        if (isset($this->cachedBricks)) {
+        if ($this->cachedBricks !== null) {
             return $this->cachedBricks;
         }
 
-        foreach ($this->getBricks() as $item) {
-            if ($item instanceof BrickGroup) {
-                foreach ($item->getBricks() as $brick) {
-                    $this->cachedBricks[$brick::getId()] = $brick;
-                }
-            } else {
-                $this->cachedBricks[$item::getId()] = $item;
-            }
+        $cached = [];
+
+        foreach ($this->getFlatBricks() as $brick) {
+            $cached[$brick::getId()] = $brick;
         }
 
-        return $this->cachedBricks;
+        return $this->cachedBricks = $cached;
     }
 
     /**
