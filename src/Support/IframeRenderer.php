@@ -66,13 +66,16 @@ class IframeRenderer
             return null;
         }
 
-        foreach ($this->getBricks() as $brick) {
-            if (is_string($brick) && ($brick::getId() === $id)) {
-                return $brick::toHtml($config);
-            }
+        // getBrick() resolves through getCachedBricks(), which unwraps BrickGroups.
+        // Walking getBricks() directly skipped every brick registered inside a
+        // group, and fatalled outright once a group reached the brick list.
+        $brick = $this->getBrick($id);
+
+        if ($brick === null) {
+            return view('mason::components.unregistered-brick', ['label' => $id])->render();
         }
 
-        return view('mason::components.unregistered-brick', ['label' => $id])->render();
+        return $brick::toHtml($config);
     }
 
     /**
@@ -119,12 +122,12 @@ class IframeRenderer
             return 'Unknown Brick';
         }
 
-        foreach ($this->getBricks() as $brick) {
-            if (is_string($brick) && ($brick::getId() === $id)) {
-                return $brick::getLabel();
-            }
+        $brick = $this->getBrick($id);
+
+        if ($brick === null) {
+            return 'Unknown Brick';
         }
 
-        return 'Unknown Brick';
+        return $brick::getLabel();
     }
 }

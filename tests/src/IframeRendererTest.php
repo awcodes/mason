@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Awcodes\Mason\BrickGroup;
 use Awcodes\Mason\Support\IframeRenderer;
 use Awcodes\Mason\Tests\Fixtures\SimpleBrick;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
@@ -196,5 +197,37 @@ describe('IframeRenderer', function () {
             // Test Brick's label is "Test Brick"
             expect($html)->toBeString();
         });
+    });
+});
+
+describe('IframeRenderer with BrickGroups', function () {
+    it('renders a brick registered inside a BrickGroup', function () {
+        $renderer = IframeRenderer::make([
+            ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => ['title' => 'Grouped']]],
+        ])->bricks([
+            BrickGroup::make('Content')->bricks([TestBrick::class]),
+        ]);
+
+        $html = $renderer->getBlockHtml([
+            'type' => 'masonBrick',
+            'attrs' => ['id' => 'test-brick', 'config' => ['title' => 'Grouped']],
+        ]);
+
+        expect($html)->toContain('Grouped')
+            ->and($html)->not->toContain('unregistered');
+    });
+
+    it('labels a brick registered inside a BrickGroup', function () {
+        $renderer = IframeRenderer::make([])->bricks([
+            BrickGroup::make('Content')->bricks([TestBrick::class]),
+        ]);
+
+        $html = $renderer
+            ->setBlocks([
+                ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => []]],
+            ])
+            ->toHtml('fixtures.labels');
+
+        expect($html)->toContain('data-label="Test Brick"');
     });
 });

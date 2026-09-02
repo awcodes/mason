@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Awcodes\Mason\BrickGroup;
 use Awcodes\Mason\Bricks\Section;
 use Awcodes\Mason\MasonEntry;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
@@ -62,5 +63,20 @@ describe('MasonEntry', function () {
             ->previewLayout(fn () => 'dynamic-layout');
 
         expect($entry->getPreviewLayout())->toBe('dynamic-layout');
+    });
+});
+
+describe('MasonEntry brick groups', function () {
+    it('flattens BrickGroups for the entry view', function () {
+        $entry = MasonEntry::make('content')
+            ->bricks([
+                BrickGroup::make('Content')->bricks([TestBrick::class]),
+                Section::class,
+            ]);
+
+        // The entry view serialises getFlatBricks() into the Alpine payload and
+        // posts it back to the entry endpoint. A BrickGroup reaching that payload
+        // is fatal there, because it has no getId().
+        expect($entry->getFlatBricks())->toBe([TestBrick::class, Section::class]);
     });
 });
