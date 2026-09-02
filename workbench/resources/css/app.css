@@ -1,0 +1,32 @@
+/*
+ * The Workbench application's own stylesheet.
+ *
+ * The same file is loaded by the frontend page layout and by Mason's preview
+ * and entry iframe layouts, which is what makes the editor's preview match the
+ * rendered page. Mason's Blade views are a `@source` so that the bricks it
+ * ships are styled here too.
+ */
+
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@source '../views/**/*.blade.php';
+@source '../../app/Mason/**/*.php';
+@source '../../../resources/views/**/*.blade.php';
+
+@theme {
+    --font-body: ui-sans-serif, system-ui, sans-serif;
+    --font-display: ui-sans-serif, system-ui, sans-serif;
+
+    --color-primary-50: oklch(0.962 0.018 272.314);
+    --color-primary-100: oklch(0.93 0.034 272.788);
+    --color-primary-200: oklch(0.87 0.065 274.039);
+    --color-primary-300: oklch(0.785 0.115 274.713);
+    --color-primary-400: oklch(0.673 0.182 276.935);
+    --color-primary-500: oklch(0.585 0.233 277.117);
+    --color-primary-600: oklch(0.511 0.262 276.966);
+    --color-primary-700: oklch(0.457 0.24 277.023);
+    --color-primary-800: oklch(0.398 0.195 277.366);
+    --color-primary-900: oklch(0.359 0.144 278.697);
+    --color-primary-950: oklch(0.257 0.09 281.288);
+}

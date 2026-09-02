@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Awcodes\Mason\Tests\Fixtures\LivewireForm;
-use Awcodes\Mason\Tests\Models\Page;
 use Livewire\Livewire;
+use Workbench\App\Models\Page;
 
 describe('Mason command execution via Livewire', function () {
     function createBrick(string $id, array $config = []): array

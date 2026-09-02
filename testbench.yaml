@@ -1,0 +1,41 @@
+laravel: '@testbench'
+
+providers:
+  - Workbench\App\Providers\Filament\AdminPanelProvider
+
+migrations:
+  - workbench/database/migrations
+
+seeders:
+  - Workbench\Database\Seeders\DatabaseSeeder
+
+env:
+  - AUTH_MODEL='Workbench\App\Models\User'
+  - APP_NAME='Mason Workbench'
+
+workbench:
+  start: '/admin'
+  install: true
+  health: false
+  discovers:
+    web: true
+    api: false
+    commands: false
+    components: false
+    factories: true
+    views: true
+  build:
+    - asset-publish
+    - filament-assets
+    - create-sqlite-db
+    - db-wipe
+    - migrate-fresh
+    - sync-skeleton
+  assets:
+    - laravel-assets
+  sync:
+    - from: storage
+      to: workbench/storage
+      reverse: true
+    - from: workbench/resources/dist
+      to: public/workbench

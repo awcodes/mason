@@ -1,0 +1,15 @@
+/*
+ * Filament panel theme for the Workbench.
+ *
+ * Mason ships no compiled CSS. Its documented installation step is to import
+ * `plugin.css` into the consuming application's Filament theme and to point
+ * Tailwind at Mason's Blade views, so that is exactly what this file does.
+ * See docs/installation.md.
+ */
+
+@import '../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../../resources/css/plugin.css';
+
+@source '../../../resources/views/**/*.blade.php';
+@source '../../app/Filament/**/*.php';
+@source '../views/**/*.blade.php';

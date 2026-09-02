@@ -505,6 +505,28 @@ Faker::make()
 composer test
 ```
 
+## Development
+
+Mason ships a Workbench — a small Laravel application, powered by Orchestra
+Testbench, that consumes the package the way a real application would. There is
+no need for a separate Laravel project.
+
+```bash
+composer install
+composer serve
+```
+
+Then open the panel at [/admin](http://127.0.0.1:8000/admin) and the frontend at
+[/](http://127.0.0.1:8000). The login form is prefilled with the seeded
+development account:
+
+```
+Email:    test@example.com
+Password: password
+```
+
+See [CONTRIBUTING](.github/CONTRIBUTING.md) for the rest.
+
 ## Contributing
 
 Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.

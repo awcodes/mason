@@ -4,13 +4,17 @@
     "scripts": {
         "dev": "node bin/build.js --dev",
         "build": "node bin/build.js",
+        "build:workbench": "npx @tailwindcss/cli --input ./workbench/resources/css/theme.css --output ./workbench/resources/dist/theme.css --minify && npx @tailwindcss/cli --input ./workbench/resources/css/app.css --output ./workbench/resources/dist/app.css --minify",
         "format": "prettier --write 'resources/**/*.blade.php' 'resources/**/*.css' 'resources/**/*.js'",
         "format:check": "prettier --check 'resources/**/*.blade.php' 'resources/**/*.css' 'resources/**/*.js'"
     },
     "devDependencies": {
+        "@tailwindcss/cli": "^4.3.3",
+        "@tailwindcss/typography": "^0.5.20",
         "esbuild": "^0.28.1",
         "prettier": "^3.5.3",
         "prettier-plugin-blade": "^2.1.21",
-        "prettier-plugin-tailwindcss": "^0.6.11"
+        "prettier-plugin-tailwindcss": "^0.6.11",
+        "tailwindcss": "^4.3.3"
     }
 }

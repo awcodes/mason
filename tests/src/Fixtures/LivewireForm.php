@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Awcodes\Mason\Tests\Fixtures;
 
 use Awcodes\Mason\Mason;
-use Awcodes\Mason\Tests\Models\Page;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
+use Workbench\App\Models\Page;
 
 class LivewireForm extends Component implements HasSchemas
 {

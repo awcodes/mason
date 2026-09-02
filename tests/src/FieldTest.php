@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Awcodes\Mason\Tests\Fixtures\LivewireForm;
-use Awcodes\Mason\Tests\Models\Page;
 use Livewire\Livewire;
+use Workbench\App\Models\Page;
 
 it('has editor field', function () {
     Livewire::test(LivewireForm::class)

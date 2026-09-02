@@ -36,6 +36,66 @@ Before submitting a pull request:
 - Check the codebase to ensure that your feature doesn't already exist.
 - Check the pull requests to ensure that another person hasn't already submitted the feature or fix.
 
+## Development
+
+The repository contains a Workbench — a small Laravel application, powered by
+Orchestra Testbench, that consumes Mason the way a real application would. You do
+not need a separate Laravel project to work on the package.
+
+Install dependencies:
+
+```bash
+composer install
+```
+
+Run the test suite:
+
+```bash
+composer test
+```
+
+Start the Workbench application:
+
+```bash
+composer serve
+```
+
+The Workbench serves on `http://127.0.0.1:8000`:
+
+| URL | What it exercises |
+|---|---|
+| `/admin` | The Filament panel. `Mason` on the page form, `MasonEntry` on the view page. |
+| `/admin/login` | Prefilled with the seeded development account. |
+| `/` | The frontend page list. |
+| `/pages/home` | Composed content rendered by the `@mason` Blade directive. |
+
+Development credentials:
+
+```
+Email:    test@example.com
+Password: password
+```
+
+Workbench code lives in `workbench/` and represents the *consuming application*:
+its `Page` model, its bricks under `Workbench\App\Mason`, its Filament panel and
+its Blade views. Nothing in `workbench/` ships to consumers.
+
+### Workbench assets
+
+Mason has no compiled CSS of its own — consumers import `resources/css/plugin.css`
+into their own Filament theme (see the installation docs). The Workbench does the
+same, and its two stylesheets are compiled by the Tailwind CLI:
+
+```bash
+npm install
+npm run build:workbench
+```
+
+The compiled output is committed under `workbench/resources/dist/`, in the same way
+`resources/dist/` holds the package's compiled JavaScript, so `composer serve`
+works from a clean checkout without Node. Rebuild it after changing
+`resources/css/plugin.css`, a Mason Blade view, or a Workbench view.
+
 ## Requirements
 
 If the project maintainer has any additional requirements, you will find them listed here.
