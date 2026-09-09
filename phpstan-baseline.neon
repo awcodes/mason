@@ -1,0 +1,82 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Bricks/Section.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Support/IframeEntryRenderer.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Support/IframeRenderer.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: src/Support/MasonRenderer.php
+
+		-
+			message: '#^Method Awcodes\\Mason\\Support\\MasonRenderer\:\:getBlocks\(\) should return array\<int, array\<string, mixed\>\> but returns array\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Support/MasonRenderer.php
+
+		-
+			message: '#^Method Awcodes\\Mason\\Support\\MasonRenderer\:\:toArray\(\) should return array\<string, mixed\> but returns array\<int, array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Support/MasonRenderer.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: workbench/app/Mason/CardGrid.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: workbench/app/Mason/Divider.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: workbench/app/Mason/Hero.php
+
+		-
+			message: '''
+				#^Access to constant on deprecated class Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken\:
+				Use PreventRequestForgery instead\.$#
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: workbench/app/Providers/Filament/AdminPanelProvider.php
+
+		-
+			message: '#^Return type \(array\<string, mixed\>\) of method Workbench\\Database\\Factories\\PageFactory\:\:definition\(\) should be compatible with return type \(array\<model property of Workbench\\App\\Models\\Page, mixed\>\) of method Illuminate\\Database\\Eloquent\\Factories\\Factory\<Workbench\\App\\Models\\Page\>\:\:definition\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: workbench/database/factories/PageFactory.php
+
+		-
+			message: '#^Return type \(array\<string, mixed\>\) of method Workbench\\Database\\Factories\\UserFactory\:\:definition\(\) should be compatible with return type \(array\<model property of Workbench\\App\\Models\\User, mixed\>\) of method Illuminate\\Database\\Eloquent\\Factories\\Factory\<Workbench\\App\\Models\\User\>\:\:definition\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: workbench/database/factories/UserFactory.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: workbench/routes/web.php
