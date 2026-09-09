@@ -1,10 +1,35 @@
+# larastan is registered automatically by phpstan/extension-installer, which is in
+# require-dev here. Adding `vendor/larastan/larastan/extension.neon` to the includes
+# below would double-register it and phpstan aborts with "This file is included
+# multiple times" before analysing anything.
 includes:
     - phpstan-baseline.neon
 
 parameters:
     level: 5
+    # A baseline entry that stops matching is not a failure worth breaking CI over.
+    # phpstan resolves under prefer-stable, so an analyser bump can stop reporting an
+    # error with no change to this package — and with the default (true), the now-dead
+    # ignore turns into a hard error: "Ignored error pattern ... was not matched in
+    # reported errors".
+    reportUnmatchedIgnoredErrors: false
     paths:
         - src
+        # The Testbench workbench is dev-only but it is hand-written code that
+        # exercises this package's own public API, so it is analysed like anything else.
+        - workbench
+        # This package ships a config/ directory, so it is analysed too. There is no
+        # database/ at the repo root (only workbench/database), so that path stays out —
+        # phpstan hard-errors on a listed path that does not exist.
+        - config
+    excludePaths:
+        analyse:
+            # workbench/storage is gitignored, but it appears the moment anyone runs the
+            # workbench app and fills up with compiled Blade, which is not valid
+            # standalone PHP. CI never sees it, so without this the config passes in CI
+            # and is unusable locally. `(?)` marks the path optional so this does not
+            # itself hard-error in CI.
+            - workbench/storage (?)
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
