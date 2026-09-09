@@ -25,14 +25,14 @@ class UpgradeBricksCommand extends Command
             label: 'Which table would you like to update?',
             placeholder: 'posts',
             required: true,
-            validate: fn (string $value) => Schema::hasTable($value) ? null : "Table '{$value}' does not exist.",
+            validate: fn (string $value): ?string => Schema::hasTable($value) ? null : "Table '{$value}' does not exist.",
         );
 
         $column = $this->option('column') ?? text(
             label: 'Which column would you like to update?',
             placeholder: 'content',
             required: true,
-            validate: fn (string $value) => Schema::hasColumn($table, $value) ? null : "Column '{$value}' does not exist on table '{$table}'.",
+            validate: fn (string $value): ?string => Schema::hasColumn($table, $value) ? null : "Column '{$value}' does not exist on table '{$table}'.",
         );
 
         if (! confirm("Are you sure you want to update the '{$column}' column in the '{$table}' table? This will overwrite existing data. Please make sure you have a backup.")) {
