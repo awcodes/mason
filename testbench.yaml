@@ -1,6 +1,7 @@
 laravel: '@testbench'
 
 providers:
+  - Awcodes\Mason\MasonServiceProvider
   - Workbench\App\Providers\Filament\AdminPanelProvider
 
 migrations:
