@@ -5,7 +5,9 @@ declare(strict_types=1);
 use Awcodes\Mason\BrickGroup;
 use Awcodes\Mason\Bricks\Section;
 use Awcodes\Mason\MasonEntry;
+use Awcodes\Mason\Support\DataPayload;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
+use Workbench\App\Models\Page;
 
 describe('MasonEntry', function () {
     it('creates entry with name', function () {
@@ -78,5 +80,58 @@ describe('MasonEntry brick groups', function () {
         // posts it back to the entry endpoint. A BrickGroup reaching that payload
         // is fatal there, because it has no getId().
         expect($entry->getFlatBricks())->toBe([TestBrick::class, Section::class]);
+    });
+});
+
+describe('MasonEntry data', function () {
+    describe('data()', function () {
+        it('defaults to the entry record', function () {
+            $page = Page::factory()->create();
+            $entry = MasonEntry::make('content')->model($page);
+
+            expect($entry->getData())->toBe(['record' => $page]);
+        });
+
+        it('returns an empty array without a record', function () {
+            expect(MasonEntry::make('content')->getData())->toBe([]);
+        });
+
+        it('can be overridden', function () {
+            $page = Page::factory()->create();
+            $entry = MasonEntry::make('content')
+                ->model($page)
+                ->data(['locale' => 'en']);
+
+            expect($entry->getData())->toBe(['locale' => 'en']);
+        });
+
+        it('accepts a closure', function () {
+            $entry = MasonEntry::make('content')->data(fn (): array => ['locale' => 'fr']);
+
+            expect($entry->getData())->toBe(['locale' => 'fr']);
+        });
+
+        it('injects the record into the closure', function () {
+            $page = Page::factory()->create();
+            $entry = MasonEntry::make('content')
+                ->model($page)
+                ->data(fn ($record): array => ['record' => $record, 'locale' => 'en']);
+
+            expect($entry->getData())->toBe(['record' => $page, 'locale' => 'en']);
+        });
+
+        it('encodes the record for the iframe request', function () {
+            $page = Page::factory()->create();
+            $entry = MasonEntry::make('content')->model($page);
+
+            $decoded = DataPayload::decode($entry->getEncodedData());
+
+            expect($decoded['record'])->toBeInstanceOf(Page::class)
+                ->and($decoded['record']->getKey())->toBe($page->getKey());
+        });
+
+        it('encodes nothing when there is no data', function () {
+            expect(MasonEntry::make('content')->getEncodedData())->toBeNull();
+        });
     });
 });

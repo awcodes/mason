@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 use Awcodes\Mason\Bricks\Section;
 use Awcodes\Mason\Support\MasonRenderer;
+use Awcodes\Mason\Tests\Fixtures\DataBrick;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
 use Illuminate\Support\Facades\Blade;
+use Workbench\App\Models\Page;
 
 describe('mason() helper function', function () {
     it('returns MasonRenderer instance', function () {
@@ -59,6 +61,21 @@ describe('mason() helper function', function () {
         expect($html)->toContain('Hello');
     });
 
+    it('passes data through to the brick', function () {
+        $page = Page::factory()->create(['title' => 'Helper Record']);
+        $content = [
+            ['type' => 'masonBrick', 'attrs' => ['id' => 'data-brick', 'config' => []]],
+        ];
+
+        $html = mason($content, [DataBrick::class], ['record' => $page])->toHtml();
+
+        expect($html)->toContain('Helper Record');
+    });
+
+    it('defaults data to an empty array', function () {
+        expect(mason([], [DataBrick::class])->getData())->toBe([]);
+    });
+
     it('renders to text', function () {
         $content = [
             ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => ['title' => 'Hello']]],
@@ -101,6 +118,23 @@ describe('@mason directive', function () {
         );
 
         expect($html)->toContain('Hello');
+    });
+
+    it('passes data given as a third argument', function () {
+        $page = Page::factory()->create(['title' => 'Directive Record']);
+
+        $html = Blade::render(
+            '@mason($content, $bricks, $data)',
+            [
+                'content' => ['type' => 'doc', 'content' => [
+                    ['type' => 'masonBrick', 'attrs' => ['id' => 'data-brick', 'config' => []]],
+                ]],
+                'bricks' => [DataBrick::class],
+                'data' => ['record' => $page],
+            ],
+        );
+
+        expect($html)->toContain('Directive Record');
     });
 
     it('still renders the default brick list when given content alone', function () {

@@ -55,6 +55,12 @@ parameters:
 			path: workbench/app/Mason/Hero.php
 
 		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: workbench/app/Mason/PageMeta.php
+
+		-
 			message: '''
 				#^Access to constant on deprecated class Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken\:
 				Use PreventRequestForgery instead\.$#

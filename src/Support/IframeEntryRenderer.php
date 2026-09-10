@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace Awcodes\Mason\Support;
 
 use Awcodes\Mason\Concerns\HasBricks;
+use Closure;
 use Filament\Support\Concerns\EvaluatesClosures;
 
 class IframeEntryRenderer
 {
     use EvaluatesClosures;
     use HasBricks;
+
+    /**
+     * @var array<string, mixed> | Closure
+     */
+    protected array | Closure $data = [];
 
     /**
      * @param  array<int, array<string, mixed>>  $blocks
@@ -49,6 +55,26 @@ class IframeEntryRenderer
     }
 
     /**
+     * Arbitrary context handed to every brick's toHtml() as its second argument.
+     *
+     * @param  array<string, mixed> | Closure  $data
+     */
+    public function data(array | Closure $data): static
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getData(): array
+    {
+        return $this->evaluate($this->data) ?? [];
+    }
+
+    /**
      * Get the HTML for a single block
      *
      * @param  array<string, mixed>  $block
@@ -75,7 +101,7 @@ class IframeEntryRenderer
             return view('mason::components.unregistered-brick', ['label' => $id])->render();
         }
 
-        return $brick::toHtml($config);
+        return $brick::toHtml($config, data: $this->getData());
     }
 
     /**

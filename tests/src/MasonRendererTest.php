@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use Awcodes\Mason\Support\MasonRenderer;
+use Awcodes\Mason\Tests\Fixtures\DataBrick;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
+use Workbench\App\Models\Page;
 
 describe('MasonRenderer', function () {
     describe('make()', function () {
@@ -101,6 +103,48 @@ describe('MasonRenderer', function () {
             $renderer = MasonRenderer::make('invalid json{');
 
             expect($renderer->toArray())->toBe([]);
+        });
+    });
+
+    describe('data()', function () {
+        it('passes data to the brick', function () {
+            $page = Page::factory()->create(['title' => 'From The Record']);
+            $content = [
+                ['type' => 'masonBrick', 'attrs' => ['id' => 'data-brick', 'config' => []]],
+            ];
+
+            $html = MasonRenderer::make($content)
+                ->bricks([DataBrick::class])
+                ->data(['record' => $page])
+                ->toHtml();
+
+            expect($html)->toContain('From The Record');
+        });
+
+        it('accepts a closure', function () {
+            $page = Page::factory()->create(['title' => 'Lazy Record']);
+            $content = [
+                ['type' => 'masonBrick', 'attrs' => ['id' => 'data-brick', 'config' => []]],
+            ];
+
+            $html = MasonRenderer::make($content)
+                ->bricks([DataBrick::class])
+                ->data(fn (): array => ['record' => $page])
+                ->toHtml();
+
+            expect($html)->toContain('Lazy Record');
+        });
+
+        it('hands the brick an empty array when no data is set', function () {
+            $content = [
+                ['type' => 'masonBrick', 'attrs' => ['id' => 'data-brick', 'config' => []]],
+            ];
+
+            $html = MasonRenderer::make($content)
+                ->bricks([DataBrick::class])
+                ->toHtml();
+
+            expect($html)->toContain('no record');
         });
     });
 

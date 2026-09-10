@@ -219,6 +219,31 @@ Then in your layout file you can include the necessary styles and includes to re
 </html>
 ```
 
+#### Record Data
+
+`MasonEntry` hands its own record to every brick automatically, so a brick that reads `$data['record']` works in an infolist with no extra wiring.
+
+```php
+MasonEntry::make('content')
+    ->bricks(BrickCollection::make())
+```
+
+If a brick needs something else, or something more, set it yourself with the `data` method. It accepts a closure, and Filament will inject the record into it.
+
+```php
+MasonEntry::make('content')
+    ->bricks(BrickCollection::make())
+    ->data(fn ($record): array => [
+        'record' => $record,
+        'locale' => app()->getLocale(),
+    ])
+```
+
+Because the entry renders inside an iframe that is fed by a separate request, this data has to cross a request boundary. Eloquent models travel as an encrypted reference to their class and key and are resolved again on arrival, so the model's attributes never go over the wire and a tampered payload is discarded rather than trusted. Anything else you put in `data` must be JSON-serializable; a closure or an arbitrary object will throw rather than silently disappear.
+
+> [!NOTE]
+> A record deleted between the page rendering and the iframe's request arrives as `null`, which is one more reason to read it defensively in the brick.
+
 ## Tips & Tricks
 
 ### Custom Height
@@ -447,15 +472,68 @@ public static function getTags(): array
 
 By default, `getTags()` returns an empty array, so tags are entirely optional.
 
+### Accessing the Record in a Brick
+
+The second argument to `toHtml()` holds whatever data the renderer was given, which is how a brick renders something that lives on the record rather than in its own config — an author name, a publish date, a related model. It is empty unless something passes it, so always guard the keys you read.
+
+```php
+public static function toHtml(array $config, ?array $data = null): ?string
+{
+    $record = $data['record'] ?? null;
+
+    return view('mason.byline', [
+        'heading' => $config['heading'] ?? null,
+        'author' => $record?->author?->name,
+        'published' => $record?->published_at,
+    ])->render();
+}
+```
+
+The `record` key is only a convention — the array is yours, and anything you put in it reaches every brick. The **Rendering Content** section below covers passing it on the front end, and the **Record Data** section under *Infolist Entry* covers the entry, which supplies the record for you.
+
+> [!WARNING]
+> The editor preview does not supply this data. It renders in an iframe that has no record in scope, so a record-dependent brick will fall through to the `null` branch while it is being edited. Write that branch so the brick still reads sensibly in the editor — a placeholder explaining what will appear works better than rendering nothing at all.
+
 ## Rendering Content
 
 You are free to render the content however you see fit. The data is stored in the database as JSON, so you can use the data however you see fit. But the plugin offers a helper method for converting the data to HTML should you choose to use it.
+
+### The Helper
 
 Similar to the form field and entry components, the helper needs to know what bricks are available. You can pass the bricks to the helper as the second argument. See, above about creating a collection of bricks. This will help keep your code DRY.
 
 ```php
 {!! mason(content: $post->content, bricks: \App\Mason\BrickCollection::make())->toHtml() !!}
 ```
+
+If your bricks need to render something from the record the content belongs to, pass it as a third argument. Whatever you put in that array is handed to every brick's `toHtml()` method — see **Accessing the Record in a Brick** under *Creating Bricks* for the other half of this.
+
+```php
+{!! mason(
+    content: $post->content,
+    bricks: \App\Mason\BrickCollection::make(),
+    data: ['record' => $post],
+)->toHtml() !!}
+```
+
+### The Blade Directive
+
+If you are rendering in a Blade view, `@mason` is shorthand for the helper followed by `toHtml()`, and takes the same three arguments. Named arguments work here too.
+
+```blade
+@mason($post->content, \App\Mason\BrickCollection::make())
+
+@mason($post->content, \App\Mason\BrickCollection::make(), ['record' => $post])
+
+@mason(content: $post->content, bricks: \App\Mason\BrickCollection::make())
+```
+
+The directive echoes the output for you, so it does not need `{!! !!}` around it. Like `toHtml()`, that output is sanitized.
+
+> [!WARNING]
+> Remember to pass your brick list. Given content alone, `@mason($post->content)` falls back to the default list — the built-in `Section` and nothing else — so any brick of your own renders as nothing at all.
+
+### The Renderer
 
 There is also a dedicated Render that can be used if you need more control over the rendering process.
 
@@ -468,6 +546,14 @@ $renderer->toHtml()
 $renderer->toUnsafeHtml();
 $renderer->toArray();
 $renderer->toText();
+```
+
+The renderer takes the same data through a `data` method, which also accepts a closure if you would rather defer the work until the content actually renders.
+
+```php
+$renderer = MasonRenderer::make($content)
+    ->bricks(\App\Mason\BrickCollection::make())
+    ->data(['record' => $post, 'locale' => app()->getLocale()]);
 ```
 
 ## Faking Content

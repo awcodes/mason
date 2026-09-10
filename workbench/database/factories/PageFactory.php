@@ -57,6 +57,13 @@ class PageFactory extends Factory
                 )
                 ->brick(id: 'divider', config: [])
                 ->brick(
+                    id: 'pageMeta',
+                    config: [
+                        'heading' => 'About this page',
+                        'show_url' => true,
+                    ],
+                )
+                ->brick(
                     id: 'section',
                     config: [
                         'background_color' => 'gray',

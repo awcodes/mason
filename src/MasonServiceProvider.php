@@ -59,6 +59,8 @@ class MasonServiceProvider extends PackageServiceProvider
             // Compiles to the mason() helper rather than the constructor: the
             // constructor takes only $content, so @mason($content, $bricks)
             // silently discarded the brick list and rendered nothing for it.
+            // Forwarding the whole expression also picks up the helper's third
+            // argument, @mason($content, $bricks, ['record' => $post]).
             handler: fn ($expression): string => "<?php echo mason({$expression})->toHtml(); ?>"
         );
 

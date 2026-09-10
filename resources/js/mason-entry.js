@@ -2,6 +2,7 @@ export default function masonEntryComponent({
     state,
     bricks = [],
     previewLayout = null,
+    data = null,
 }) {
     let iframe = null
 
@@ -69,6 +70,15 @@ export default function masonEntryComponent({
             bricksInput.name = 'bricks'
             bricksInput.value = JSON.stringify(bricks)
             form.appendChild(bricksInput)
+
+            // Add the encrypted render data if provided
+            if (data) {
+                const dataInput = document.createElement('input')
+                dataInput.type = 'hidden'
+                dataInput.name = 'data'
+                dataInput.value = data
+                form.appendChild(dataInput)
+            }
 
             // Add preview layout if provided
             if (previewLayout) {
