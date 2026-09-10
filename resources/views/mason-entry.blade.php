@@ -18,6 +18,7 @@
                     state: @js($state),
                     bricks: @js($flatBricks),
                     previewLayout: @js($getPreviewLayout()),
+                    data: @js($getEncodedData()),
                 })"
         id="{{ "mason-entry-wrapper-" . $statePath }}"
         {{

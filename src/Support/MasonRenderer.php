@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Awcodes\Mason\Support;
 
 use Awcodes\Mason\Concerns\HasBricks;
+use Closure;
 use Filament\Support\Concerns\EvaluatesClosures;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
@@ -20,6 +21,11 @@ class MasonRenderer implements Htmlable
      * @var string | array<string, mixed>
      */
     protected string | array | null $content = null;
+
+    /**
+     * @var array<string, mixed> | Closure
+     */
+    protected array | Closure $data = [];
 
     /**
      * @param  string | array<string, mixed> | null  $content
@@ -51,6 +57,27 @@ class MasonRenderer implements Htmlable
         $this->content = $content;
 
         return $this;
+    }
+
+    /**
+     * Arbitrary context handed to every brick's toHtml() as its second argument.
+     * Pass the record under a 'record' key to render content that depends on it.
+     *
+     * @param  array<string, mixed> | Closure  $data
+     */
+    public function data(array | Closure $data): static
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getData(): array
+    {
+        return $this->evaluate($this->data) ?? [];
     }
 
     public function toUnsafeHtml(): string
@@ -116,7 +143,7 @@ class MasonRenderer implements Htmlable
             return '';
         }
 
-        return $brick::toHtml($config, data: []);
+        return $brick::toHtml($config, data: $this->getData());
     }
 
     /**

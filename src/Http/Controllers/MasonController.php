@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Awcodes\Mason\Http\Controllers;
 
+use Awcodes\Mason\Support\DataPayload;
 use Awcodes\Mason\Support\IframeEntryRenderer;
 use Awcodes\Mason\Support\IframeRenderer;
 use Illuminate\Http\Request;
@@ -49,6 +50,12 @@ class MasonController
             }, $bricks);
 
             $renderer->bricks($brickClasses);
+        }
+
+        // Only the entry carries render data today: the editor preview has no
+        // record in scope, so mason.js posts none.
+        if ($renderer instanceof IframeEntryRenderer) {
+            $renderer->data(DataPayload::decode($request->input('data')));
         }
 
         $layoutToUse = $layout ?? config($layoutConfigKey);
