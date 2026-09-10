@@ -77,7 +77,7 @@ class Section extends Brick
 | `getLabel()` | Sidebar label. Derived from the class name unless overridden. |
 | `getIcon()` | Sidebar icon. A `Heroicon` case, an icon name, or an `Htmlable` for inline SVG. |
 | `getTags()` | Search terms. Empty by default. |
-| `toHtml()` | Renders the brick from its saved `$config`. |
+| `toHtml()` | Renders the brick from its saved `$config`, plus any `$data` passed by the renderer. |
 | `configureBrickAction()` | Builds the form shown when inserting or editing. |
 
 `getId()` is what ties stored content to a class, so changing it on a brick that is already in use orphans the existing content.
@@ -92,6 +92,28 @@ public static function getTags(): array
     return ['hero', 'banner', 'header', 'landing page', 'marketing'];
 }
 ```
+
+## Rendering from the record
+
+`toHtml()` takes a second argument holding whatever context the renderer was given — most usefully the record the content belongs to. It is empty unless something passes it, so guard the keys you read:
+
+```php
+public static function toHtml(array $config, ?array $data = null): ?string
+{
+    $record = $data['record'] ?? null;
+
+    return view('mason.byline', [
+        'heading' => $config['heading'] ?? null,
+        'author' => $record?->author?->name,
+        'published' => $record?->published_at,
+    ])->render();
+}
+```
+
+See [Rendering](rendering.md#passing-data-to-bricks) for how to supply it.
+
+> [!WARNING]
+> The editor preview does not supply `$data`. It renders in an iframe that has no record in scope, so a record-dependent brick renders its fallback there. Write the fallback so the brick still reads sensibly while it is being edited.
 
 ## Bricks without a form
 
