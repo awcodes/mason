@@ -1,7 +1,6 @@
 export default function masonEntryComponent({
     state,
-    bricks = [],
-    previewLayout = null,
+    context = null,
     data = null,
 }) {
     let iframe = null
@@ -64,12 +63,12 @@ export default function masonEntryComponent({
             blocksInput.value = JSON.stringify(plainBlocks)
             form.appendChild(blocksInput)
 
-            // Add bricks data
-            const bricksInput = document.createElement('input')
-            bricksInput.type = 'hidden'
-            bricksInput.name = 'bricks'
-            bricksInput.value = JSON.stringify(bricks)
-            form.appendChild(bricksInput)
+            // Add the encrypted bricks and layout context
+            const contextInput = document.createElement('input')
+            contextInput.type = 'hidden'
+            contextInput.name = 'context'
+            contextInput.value = context
+            form.appendChild(contextInput)
 
             // Add the encrypted render data if provided
             if (data) {
@@ -78,15 +77,6 @@ export default function masonEntryComponent({
                 dataInput.name = 'data'
                 dataInput.value = data
                 form.appendChild(dataInput)
-            }
-
-            // Add preview layout if provided
-            if (previewLayout) {
-                const layoutInput = document.createElement('input')
-                layoutInput.type = 'hidden'
-                layoutInput.name = 'layout'
-                layoutInput.value = previewLayout
-                form.appendChild(layoutInput)
             }
 
             // Add CSRF token

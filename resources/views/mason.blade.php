@@ -29,8 +29,7 @@
                     placeholder: @js($getPlaceholder()),
                     disabled: @js($isDisabled),
                     dblClickToEdit: @js($shouldDblClickToEdit()),
-                    bricks: @js($flatBricks),
-                    previewLayout: @js($getPreviewLayout()),
+                    context: @js($getRenderContext()),
                     defaultColorMode: @js($defaultColorMode),
                     hasColorModeToggle: @js($hasColorModeToggle),
                 })"

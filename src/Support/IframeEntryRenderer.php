@@ -124,7 +124,7 @@ class IframeEntryRenderer
         }, $this->blocks, array_keys($this->blocks));
 
         // Use the provided layout, fallback to config, then default
-        $layoutToUse = $layout ?? config('mason.iframe-entry.layout');
+        $layoutToUse = $layout ?? config('mason.entry.layout');
 
         // If a layout is configured, use it with the entry content slotted in
         if ($layoutToUse) {

@@ -4,8 +4,7 @@ export default function masonComponent({
     statePath,
     disabled,
     dblClickToEdit,
-    bricks = [],
-    previewLayout = null,
+    context = null,
     defaultColorMode = 'light',
     hasColorModeToggle = false,
 }) {
@@ -26,7 +25,6 @@ export default function masonComponent({
         isUpdatingBrick: false,
         isInsertingBrick: false,
         previewUrl: null,
-        previewLayout: previewLayout,
         brickPickerOpen: false,
         brickPickerBlockIndex: null,
         brickPickerPosition: 'below',
@@ -534,21 +532,12 @@ export default function masonComponent({
             blocksInput.value = JSON.stringify(plainBlocks)
             form.appendChild(blocksInput)
 
-            // Add bricks data
-            const bricksInput = document.createElement('input')
-            bricksInput.type = 'hidden'
-            bricksInput.name = 'bricks'
-            bricksInput.value = JSON.stringify(bricks)
-            form.appendChild(bricksInput)
-
-            // Add preview layout if provided
-            if (this.previewLayout) {
-                const layoutInput = document.createElement('input')
-                layoutInput.type = 'hidden'
-                layoutInput.name = 'layout'
-                layoutInput.value = this.previewLayout
-                form.appendChild(layoutInput)
-            }
+            // Add the encrypted bricks and layout context
+            const contextInput = document.createElement('input')
+            contextInput.type = 'hidden'
+            contextInput.name = 'context'
+            contextInput.value = context
+            form.appendChild(contextInput)
 
             // Add CSRF token
             const csrfInput = document.createElement('input')

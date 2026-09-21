@@ -2,7 +2,6 @@
     use Filament\Support\Facades\FilamentView;
 
     $statePath = $getStatePath();
-    $flatBricks = $getFlatBricks();
     $state = $getState();
 @endphp
 
@@ -16,8 +15,7 @@
         x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc("mason-entry", "awcodes/mason") }}"
         x-data="masonEntryComponent({
                     state: @js($state),
-                    bricks: @js($flatBricks),
-                    previewLayout: @js($getPreviewLayout()),
+                    context: @js($getRenderContext()),
                     data: @js($getEncodedData()),
                 })"
         id="{{ "mason-entry-wrapper-" . $statePath }}"
