@@ -7,7 +7,7 @@
 
 ### Iframe routes take a signed render context
 
-The preview and entry iframes are fed by a POST to `/mason/preview` and `/mason/entry`. Those routes used to accept the brick classes and the layout view name from the request body, so a signed-in user could name classes and views of their own. They now accept only an encrypted `context` token, generated server side by the field or entry, and ignore any `bricks` or `layout` sent in the clear.
+The preview and entry iframes are fed by a POST to `/mason/preview` and `/mason/entry`. Those routes used to accept the brick classes and the layout view name from the request body, so a signed-in user could name classes and views of their own. They now accept only a signed `context` token, generated server side by the field or entry, and ignore any `bricks` or `layout` sent in the clear.
 
 #### Action required
 

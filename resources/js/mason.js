@@ -532,7 +532,7 @@ export default function masonComponent({
             blocksInput.value = JSON.stringify(plainBlocks)
             form.appendChild(blocksInput)
 
-            // Add the encrypted bricks and layout context
+            // Add the signed bricks and layout context
             const contextInput = document.createElement('input')
             contextInput.type = 'hidden'
             contextInput.name = 'context'
