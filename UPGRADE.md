@@ -1,15 +1,61 @@
 # Upgrade Guide
 
+- [Upgrading to 3.4 from 3.x](#upgrading-to-34-from-3x)
+- [Upgrading to 1.x from 0.x](#upgrading-to-1x-from-0x)
+
+## Upgrading to 3.4 from 3.x
+
+### Iframe routes take a signed render context
+
+The preview and entry iframes are fed by a POST to `/mason/preview` and `/mason/entry`. Those routes used to accept the brick classes and the layout view name from the request body, so a signed-in user could name classes and views of their own. They now accept only an encrypted `context` token, generated server side by the field or entry, and ignore any `bricks` or `layout` sent in the clear.
+
+#### Action required
+
+Republish Filament's assets after upgrading, so the browser loads the updated Alpine components:
+
+```bash
+php artisan filament:assets
+```
+
+Most Filament apps already run this from `filament:upgrade` in Composer's `post-autoload-dump` script.
+
+If you have published and customized Mason's `mason.blade.php` or `mason-entry.blade.php` views, replace the `bricks` and `previewLayout` arguments passed to the Alpine component with the render context:
+
+**Before:**
+
+```blade
+bricks: @js($flatBricks),
+previewLayout: @js($getPreviewLayout()),
+```
+
+**After:**
+
+```blade
+context: @js($getRenderContext()),
+```
+
+Until a published view is updated, its preview renders without any bricks.
+
+If you post to the Mason routes yourself, send `context` from `$field->getRenderContext()` in place of `bricks` and `layout`.
+
+### Layout config fallback
+
+`IframeRenderer` and `IframeEntryRenderer` now fall back to the `mason.preview.layout` and `mason.entry.layout` config keys, which are the keys `config/mason.php` defines. They previously read `mason.iframe.layout` and `mason.iframe-entry.layout`. If you set either of those keys in your own config, move the value to the matching key.
+
+---
+
+## Upgrading to 1.x from 0.x
+
 This guide will help you upgrade from Mason 0.x to 1.x.
 
-## High Impact Changes
+### High Impact Changes
 
 - [Filament v4 Upgrade](#filament-v4-upgrade)
 - [Brick Architecture Redesign](#brick-architecture-redesign)
 - [Mason Component API Changes](#mason-component-api-changes)
 - [Database Schema](#database-schema)
 
-## Medium Impact Changes
+### Medium Impact Changes
 
 - [Dependency Updates](#dependency-updates)
 - [Support Helpers and Converter Removal](#support-helpers-and-converter-removal)
@@ -19,15 +65,15 @@ This guide will help you upgrade from Mason 0.x to 1.x.
 
 ---
 
-## Filament v4 Upgrade
+### Filament v4 Upgrade
 
 Mason 1.x now requires Filament v4. Please follow the [Filament v4 Upgrade Guide](https://filamentphp.com/docs/4.x/upgrade-guide) before upgrading Mason.
 
-## Brick Architecture Redesign
+### Brick Architecture Redesign
 
 The `Brick` architecture has been completely redesigned to be more robust and easier to manage. In 0.x, Bricks were created using a fluent API that extended Filament's action class. In 1.x, they are now dedicated classes that extend `Awcodes\Mason\Brick`.
 
-### Action required
+#### Action required
 
 You must update all your custom Bricks to the new class-based structure.
 
@@ -90,11 +136,11 @@ class Section extends Brick
 }
 ```
 
-## Mason Component API Changes
+### Mason Component API Changes
 
 The `bricks()` method now expects an array of class strings instead of an array of `Brick` instances.
 
-### Action required
+#### Action required
 
 Update your `Mason` component definitions:
 
@@ -116,7 +162,7 @@ Mason::make('content')
     ])
 ```
 
-## Database Schema
+### Database Schema
 
 Blocks stored in the database need to be updated to the new brick schema.
 
@@ -151,7 +197,7 @@ Blocks stored in the database need to be updated to the new brick schema.
 }
 ```
 
-### Upgrade Command
+#### Upgrade Command
 
 To help with this migration, a new command has been added to the package:
 
@@ -168,23 +214,23 @@ php artisan mason:upgrade-bricks --table=posts --column=content
 The command is still shipped, and still converts the 0.x schema to the one the renderer reads — that shape has not changed since 1.0, so it remains the right tool whether you are upgrading to 1.x or straight to a later major.
 
 
-## Dependency Updates
+### Dependency Updates
 
 - PHP 8.2+ is now required.
 - `ueberdosis/tiptap-php` has been upgraded to v2.
 - `filament/filament` has been upgraded to v4.
 
-## Support Helpers and Converter Removal
+### Support Helpers and Converter Removal
 
 The `Awcodes\Mason\Support\Helpers` and `Awcodes\Mason\Support\Converter` classes have been removed.
 
 If you were using `Helpers::sanitizeBricks()`, this is now handled internally by the `Mason` component using Tiptap PHP during hydration and dehydration.
 
-## Helper Function Changes
+### Helper Function Changes
 
 The `mason()` helper function now returns an instance of `Awcodes\Mason\Support\MasonRenderer` instead of the removed `Converter` class.
 
-## Translation Changes
+### Translation Changes
 
 The translation keys have been restructured. If you have published and customized the translation files, you will need to update them to match the new structure.
 
@@ -194,7 +240,7 @@ The translation keys have been restructured. If you have published and customize
 **After:**
 `mason.actions.brick.modal.actions.insert.label`
 
-## Livewire Renderer Removal
+### Livewire Renderer Removal
 
 The `mason.renderer` Livewire component and its associated render hook have been removed as they are no longer needed for the new architecture. If you were manually referencing this component, you should remove those references.
 
