@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Awcodes\Mason\Support\DataPayload;
+use Awcodes\Mason\Support\RenderContext;
 use Awcodes\Mason\Tests\Fixtures\DataBrick;
 use Workbench\App\Models\Page;
 use Workbench\App\Models\User;
@@ -22,7 +23,7 @@ describe('entry route render data', function () {
 
         $response = $this->post(route('mason.entry'), [
             'blocks' => json_encode($blocks),
-            'bricks' => json_encode([DataBrick::class]),
+            'context' => RenderContext::encode([DataBrick::class], null),
             'data' => DataPayload::encode(['record' => $page]),
         ]);
 
@@ -33,7 +34,7 @@ describe('entry route render data', function () {
     it('renders without data when no payload is sent', function () use ($blocks) {
         $response = $this->post(route('mason.entry'), [
             'blocks' => json_encode($blocks),
-            'bricks' => json_encode([DataBrick::class]),
+            'context' => RenderContext::encode([DataBrick::class], null),
         ]);
 
         $response->assertOk();
@@ -45,7 +46,7 @@ describe('entry route render data', function () {
 
         $response = $this->post(route('mason.entry'), [
             'blocks' => json_encode($blocks),
-            'bricks' => json_encode([DataBrick::class]),
+            'context' => RenderContext::encode([DataBrick::class], null),
             'data' => base64_encode(json_encode(['record' => ['__mason_model' => Page::class, 'key' => 1]])),
         ]);
 

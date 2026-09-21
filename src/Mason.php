@@ -8,6 +8,7 @@ use Awcodes\Mason\Actions\BrickAction;
 use Awcodes\Mason\Concerns\HasBricks;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\BrickCommand;
+use Awcodes\Mason\Support\RenderContext;
 use Closure;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Contracts\CanBeLengthConstrained;
@@ -139,6 +140,15 @@ class Mason extends Field implements CanBeLengthConstrained
     public function getPreviewLayout(): ?string
     {
         return $this->evaluate($this->previewLayout) ?? config('mason.preview.layout');
+    }
+
+    /**
+     * The preview renders inside an iframe fed by a separate request, so the
+     * bricks and layout it may use travel as an encrypted payload.
+     */
+    public function getRenderContext(): string
+    {
+        return RenderContext::encode($this->getFlatBricks(), $this->getPreviewLayout());
     }
 
     public function defaultColorMode(string | Closure | null $mode): static

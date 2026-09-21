@@ -98,7 +98,7 @@ class IframeRenderer
         }, $this->blocks, array_keys($this->blocks));
 
         // Use the provided layout, fallback to config, then default
-        $layoutToUse = $layout ?? config('mason.iframe.layout');
+        $layoutToUse = $layout ?? config('mason.preview.layout');
 
         // If a layout is configured, use it with the preview content slotted in
         if ($layoutToUse) {

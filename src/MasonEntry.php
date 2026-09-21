@@ -6,6 +6,7 @@ namespace Awcodes\Mason;
 
 use Awcodes\Mason\Concerns\HasBricks;
 use Awcodes\Mason\Support\DataPayload;
+use Awcodes\Mason\Support\RenderContext;
 use Closure;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Infolists\Components\Entry;
@@ -35,6 +36,15 @@ class MasonEntry extends Entry
     public function getPreviewLayout(): ?string
     {
         return $this->evaluate($this->previewLayout) ?? config('mason.entry.layout');
+    }
+
+    /**
+     * The preview renders inside an iframe fed by a separate request, so the
+     * bricks and layout it may use travel as an encrypted payload.
+     */
+    public function getRenderContext(): string
+    {
+        return RenderContext::encode($this->getFlatBricks(), $this->getPreviewLayout());
     }
 
     /**
