@@ -144,7 +144,7 @@ class Mason extends Field implements CanBeLengthConstrained
 
     /**
      * The preview renders inside an iframe fed by a separate request, so the
-     * bricks and layout it may use travel as an encrypted payload.
+     * bricks and layout it may use travel as a signed payload.
      */
     public function getRenderContext(): string
     {

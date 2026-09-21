@@ -22,6 +22,18 @@ describe('RenderContext', function () {
         ]);
     });
 
+    it('is deterministic, so re-renders do not change the component', function () {
+        expect(RenderContext::encode([TestBrick::class], 'fixtures.layout'))
+            ->toBe(RenderContext::encode([TestBrick::class], 'fixtures.layout'));
+    });
+
+    it('rejects a context whose payload was changed', function () {
+        [, $signature] = explode('.', RenderContext::encode([TestBrick::class], null));
+        $forged = base64_encode(json_encode(['bricks' => [SimpleBrick::class], 'layout' => 'fixtures.layout'])) . '.' . $signature;
+
+        expect(RenderContext::decode($forged))->toBe(['bricks' => [], 'layout' => null]);
+    });
+
     it('treats a missing or forged context as empty', function (mixed $payload) {
         expect(RenderContext::decode($payload))->toBe(['bricks' => [], 'layout' => null]);
     })->with([
@@ -29,6 +41,8 @@ describe('RenderContext', function () {
         'empty string' => [''],
         'array' => [[TestBrick::class]],
         'unsigned json' => [json_encode(['bricks' => [TestBrick::class], 'layout' => 'fixtures.layout'])],
+        'bad signature' => [base64_encode(json_encode(['bricks' => [TestBrick::class], 'layout' => null])) . '.nope'],
+        'not base64' => ['!!!.abc'],
     ]);
 
     it('drops anything that is not a brick class', function () {
