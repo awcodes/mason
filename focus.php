@@ -8,7 +8,7 @@ use Awcodes\Focus\ScreenshotSuite;
 
 /*
  * Documentation screenshots for Mason, generated with awcodes/focus from the
- * Workbench (run `composer build` first). Every flow closes without saving so
+ * Workbench. Regenerate with `composer focus` (run `composer build` first). Every flow closes without saving so
  * the seeded pages keep their fixed content and timestamps.
  */
 
