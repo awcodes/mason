@@ -22,7 +22,12 @@
         @endif
 
         @if ($text)
-            <div class="prose mx-auto mt-6 max-w-2xl">
+            <div
+                @class([
+                    'prose mx-auto mt-6 max-w-2xl',
+                    'prose-invert prose-p:text-white' => $background_color === 'primary',
+                ])
+            >
                 {!! $text !!}
             </div>
         @endif
