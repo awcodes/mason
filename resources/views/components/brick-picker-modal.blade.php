@@ -44,6 +44,7 @@
         x-transition:leave-start="scale-100 opacity-100"
         x-transition:leave-end="scale-95 opacity-0"
         class="mason-brick-picker-modal"
+        data-focus="mason-brick-picker"
         x-data="{
             actions: @js($brickData),
             search: '',

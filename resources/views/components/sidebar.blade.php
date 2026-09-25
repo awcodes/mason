@@ -32,6 +32,7 @@
         'has-color-mode-toggle' => $hasColorModeToggle ?? false,
         'has-outline' => $hasOutline,
     ])
+    data-focus="mason-sidebar"
     {{ $attributes }}
 >
     <x-mason::controls :has-color-mode-toggle="$hasColorModeToggle" />

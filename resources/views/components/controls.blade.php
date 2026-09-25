@@ -2,11 +2,12 @@
     'hasColorModeToggle' => false,
 ])
 
-<div class="mason-controls">
+<div class="mason-controls" data-focus="mason-toolbar">
     <x-filament::icon-button
         type="button"
         color="gray"
         x-on:click="toggleFullscreen()"
+        data-focus-action="mason-fullscreen"
         title="Toggle Fullscreen"
     >
         <x-slot name="icon">
@@ -41,6 +42,7 @@
         icon="heroicon-o-device-phone-mobile"
         color="gray"
         x-on:click="toggleViewport('mobile')"
+        data-focus-action="mason-mobile"
         size="sm"
         x-bind:class="{'active': viewport === 'mobile'}"
         title="Toggle Mobile View"
@@ -51,6 +53,7 @@
         icon="heroicon-o-device-tablet"
         color="gray"
         x-on:click="toggleViewport('tablet')"
+        data-focus-action="mason-tablet"
         size="sm"
         x-bind:class="{'active': viewport === 'tablet'}"
         title="Toggle Tablet View"
