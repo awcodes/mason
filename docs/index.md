@@ -9,6 +9,9 @@ Mason is a drag and drop page builder for Filament. Authors assemble a document 
 
 Because the editor renders inside an iframe using your application's own stylesheet, what an author sees while building is what the front end will render.
 
+![The Mason editor: a live preview of the page on the left, and the brick sidebar with search on the right](assets/editor-light.png#gh-light-mode-only)
+![The Mason editor: a live preview of the page on the left, and the brick sidebar with search on the right](assets/editor-dark.png#gh-dark-mode-only)
+
 ## The pieces
 
 - **A form field** — `Mason` gives you the editor, with a sidebar of available bricks.

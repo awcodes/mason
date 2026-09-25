@@ -7,6 +7,9 @@ description: Render stored Mason content read-only in a Filament infolist.
 
 `MasonEntry` displays stored content in an infolist. It takes the same `bricks()` list as the field, so it knows how to render what it finds.
 
+![A page's content rendered read-only by MasonEntry](../assets/entry-light.png#gh-light-mode-only)
+![A page's content rendered read-only by MasonEntry](../assets/entry-dark.png#gh-dark-mode-only)
+
 ```php
 use Awcodes\Mason\Bricks\Section;
 use Awcodes\Mason\MasonEntry;
