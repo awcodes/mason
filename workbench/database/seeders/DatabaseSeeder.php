@@ -20,12 +20,12 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        PageFactory::new()->create([
+        PageFactory::new()->deterministic()->create([
             'title' => 'Home',
             'slug' => 'home',
         ]);
 
-        PageFactory::new()->create([
+        PageFactory::new()->deterministic()->create([
             'title' => 'About',
             'slug' => 'about',
         ]);
