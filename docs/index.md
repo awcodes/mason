@@ -16,20 +16,6 @@ Because the editor renders inside an iframe using your application's own stylesh
 - **Bricks** — classes extending `Brick`, scaffolded with `make:mason-brick`.
 - **A renderer** — `MasonRenderer`, or the `mason()` helper, turns stored JSON into HTML on the front end.
 
-## Compatibility
-
-| Package version | Filament version |
-|-----------------|------------------|
-| 0.x             | 3.x              |
-| 1.x             | 4.x              |
-| 2.x             | 5.x              |
-| 3.x             | 4.x & 5.x        |
-
-Mason requires PHP 8.2 or later and `filament/filament`.
-
-> [!IMPORTANT]
-> Mason stores its data as JSON, so cast the attribute to `array` or `json` on your model, and use a `longText` column.
-
 ## Where to go next
 
 - [Installation](installation.md) — install the package and import its CSS.

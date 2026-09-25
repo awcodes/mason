@@ -5,6 +5,17 @@ description: Install Mason and import its stylesheet into your Filament theme.
 
 # Installation
 
+## Compatibility
+
+| Filament version | Package version |
+|------------------|-----------------|
+| 3.x              | 0.x             |
+| 4.x              | 1.x             |
+| 5.x              | 2.x             |
+| 4.x & 5.x        | 3.x             |
+
+Mason requires PHP 8.2 or later and `filament/filament`.
+
 ## Requiring the package
 
 ```bash
@@ -39,6 +50,27 @@ protected $casts = [
 A `longText` column is recommended, since a document with several bricks grows quickly.
 
 Next, add the field to a form — see [Form field](fields/form.md).
+
+## Configuring Livewire's maximum nesting depth
+
+Mason synchronizes its document with Livewire as nested data. Livewire limits nested property paths to 10 levels by default, and a Mason document reaches that quickly: each brick's config sits inside the document, and a brick whose form holds repeaters or other structured fields nests further still. If you encounter a `Livewire\Exceptions\MaxNestingDepthExceededException` and your application does not already have a `config/livewire.php` file, publish Livewire's configuration file:
+
+```bash
+php artisan livewire:publish --config
+```
+
+The command overwrites an existing `config/livewire.php` file, so skip it if you have already published the configuration.
+
+Then, increase the existing `max_nesting_depth` setting in `config/livewire.php`. For example, a depth of 32 leaves room for bricks with nested fields:
+
+```php
+'payload' => [
+    // ...
+    'max_nesting_depth' => 32,
+],
+```
+
+Only change the `max_nesting_depth` value in the existing `payload` array, so that you preserve Livewire's other version-specific payload settings.
 
 ## Upgrading content stored by Mason 0.x
 
