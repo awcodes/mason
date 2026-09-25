@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Awcodes\Focus\Enums\Theme;
 use Awcodes\Focus\Screenshot;
 use Awcodes\Focus\ScreenshotSuite;
-use Playwright\Page\PageInterface;
 
 /*
  * Documentation screenshots for Mason, generated with awcodes/focus from the
@@ -17,16 +16,13 @@ $preview = 'iframe.mason-iframe';
 $firstBlock = '.mason-block[data-block-index="0"]';
 
 // The form's Save and Cancel buttons sit just below the editor, inside the default padding.
-// Hidden rather than removed, so the layout and the framing do not move.
-$hideFormActions = fn (PageInterface $page): PageInterface => $page->addStyleTag([
-    'content' => '.fi-sc-actions:has([type="submit"]) { visibility: hidden !important; }',
-]);
+$formActions = '.fi-sc-actions:has([type="submit"])';
 
 return ScreenshotSuite::make()
     ->screenshots([
         Screenshot::make('editor')
             ->visit('/admin/pages/1/edit')
-            ->beforeCapture($hideFormActions)
+            ->hide($formActions)
             ->focus('[data-focus="mason-editor"]'),
 
         Screenshot::make('brick-sidebar')
@@ -51,7 +47,7 @@ return ScreenshotSuite::make()
         Screenshot::make('mobile-preview')
             ->visit('/admin/pages/1/edit')
             ->click('[data-focus="mason-sidebar"] [data-focus-action="mason-mobile"]')
-            ->beforeCapture($hideFormActions)
+            ->hide($formActions)
             ->focus('[data-focus="mason-editor"]'),
 
         Screenshot::make('edit-brick')
