@@ -105,4 +105,10 @@ return ScreenshotSuite::make()
             ->template('two-up')
             ->screenshots(['card-editor', 'card-brick-picker'])
             ->sizes([Size::YouTube]),
+
+        // The Filament plugin directory's 2560x1440 thumbnail.
+        Card::make('thumbnail')
+            ->template('two-up')
+            ->screenshots(['card-editor', 'card-brick-picker'])
+            ->sizes([Size::Filament]),
     ]);
