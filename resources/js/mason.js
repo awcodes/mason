@@ -517,8 +517,18 @@ export default function masonComponent({
                         `.mason-outline-item[data-outline-index="${this.selectedBlockIndex}"]`,
                     )
                     .forEach((row) => {
-                        if (row.offsetParent !== null) {
-                            row.scrollIntoView({ block: 'nearest' })
+                        const list = row.closest('.mason-outline')
+
+                        if (!list || row.offsetParent === null) return
+
+                        // Scroll only the list; scrollIntoView() would also scroll the page
+                        const rowRect = row.getBoundingClientRect()
+                        const listRect = list.getBoundingClientRect()
+
+                        if (rowRect.top < listRect.top) {
+                            list.scrollTop -= listRect.top - rowRect.top
+                        } else if (rowRect.bottom > listRect.bottom) {
+                            list.scrollTop += rowRect.bottom - listRect.bottom
                         }
                     })
             })

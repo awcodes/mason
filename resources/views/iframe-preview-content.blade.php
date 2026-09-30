@@ -323,8 +323,12 @@
                 selectedBlock = block
                 updateMoveButtons(block)
 
+                // scrollIntoView() would also scroll the host page around the iframe
                 if (scroll) {
-                    block.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    window.scrollTo({
+                        top: block.getBoundingClientRect().top + window.scrollY,
+                        behavior: 'smooth',
+                    })
                 }
             }
         }
