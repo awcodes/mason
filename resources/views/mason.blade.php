@@ -63,6 +63,19 @@
                 <x-mason::controls
                     :has-color-mode-toggle="$hasColorModeToggle"
                 />
+
+                @if ($hasOutline)
+                    <x-filament::icon-button
+                        icon="heroicon-o-queue-list"
+                        color="gray"
+                        x-on:click="outlineSheetOpen = true"
+                        x-bind:aria-expanded="outlineSheetOpen"
+                        class="mason-outline-sheet-trigger"
+                        data-focus-action="mason-outline"
+                        :label="trans('mason::mason.outline.open')"
+                        :tooltip="trans('mason::mason.outline.open')"
+                    />
+                @endif
             </div>
         @endif
 
@@ -125,6 +138,10 @@
 
         @if (! $isDisabled && filled($bricks))
             <x-mason::brick-picker-modal :bricks="$bricks" />
+        @endif
+
+        @if ($hasOutline)
+            <x-mason::outline-sheet :id="'mason-outline-sheet-' . $key" />
         @endif
     </div>
 </x-dynamic-component>

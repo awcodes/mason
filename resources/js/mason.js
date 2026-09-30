@@ -24,6 +24,7 @@ export default function masonComponent({
         viewport: 'desktop',
         sidebarOpen: true,
         sidebarTab: 'bricks',
+        outlineSheetOpen: false,
         selectedBlockIndex: null,
         colorMode: hasColorModeToggle
             ? localStorage.getItem('mason-color-mode') || defaultColorMode
@@ -445,6 +446,11 @@ export default function masonComponent({
                 return
             }
 
+            // On touch, Sortable appends a copy of the dragged row to the list.
+            // Alpine would try to initialise that copy outside of x-for and fail
+            // on `item` and `index`. x-for renders its rows without the observer.
+            list._x_ignoreMutationObserver = true
+
             outlineSortables.push(
                 window.Sortable.create(list, {
                     draggable: '[data-outline-item]',
@@ -483,6 +489,15 @@ export default function masonComponent({
                     `[data-outline-index="${this.selectedBlockIndex}"] .mason-outline-select`,
                 )?.focus()
             })
+        },
+
+        closeOutlineSheet() {
+            if (!this.outlineSheetOpen) return
+
+            this.outlineSheetOpen = false
+            this.$el
+                .querySelector('.mason-outline-sheet-trigger')
+                ?.focus({ preventScroll: true })
         },
 
         focusBlock(index) {

@@ -9,6 +9,7 @@ it('does not render the outline when disabled', function () {
     Livewire::test(LivewireOutlineForm::class, ['hasOutline' => false])
         ->assertSeeHtml('mason-sidebar')
         ->assertDontSeeHtml('mason-outline-panel')
+        ->assertDontSeeHtml('mason-outline-sheet')
         ->assertDontSeeHtml('mason-sidebar-tabs');
 });
 
@@ -16,5 +17,6 @@ it('renders the outline when enabled', function () {
     Livewire::test(LivewireOutlineForm::class)
         ->assertSeeHtml('mason-outline-panel')
         ->assertSeeHtml('mason-sidebar-tabs')
+        ->assertSeeHtml('mason-outline-sheet')
         ->assertSeeHtml('outlineBricks');
 });

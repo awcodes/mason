@@ -44,6 +44,8 @@ return [
         'empty' => 'No bricks yet',
         'drag' => 'Drag to reorder',
         'keyboard_hint' => 'Select to show in the preview. Alt + Up or Down moves the brick.',
+        'open' => 'Show outline',
+        'close' => 'Close outline',
     ],
     'entry' => [
         'empty' => 'No content',

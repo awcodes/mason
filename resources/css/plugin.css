@@ -1,10 +1,14 @@
 .mason-wrapper {
     .mason-topbar {
-        @apply rounded-t-lg shadow-sm ring-1 ring-gray-950/10 transition duration-75 md:hidden dark:ring-white/20;
+        @apply flex items-center justify-between rounded-t-lg shadow-sm ring-1 ring-gray-950/10 transition duration-75 md:hidden dark:ring-white/20;
 
         + .mason-input-wrapper {
             @apply rounded-t-none md:rounded-t-lg;
         }
+    }
+
+    .mason-outline-sheet-trigger {
+        @apply me-3;
     }
 
     .mason-controls {
@@ -146,57 +150,98 @@
             @apply border-e-0 border-s;
         }
 
-        .mason-outline {
-            @apply flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-2;
+        &.sidebar-start .fi-input-wrp-input {
+            @apply flex-row-reverse;
+        }
+    }
 
-            .mason-outline-empty {
-                @apply py-2 text-xs text-gray-500 dark:text-gray-400;
+    .mason-outline {
+        @apply flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-2;
+
+        .mason-outline-empty {
+            @apply py-2 text-xs text-gray-500 dark:text-gray-400;
+        }
+
+        .mason-outline-list {
+            @apply flex flex-col gap-1;
+        }
+
+        .mason-outline-item {
+            @apply flex items-center rounded border border-gray-300 bg-white text-xs dark:border-gray-700 dark:bg-gray-800;
+
+            &.selected {
+                @apply border-primary-500 ring-1 ring-primary-500;
             }
 
-            .mason-outline-list {
-                @apply flex flex-col gap-1;
+            &.mason-outline-ghost {
+                @apply opacity-50;
             }
+        }
 
-            .mason-outline-item {
-                @apply flex items-center rounded border border-gray-300 bg-white text-xs dark:border-gray-700 dark:bg-gray-800;
+        .mason-outline-handle {
+            @apply flex shrink-0 cursor-move items-center self-stretch ps-2 pe-1 text-gray-400 dark:text-gray-500;
 
-                &.selected {
-                    @apply border-primary-500 ring-1 ring-primary-500;
-                }
-
-                &.mason-outline-ghost {
-                    @apply opacity-50;
-                }
+            svg {
+                @apply size-4;
             }
+        }
 
-            .mason-outline-handle {
-                @apply flex shrink-0 cursor-move items-center self-stretch ps-2 pe-1 text-gray-400 dark:text-gray-500;
+        .mason-outline-select {
+            @apply flex min-w-0 flex-1 items-center gap-2 py-2 pe-3 ps-1 text-start;
+
+            .mason-outline-icon {
+                @apply shrink-0;
 
                 svg {
                     @apply size-4;
                 }
             }
 
-            .mason-outline-select {
-                @apply flex min-w-0 flex-1 items-center gap-2 py-2 pe-3 ps-1 text-start;
-
-                .mason-outline-icon {
-                    @apply shrink-0;
-
-                    svg {
-                        @apply size-4;
-                    }
-                }
-
-                .mason-outline-label {
-                    @apply truncate;
-                }
+            .mason-outline-label {
+                @apply truncate;
             }
         }
+    }
 
-        &.sidebar-start .fi-input-wrp-input {
-            @apply flex-row-reverse;
+    .mason-outline-sheet-overlay {
+        @apply fixed inset-0 z-50 flex items-end bg-gray-950/30 md:hidden;
+    }
+
+    .mason-outline-sheet {
+        @apply flex max-h-[60vh] w-full flex-col overflow-hidden rounded-t-xl bg-gray-50 shadow-xl dark:bg-gray-900;
+
+        /* Larger touch targets than the sidebar */
+        .mason-outline {
+            @apply pb-[max(0.5rem,env(safe-area-inset-bottom))];
+
+            .mason-outline-item {
+                @apply text-sm;
+            }
+
+            .mason-outline-handle {
+                @apply ps-3 pe-2;
+
+                svg {
+                    @apply size-5;
+                }
+            }
+
+            .mason-outline-select {
+                @apply py-3;
+            }
         }
+    }
+
+    .mason-outline-sheet-header {
+        @apply flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700;
+    }
+
+    .mason-outline-sheet-title {
+        @apply text-base font-semibold text-gray-950 dark:text-white;
+    }
+
+    .mason-outline-sheet-close {
+        @apply rounded-lg p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300;
     }
 
     &.fullscreen {
