@@ -77,11 +77,12 @@ return ScreenshotSuite::make()
 
         // Share-image sources: the editor and the brick picker, shaped to the card templates' screenshot slots.
         // The two-up templates show the editor dark and the brick picker light, so the picker is captured in both.
+        // The whole top of the page at the slot's shape, so the heading is never cut; centring on the editor was.
         Screenshot::make('card-editor')
+            ->viewportSize(...$cardSlot)
             ->visit('/admin/pages/1/edit')
             ->hide($formActions)
-            ->focus('[data-focus="mason-editor"]')
-            ->minSize(...$cardSlot)
+            ->viewport()
             ->themes([Theme::Dark]),
 
         Screenshot::make('card-brick-picker')
