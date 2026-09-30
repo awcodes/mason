@@ -209,7 +209,7 @@
                     moveBlock(data.from, data.to)
                     break
                 case 'selectBlock':
-                    selectBlock(data.index)
+                    selectBlock(data.index, data.scroll)
                     break
                 case 'updateMoveButtons':
                     updateAllMoveButtons()
@@ -309,7 +309,7 @@
             })
         }
 
-        function selectBlock(index) {
+        function selectBlock(index, scroll = false) {
             // Remove previous selection
             if (selectedBlock) {
                 selectedBlock.classList.remove('selected')
@@ -322,6 +322,10 @@
                 block.classList.add('selected')
                 selectedBlock = block
                 updateMoveButtons(block)
+
+                if (scroll) {
+                    block.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
             }
         }
 
@@ -413,6 +417,7 @@
                 // Click on block content - select it
                 const index = parseInt(block.getAttribute('data-block-index'))
                 selectBlock(index)
+                postToParent({ type: 'blockSelected', index })
             }
         })
 

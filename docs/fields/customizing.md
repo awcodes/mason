@@ -43,6 +43,18 @@ Mason::make('content')
     ->bricks([...]);
 ```
 
+## Outline
+
+For long documents, add an outline of the content to the sidebar. It lists every brick in order. Drag a brick's handle to move it, or focus a brick and press <kbd>Alt</kbd> + <kbd>↑</kbd> or <kbd>↓</kbd>. Selecting a brick in the outline scrolls the preview to it.
+
+```php
+Mason::make('content')
+    ->outline()
+    ->bricks([...]);
+```
+
+The outline sits in an **Outline** tab next to the brick list. On wide screens in fullscreen mode, it moves into its own column on the other side of the preview, so both are visible at once.
+
 ## Light and dark mode
 
 Add a toggle to the editor sidebar so authors can preview both modes:
@@ -63,4 +75,4 @@ For this to work your application's CSS must support manually toggling dark mode
 ```
 
 > [!NOTE]
-> `sidebarPosition()`, `displayActionsAsGrid()` and the colour mode methods are editor-only. `MasonEntry` has no sidebar, though it does accept `extraInputAttributes()`.
+> `sidebarPosition()`, `displayActionsAsGrid()`, `outline()` and the colour mode methods are editor-only. `MasonEntry` has no sidebar, though it does accept `extraInputAttributes()`.

@@ -2,6 +2,7 @@
     'bricks' => [],
     'hasGridActions' => false,
     'hasColorModeToggle' => false,
+    'hasOutline' => false,
 ])
 
 @php
@@ -29,13 +30,39 @@
         'mason-sidebar',
         'has-grid-actions' => $hasGridActions,
         'has-color-mode-toggle' => $hasColorModeToggle ?? false,
+        'has-outline' => $hasOutline,
     ])
     {{ $attributes }}
 >
     <x-mason::controls :has-color-mode-toggle="$hasColorModeToggle" />
+    @if ($hasOutline)
+        <div class="mason-sidebar-tabs" role="tablist">
+            <button
+                type="button"
+                role="tab"
+                x-on:click="sidebarTab = 'bricks'"
+                x-bind:aria-selected="sidebarTab === 'bricks'"
+                x-bind:class="{ 'active': sidebarTab === 'bricks' }"
+            >
+                {{ trans('mason::mason.sidebar.tabs.bricks') }}
+            </button>
+            <button
+                type="button"
+                role="tab"
+                x-on:click="sidebarTab = 'outline'"
+                x-bind:aria-selected="sidebarTab === 'outline'"
+                x-bind:class="{ 'active': sidebarTab === 'outline' }"
+            >
+                {{ trans('mason::mason.sidebar.tabs.outline') }}
+            </button>
+        </div>
+    @endif
     <div
         class="mason-actions"
         wire:ignore
+        @if ($hasOutline)
+            x-show="sidebarTab === 'bricks'"
+        @endif
         x-data="{
             actions: @js($brickData),
             search: '',
@@ -161,4 +188,13 @@
             @endforeach
         </div>
     </div>
+    @if ($hasOutline)
+        <div
+            class="mason-sidebar-outline"
+            x-show="sidebarTab === 'outline'"
+            x-cloak
+        >
+            <x-mason::outline />
+        </div>
+    @endif
 </div>

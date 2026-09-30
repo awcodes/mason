@@ -16,6 +16,8 @@ trait HasSidebar
 
     protected bool | Closure | null $hasGridActions = null;
 
+    protected bool | Closure | null $hasOutline = null;
+
     /**
      * @param  array<Action> | Closure  $actions
      */
@@ -40,6 +42,13 @@ trait HasSidebar
         return $this;
     }
 
+    public function outline(bool | Closure $condition = true): static
+    {
+        $this->hasOutline = $condition;
+
+        return $this;
+    }
+
     /**
      * @return array<Action>
      */
@@ -56,5 +65,10 @@ trait HasSidebar
     public function hasGridActions(): bool
     {
         return $this->evaluate($this->hasGridActions) ?? false;
+    }
+
+    public function hasOutline(): bool
+    {
+        return $this->evaluate($this->hasOutline) ?? false;
     }
 }

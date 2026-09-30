@@ -11,6 +11,18 @@
     $flatBricks = $getFlatBricks();
     $defaultColorMode = $getDefaultColorMode();
     $hasColorModeToggle = $hasColorModeToggle();
+    $hasOutline = ! $isDisabled && filled($bricks) && $hasOutline();
+
+    $outlineBricks = [];
+
+    if ($hasOutline) {
+        foreach ($flatBricks as $brick) {
+            $outlineBricks[$brick::getId()] = [
+                "label" => $brick::getLabel(),
+                "icon" => generate_icon_html($brick::getIcon())?->toHtml(),
+            ];
+        }
+    }
 @endphp
 
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
@@ -32,6 +44,7 @@
                     context: @js($getRenderContext()),
                     defaultColorMode: @js($defaultColorMode),
                     hasColorModeToggle: @js($hasColorModeToggle),
+                    outlineBricks: @js($outlineBricks),
                 })"
         id="{{ "mason-wrapper-" . $statePath }}"
         class="mason-wrapper"
@@ -69,6 +82,18 @@
                         $getSidebarPosition() === \Awcodes\Mason\Enums\SidebarPosition::Start,
                 ])
             >
+                @if ($hasOutline)
+                    <div
+                        class="mason-outline-panel"
+                        data-focus="mason-outline-panel"
+                    >
+                        <div class="mason-outline-panel-header">
+                            {{ trans("mason::mason.outline.label") }}
+                        </div>
+                        <x-mason::outline />
+                    </div>
+                @endif
+
                 <div
                     wire:key="{{ "mason-editor-" . $statePath }}"
                     wire:ignore
@@ -91,6 +116,7 @@
                         :bricks="$bricks"
                         :has-grid-actions="$hasGridActions()"
                         :has-color-mode-toggle="$hasColorModeToggle"
+                        :has-outline="$hasOutline"
                         wire:key="sidebar-{{ hash('sha256', json_encode($flatBricks)) }}"
                     />
                 @endif

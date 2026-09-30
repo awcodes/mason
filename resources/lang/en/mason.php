@@ -33,6 +33,18 @@ return [
         'insert_above' => 'Insert above',
         'insert_below' => 'Insert below',
     ],
+    'sidebar' => [
+        'tabs' => [
+            'bricks' => 'Bricks',
+            'outline' => 'Outline',
+        ],
+    ],
+    'outline' => [
+        'label' => 'Outline',
+        'empty' => 'No bricks yet',
+        'drag' => 'Drag to reorder',
+        'keyboard_hint' => 'Select to show in the preview. Alt + Up or Down moves the brick.',
+    ],
     'entry' => [
         'empty' => 'No content',
     ],
