@@ -67,6 +67,27 @@ describe('Brick', function () {
         });
     });
 
+    describe('getOutlineLabel()', function () {
+        it('returns null when not overridden', function () {
+            expect(TestBrick::getOutlineLabel(['text' => 'Hello']))->toBeNull();
+        });
+
+        it('uses the plain text of a section', function () {
+            expect(Section::getOutlineLabel(['text' => '<h2>About&amp;us</h2><p>We   build things.</p>']))
+                ->toBe('About&us We build things.');
+        });
+
+        it('truncates long section text', function () {
+            expect(Section::getOutlineLabel(['text' => '<p>' . str_repeat('a', 80) . '</p>']))
+                ->toBe(str_repeat('a', 60) . '...');
+        });
+
+        it('returns null for a section without text', function () {
+            expect(Section::getOutlineLabel([]))->toBeNull()
+                ->and(Section::getOutlineLabel(['text' => ['type' => 'doc']]))->toBeNull();
+        });
+    });
+
     describe('configureBrickAction()', function () {
         it('configures the action with schema', function () {
             $action = Action::make('test');

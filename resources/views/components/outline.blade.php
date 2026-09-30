@@ -47,10 +47,18 @@
                         x-show="item.icon"
                         x-html="item.icon"
                     ></span>
-                    <span
-                        class="mason-outline-label"
-                        x-text="item.label"
-                    ></span>
+                    <span class="mason-outline-text">
+                        <span
+                            class="mason-outline-label"
+                            x-text="item.label"
+                            x-bind:title="item.label"
+                        ></span>
+                        <span
+                            class="mason-outline-type"
+                            x-show="item.type"
+                            x-text="item.type"
+                        ></span>
+                    </span>
                 </button>
             </li>
         </template>

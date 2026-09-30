@@ -197,8 +197,16 @@
                 }
             }
 
+            .mason-outline-text {
+                @apply flex min-w-0 flex-col;
+            }
+
             .mason-outline-label {
                 @apply truncate;
+            }
+
+            .mason-outline-type {
+                @apply truncate text-[0.6875rem] text-gray-500 dark:text-gray-400;
             }
         }
     }

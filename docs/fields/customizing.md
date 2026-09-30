@@ -55,6 +55,8 @@ Mason::make('content')
 
 The outline sits in an **Outline** tab next to the brick list. On wide screens in fullscreen mode, it moves into its own column on the other side of the preview, so both are visible at once. On small screens, where the sidebar is hidden, an outline button in the editor toolbar opens it as a panel from the bottom of the screen.
 
+To tell apart several bricks of the same type, give them [outline labels](../bricks/creating.md#outline-labels).
+
 ## Light and dark mode
 
 Add a toggle to the editor sidebar so authors can preview both modes:

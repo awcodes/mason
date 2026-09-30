@@ -319,6 +319,8 @@ Mason::make('content')
 
 The outline sits in an **Outline** tab next to the brick list. On wide screens in fullscreen mode, it moves into its own column on the other side of the preview, so both are visible at once. On small screens, where the sidebar is hidden, an outline button in the editor toolbar opens it as a panel from the bottom of the screen.
 
+To tell apart several bricks of the same type, see [Outline Labels](#outline-labels).
+
 ### Grouping Bricks
 
 Bricks can be organized into labeled groups in the editor sidebar by wrapping them in a `BrickGroup`. Groups are collapsible, and searching by brick name or tag will automatically expand any group that contains a match.
@@ -483,6 +485,19 @@ public static function getTags(): array
 ```
 
 By default, `getTags()` returns an empty array, so tags are entirely optional.
+
+### Outline Labels
+
+When the [outline](#outline) is enabled, each brick is listed by its label, so a page with several Sections shows several identical rows. Bricks can optionally define `getOutlineLabel()` to give each one its own name, worked out from its saved config. The outline shows it with the brick's label underneath.
+
+```php
+public static function getOutlineLabel(array $config): ?string
+{
+    return $config['heading'] ?? null;
+}
+```
+
+Returning `null` or an empty string falls back to the brick's label. It is only called when the outline is enabled, and the result is never saved with the content. The built-in Section brick uses the first 60 characters of its text.
 
 ### Accessing the Record in a Brick
 

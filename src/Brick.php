@@ -33,6 +33,16 @@ abstract class Brick
         return [];
     }
 
+    /**
+     * Distinguishes this brick from others of the same type in the editor outline.
+     *
+     * @param  array<string, mixed>  $config
+     */
+    public static function getOutlineLabel(array $config): ?string
+    {
+        return null;
+    }
+
     public static function toHtml(array $config, ?array $data = null): ?string
     {
         return null;

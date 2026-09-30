@@ -434,8 +434,13 @@ export default function masonComponent({
             return this.getBlocksFromState().map((block) => {
                 const brick = outlineBricks[block.attrs?.id]
 
+                const type =
+                    brick?.label ?? block.attrs?.label ?? block.attrs?.id
+                const outlineLabel = block.attrs?.outlineLabel
+
                 return {
-                    label: brick?.label ?? block.attrs?.label ?? block.attrs?.id,
+                    label: outlineLabel || type,
+                    type: outlineLabel ? type : null,
                     icon: brick?.icon ?? null,
                 }
             })
