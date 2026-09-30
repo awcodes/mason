@@ -56,6 +56,21 @@ class Mason extends Field implements CanBeLengthConstrained
                 $state = $state['content'];
             }
 
+            if ($component->hasOutline()) {
+                $state = array_map(function (mixed $block) use ($component): mixed {
+                    if (! is_array($block) || ($block['type'] ?? null) !== 'masonBrick') {
+                        return $block;
+                    }
+
+                    $block['attrs']['outlineLabel'] = $component->getBrickOutlineLabel(
+                        $block['attrs']['id'] ?? '',
+                        is_array($block['attrs']['config'] ?? null) ? $block['attrs']['config'] : [],
+                    );
+
+                    return $block;
+                }, $state);
+            }
+
             $component->state($state);
         });
 
@@ -76,10 +91,27 @@ class Mason extends Field implements CanBeLengthConstrained
 
                 unset($block['attrs']['label']);
                 unset($block['attrs']['preview']);
+                unset($block['attrs']['outlineLabel']);
 
                 return $block;
             }, $state);
         });
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    public function getBrickOutlineLabel(string $id, array $config): ?string
+    {
+        $brick = $this->getBrick($id);
+
+        if (! $this->hasOutline() || blank($brick)) {
+            return null;
+        }
+
+        $label = $brick::getOutlineLabel($config);
+
+        return filled($label) ? $label : null;
     }
 
     public function getDefaultActions(): array

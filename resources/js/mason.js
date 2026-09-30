@@ -7,11 +7,15 @@ export default function masonComponent({
     context = null,
     defaultColorMode = 'light',
     hasColorModeToggle = false,
+    outlineBricks = {},
 }) {
     let iframe = null
     let eventListeners = []
     let isDestroyed = false
     let savedScrollPosition = { x: 0, y: 0 }
+    let outlineSortables = []
+    // Block to re-select in the preview once it reloads after an outline move
+    let pendingFocusIndex = null
 
     return {
         state: state,
@@ -19,6 +23,9 @@ export default function masonComponent({
         fullscreen: false,
         viewport: 'desktop',
         sidebarOpen: true,
+        sidebarTab: 'bricks',
+        outlineSheetOpen: false,
+        selectedBlockIndex: null,
         colorMode: hasColorModeToggle
             ? localStorage.getItem('mason-color-mode') || defaultColorMode
             : defaultColorMode,
@@ -72,6 +79,10 @@ export default function masonComponent({
                         break
                     case 'openBrickPicker':
                         this.openBrickPicker(data.blockIndex)
+                        break
+                    case 'blockSelected':
+                        this.selectedBlockIndex = data.index
+                        this.scrollOutlineToSelected()
                         break
                     case 'keyboardShortcut':
                         const isMac =
@@ -132,6 +143,10 @@ export default function masonComponent({
             // Watch for state changes
             this.$watch('state', () => {
                 if (isDestroyed) return
+                // The preview reloads and loses its selection
+                if (pendingFocusIndex === null) {
+                    this.selectedBlockIndex = null
+                }
                 this.updateIframeContent()
                 // Update move buttons after iframe updates (with delay for iframe to load)
                 setTimeout(() => {
@@ -187,6 +202,20 @@ export default function masonComponent({
                         type: 'updateMoveButtons',
                     })
                 }, 100)
+
+                // Runs after restoreScrollPosition so the scroll isn't undone
+                if (pendingFocusIndex !== null) {
+                    const index = pendingFocusIndex
+                    pendingFocusIndex = null
+
+                    setTimeout(() => {
+                        this.sendMessageToIframe({
+                            type: 'selectBlock',
+                            index,
+                            scroll: true,
+                        })
+                    }, 150)
+                }
             })
 
             // Load initial content via form submission
@@ -383,6 +412,118 @@ export default function masonComponent({
             }, 150)
         },
 
+        moveBlockTo(from, to) {
+            const blocks = this.getBlocksFromState()
+
+            if (from < 0 || from >= blocks.length) return
+            if (to < 0 || to >= blocks.length) return
+            if (from === to) return
+
+            this.pushToUndoStack(this.captureState())
+
+            const [moved] = blocks.splice(from, 1)
+            blocks.splice(to, 0, moved)
+
+            this.selectedBlockIndex = to
+            pendingFocusIndex = to
+
+            this.updateStateFromBlocks(blocks)
+        },
+
+        outlineItems() {
+            return this.getBlocksFromState().map((block) => {
+                const brick = outlineBricks[block.attrs?.id]
+
+                const type =
+                    brick?.label ?? block.attrs?.label ?? block.attrs?.id
+                const outlineLabel = block.attrs?.outlineLabel
+
+                return {
+                    label: outlineLabel || type,
+                    type: outlineLabel ? type : null,
+                    icon: brick?.icon ?? null,
+                }
+            })
+        },
+
+        initOutline(list) {
+            if (!window.Sortable) {
+                return
+            }
+
+            // On touch, Sortable appends a copy of the dragged row to the list.
+            // Alpine would try to initialise that copy outside of x-for and fail
+            // on `item` and `index`. x-for renders its rows without the observer.
+            list._x_ignoreMutationObserver = true
+
+            outlineSortables.push(
+                window.Sortable.create(list, {
+                    draggable: '[data-outline-item]',
+                    handle: '[data-outline-handle]',
+                    animation: 150,
+                    ghostClass: 'mason-outline-ghost',
+                    onEnd: ({ item, oldDraggableIndex, newDraggableIndex }) => {
+                        if (oldDraggableIndex === newDraggableIndex) return
+
+                        // Put the row back where Sortable took it from so that
+                        // Alpine's x-for stays in charge of the DOM, then let the
+                        // state change re-render the list in its new order.
+                        list.removeChild(item)
+                        const rows = list.querySelectorAll(
+                            ':scope > [data-outline-item]',
+                        )
+                        const next = rows[oldDraggableIndex]
+                        list.insertBefore(
+                            item,
+                            next ?? rows[rows.length - 1]?.nextSibling ?? null,
+                        )
+
+                        this.moveBlockTo(oldDraggableIndex, newDraggableIndex)
+                    },
+                }),
+            )
+        },
+
+        moveOutlineBlock(from, to, button) {
+            const list = button.closest('.mason-outline-list')
+
+            this.moveBlockTo(from, to)
+
+            this.$nextTick(() => {
+                list?.querySelector(
+                    `[data-outline-index="${this.selectedBlockIndex}"] .mason-outline-select`,
+                )?.focus()
+            })
+        },
+
+        closeOutlineSheet() {
+            if (!this.outlineSheetOpen) return
+
+            this.outlineSheetOpen = false
+            this.$el
+                .querySelector('.mason-outline-sheet-trigger')
+                ?.focus({ preventScroll: true })
+        },
+
+        focusBlock(index) {
+            this.selectedBlockIndex = index
+            this.sendMessageToIframe({ type: 'selectBlock', index, scroll: true })
+        },
+
+        scrollOutlineToSelected() {
+            this.$nextTick(() => {
+                this.$el
+                    .querySelectorAll(
+                        `.mason-outline-item[data-outline-index="${this.selectedBlockIndex}"]`,
+                    )
+                    .forEach((row) => {
+                        if (row.offsetParent !== null) {
+                            row.scrollIntoView({ block: 'nearest' })
+                        }
+                    })
+            })
+        },
+
         updateStateFromBlocks(blocks) {
             // Ensure blocks is a plain array (not Proxy) before updating
             let plainBlocks = blocks
@@ -561,6 +702,7 @@ export default function masonComponent({
 
         deselectAllBlocks() {
             if (this.isUpdatingBrick) return
+            this.selectedBlockIndex = null
             this.sendMessageToIframe({ type: 'deselectAllBlocks' })
         },
 
@@ -650,6 +792,9 @@ export default function masonComponent({
                 window.removeEventListener(eventName, handler)
             })
             eventListeners = []
+
+            outlineSortables.forEach((sortable) => sortable.destroy())
+            outlineSortables = []
 
             if (iframe) {
                 // Allow a future init to rebind if the element outlives this component

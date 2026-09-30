@@ -11,6 +11,18 @@
     $flatBricks = $getFlatBricks();
     $defaultColorMode = $getDefaultColorMode();
     $hasColorModeToggle = $hasColorModeToggle();
+    $hasOutline = ! $isDisabled && filled($bricks) && $hasOutline();
+
+    $outlineBricks = [];
+
+    if ($hasOutline) {
+        foreach ($flatBricks as $brick) {
+            $outlineBricks[$brick::getId()] = [
+                "label" => $brick::getLabel(),
+                "icon" => generate_icon_html($brick::getIcon())?->toHtml(),
+            ];
+        }
+    }
 @endphp
 
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
@@ -32,6 +44,7 @@
                     context: @js($getRenderContext()),
                     defaultColorMode: @js($defaultColorMode),
                     hasColorModeToggle: @js($hasColorModeToggle),
+                    outlineBricks: @js($outlineBricks),
                 })"
         id="{{ "mason-wrapper-" . $statePath }}"
         class="mason-wrapper"
@@ -50,6 +63,19 @@
                 <x-mason::controls
                     :has-color-mode-toggle="$hasColorModeToggle"
                 />
+
+                @if ($hasOutline)
+                    <x-filament::icon-button
+                        icon="heroicon-o-queue-list"
+                        color="gray"
+                        x-on:click="outlineSheetOpen = true"
+                        x-bind:aria-expanded="outlineSheetOpen"
+                        class="mason-outline-sheet-trigger"
+                        data-focus-action="mason-outline"
+                        :label="trans('mason::mason.outline.open')"
+                        :tooltip="trans('mason::mason.outline.open')"
+                    />
+                @endif
             </div>
         @endif
 
@@ -69,6 +95,18 @@
                         $getSidebarPosition() === \Awcodes\Mason\Enums\SidebarPosition::Start,
                 ])
             >
+                @if ($hasOutline)
+                    <div
+                        class="mason-outline-panel"
+                        data-focus="mason-outline-panel"
+                    >
+                        <div class="mason-outline-panel-header">
+                            {{ trans("mason::mason.outline.label") }}
+                        </div>
+                        <x-mason::outline />
+                    </div>
+                @endif
+
                 <div
                     wire:key="{{ "mason-editor-" . $statePath }}"
                     wire:ignore
@@ -91,6 +129,7 @@
                         :bricks="$bricks"
                         :has-grid-actions="$hasGridActions()"
                         :has-color-mode-toggle="$hasColorModeToggle"
+                        :has-outline="$hasOutline"
                         wire:key="sidebar-{{ hash('sha256', json_encode($flatBricks)) }}"
                     />
                 @endif
@@ -99,6 +138,10 @@
 
         @if (! $isDisabled && filled($bricks))
             <x-mason::brick-picker-modal :bricks="$bricks" />
+        @endif
+
+        @if ($hasOutline)
+            <x-mason::outline-sheet :id="'mason-outline-sheet-' . $key" />
         @endif
     </div>
 </x-dynamic-component>

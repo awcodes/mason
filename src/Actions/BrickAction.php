@@ -55,6 +55,7 @@ class BrickAction
                         'id' => $arguments['id'],
                         'label' => $brick::getLabel(),
                         'preview' => base64_encode($brick::toHtml($data)),
+                        'outlineLabel' => $component->getBrickOutlineLabel($arguments['id'], $data),
                     ],
                 ];
 

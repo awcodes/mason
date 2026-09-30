@@ -59,6 +59,35 @@ describe('HasSidebar trait', function () {
             expect($field->getSidebarPosition())->toBe(SidebarPosition::End);
         });
     });
+
+    describe('outline()', function () {
+        it('enables the outline', function () {
+            $field = Mason::make('content')
+                ->outline();
+
+            expect($field->hasOutline())->toBeTrue();
+        });
+
+        it('accepts a condition', function () {
+            $field = Mason::make('content')
+                ->outline(false);
+
+            expect($field->hasOutline())->toBeFalse();
+        });
+
+        it('accepts closure for condition', function () {
+            $field = Mason::make('content')
+                ->outline(fn () => true);
+
+            expect($field->hasOutline())->toBeTrue();
+        });
+
+        it('defaults to false when not set', function () {
+            $field = Mason::make('content');
+
+            expect($field->hasOutline())->toBeFalse();
+        });
+    });
 });
 
 describe('SidebarPosition enum', function () {

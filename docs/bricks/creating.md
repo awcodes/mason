@@ -93,6 +93,19 @@ public static function getTags(): array
 }
 ```
 
+## Outline labels
+
+When a field has the [outline](../fields/customizing.md#outline) enabled, each brick is listed by its label, so a page with several Sections shows several identical rows. `getOutlineLabel()` gives each one its own name, worked out from its saved config. The outline shows it with the brick's label underneath:
+
+```php
+public static function getOutlineLabel(array $config): ?string
+{
+    return $config['heading'] ?? null;
+}
+```
+
+Returning `null` or an empty string falls back to the brick's label. It is only called when the outline is enabled, and the result is never saved with the content. The built-in Section brick uses the first 60 characters of its text.
+
 ## Rendering from the record
 
 `toHtml()` takes a second argument holding whatever context the renderer was given — most usefully the record the content belongs to. It is empty unless something passes it, so guard the keys you read:
