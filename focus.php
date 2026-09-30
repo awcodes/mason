@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Awcodes\Focus\Card;
+use Awcodes\Focus\Enums\Size;
 use Awcodes\Focus\Enums\Theme;
 use Awcodes\Focus\Screenshot;
 use Awcodes\Focus\ScreenshotSuite;
@@ -17,6 +19,9 @@ $firstBlock = '.mason-block[data-block-index="0"]';
 
 // The form's Save and Cancel buttons sit just below the editor, inside the default padding.
 $formActions = '.fi-sc-actions:has([type="submit"])';
+
+// The awcodes card templates frame each screenshot at 1400x816, so card screenshots are captured at that size.
+$cardSlot = [1400, 816];
 
 return ScreenshotSuite::make()
     ->screenshots([
@@ -69,4 +74,35 @@ return ScreenshotSuite::make()
             ->fullPage()
             // The Workbench front end has no dark mode, so a dark capture would be a duplicate.
             ->themes([Theme::Light]),
+
+        // Share-image sources: the editor and the brick picker, shaped to the card templates' screenshot slots.
+        // The two-up templates show the editor dark and the brick picker light, so the picker is captured in both.
+        Screenshot::make('card-editor')
+            ->visit('/admin/pages/1/edit')
+            ->hide($formActions)
+            ->focus('[data-focus="mason-editor"]')
+            ->minSize(...$cardSlot)
+            ->themes([Theme::Dark]),
+
+        Screenshot::make('card-brick-picker')
+            ->visit('/admin/pages/1/edit')
+            ->within($preview, fn (Screenshot $screenshot): Screenshot => $screenshot
+                ->click($firstBlock)
+                ->click('.mason-block.selected [data-focus-action="mason-add-brick"]'))
+            ->waitFor('[data-focus="mason-brick-picker"]')
+            ->focus('[data-focus="mason-brick-picker"]')
+            ->minSize(...$cardSlot),
+    ])
+    ->cardTemplates('https://github.com/awcodes/focus-templates/tree/v1.1.0/dist')
+    ->cards([
+        // Open Graph and the GitHub social preview share one 2400x1260 template; GitHub crops 30px top and bottom.
+        Card::make('social')
+            ->template('two-up-wide')
+            ->screenshots(['card-editor', 'card-brick-picker'])
+            ->sizes([Size::OpenGraph, Size::GitHubSocial]),
+
+        Card::make('video')
+            ->template('two-up')
+            ->screenshots(['card-editor', 'card-brick-picker'])
+            ->sizes([Size::YouTube]),
     ]);
