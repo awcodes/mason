@@ -41,6 +41,11 @@ class PageMeta extends Brick
         return ['meta', 'record', 'byline', 'page', 'details'];
     }
 
+    public static function getOutlineLabel(array $config): ?string
+    {
+        return $config['heading'] ?? null;
+    }
+
     /**
      * @param  array<string, mixed>  $config
      * @param  array<string, mixed>|null  $data

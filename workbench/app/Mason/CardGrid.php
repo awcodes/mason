@@ -38,6 +38,11 @@ class CardGrid extends Brick
         return ['cards', 'grid', 'features', 'columns'];
     }
 
+    public static function getOutlineLabel(array $config): ?string
+    {
+        return collect($config['cards'] ?? [])->pluck('heading')->filter()->join(', ');
+    }
+
     /**
      * @param  array<string, mixed>  $config
      * @param  array<string, mixed>|null  $data

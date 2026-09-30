@@ -33,6 +33,11 @@ class Hero extends Brick
         return ['hero', 'banner', 'header', 'landing page', 'marketing'];
     }
 
+    public static function getOutlineLabel(array $config): ?string
+    {
+        return $config['heading'] ?? null;
+    }
+
     /**
      * @param  array<string, mixed>  $config
      * @param  array<string, mixed>|null  $data
