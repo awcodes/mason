@@ -50,11 +50,13 @@
                     <span class="mason-outline-text">
                         <span
                             class="mason-outline-label"
+                            dir="auto"
                             x-text="item.label"
                             x-bind:title="item.label"
                         ></span>
                         <span
                             class="mason-outline-type"
+                            dir="auto"
                             x-show="item.type"
                             x-text="item.type"
                         ></span>
