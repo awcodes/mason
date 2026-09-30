@@ -61,8 +61,12 @@
                     }
                 }
 
+                .mason-sidebar-panes {
+                    @apply relative flex min-h-0 flex-1 flex-col;
+                }
+
                 .mason-sidebar-outline {
-                    @apply flex min-h-0 flex-1 flex-col;
+                    @apply absolute inset-0 flex flex-col;
                 }
 
                 .mason-actions {
@@ -279,7 +283,7 @@
             }
 
             .mason-actions {
-                @apply lg:flex!;
+                @apply lg:visible!;
             }
         }
     }
