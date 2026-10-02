@@ -49,7 +49,7 @@ on:
 # running the suite. main (Filament 3), 2.x and 1.x are frozen legacy branches.
 jobs:
   ci:
-    uses: awcodes/.github/.github/workflows/filament-plugin.yml@v1
+    uses: awcodes/.github/.github/workflows/filament-plugin.yml@ad63f1536b965fed92274516cb81f172b1d60e1a # v1.4.3
     with:
       # All seven rows were resolved locally before being committed. The two Laravel 13
       # rows only became possible once orchestra/testbench was widened to allow ^11.0.
