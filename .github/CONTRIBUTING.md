@@ -100,11 +100,11 @@ works from a clean checkout without Node. Rebuild it after changing
 
 If the project maintainer has any additional requirements, you will find them listed here.
 
-- **[PSR-2 Coding Standard](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)** – The easiest way to apply the conventions is to install [PHP Code Sniffer](https://pear.php.net/package/PHP_CodeSniffer).
+- **Code style** – This repository uses [Laravel Pint](https://laravel.com/docs/pint) with the rules in `pint.json`. Run `composer lint` before you commit.
 
 - **Add tests!** — Your patch won't be accepted if it doesn't have tests.
 
-- **Document any change in behavior** – Make sure the `README.md` and any other relevant documentation are kept up to date.
+- **Document any change in behavior** – Make sure the relevant pages in `docs/` are kept up to date.
 
 - **Consider our release cycle** – We try to follow [SemVer v2.0.0](https://semver.org/). Randomly breaking public APIs is not an option.
 
