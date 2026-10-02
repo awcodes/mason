@@ -7,6 +7,8 @@ description: Turn stored Mason content into HTML on the front end.
 
 Content is stored as JSON, so you are free to render it however you like. Mason also ships a renderer, which needs the same brick list the field used — this is where a [reusable collection](organizing.md) pays off.
 
+![The Home page rendered on the front end with the same brick views the editor uses](../assets/rendered-page-light.png)
+
 ## The helper
 
 ```blade

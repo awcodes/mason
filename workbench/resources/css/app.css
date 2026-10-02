@@ -30,3 +30,14 @@
     --color-primary-900: oklch(0.359 0.144 278.697);
     --color-primary-950: oklch(0.257 0.09 281.288);
 }
+
+/*
+ * Chromium on macOS picks the system font's optical size inconsistently for
+ * small text, so the same page could render with different glyph widths from
+ * one load to the next. Pinning it keeps generated screenshots stable.
+ */
+@layer base {
+    html {
+        font-optical-sizing: none;
+    }
+}

@@ -19,6 +19,28 @@ The name is the attribute on your model — cast to `array` or `json`, as covere
 
 `bricks()` lists what the author can insert. It also accepts a closure, and if you omit it entirely Mason falls back to its built-in `Section` brick, which is useful for a first look but rarely what you want in an application. See [Creating bricks](../bricks/creating.md).
 
+## Working in the editor
+
+Clicking a brick in the preview selects it and shows its controls: move up, move down, add, edit, and delete.
+
+![A selected hero brick with its controls in the top corner](../assets/block-controls-light.png#gh-light-mode-only)
+![A selected hero brick with its controls in the top corner](../assets/block-controls-dark.png#gh-dark-mode-only)
+
+**Add** opens the brick picker, where the author chooses whether to insert above or below the selected brick, and can search the available bricks.
+
+![The Add Brick picker with Insert above and Insert below, a search field, and the Content group of bricks](../assets/brick-picker-light.png#gh-light-mode-only)
+![The Add Brick picker with Insert above and Insert below, a search field, and the Content group of bricks](../assets/brick-picker-dark.png#gh-dark-mode-only)
+
+**Edit** opens the brick's form. How it opens is up to the brick's `configureBrickAction()`; the hero brick here uses a slide-over.
+
+![The hero brick's form open in a slide-over](../assets/edit-brick-light.png#gh-light-mode-only)
+![The hero brick's form open in a slide-over](../assets/edit-brick-dark.png#gh-dark-mode-only)
+
+The sidebar toolbar switches the preview between mobile and tablet widths and toggles fullscreen, so authors can check responsive layouts while they work. It also has clear all, undo, and redo.
+
+![The editor previewing the page at mobile width](../assets/mobile-preview-light.png#gh-light-mode-only)
+![The editor previewing the page at mobile width](../assets/mobile-preview-dark.png#gh-dark-mode-only)
+
 ## Preview layout
 
 The editor renders inside an iframe, so it needs a layout carrying your application's styles. Without one the editor shows unstyled content that looks nothing like the front end.

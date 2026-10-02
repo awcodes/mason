@@ -21,6 +21,9 @@ MasonEntry::make('content')
 
 ## Sidebar position
 
+![The brick sidebar: the toolbar, a brick search, and the Content group of bricks](../assets/brick-sidebar-light.png#gh-light-mode-only)
+![The brick sidebar: the toolbar, a brick search, and the Content group of bricks](../assets/brick-sidebar-dark.png#gh-dark-mode-only)
+
 The brick sidebar sits on the right. Move it to the left with `SidebarPosition::Start`:
 
 ```php

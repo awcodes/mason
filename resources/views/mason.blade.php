@@ -48,6 +48,7 @@
                 })"
         id="{{ "mason-wrapper-" . $statePath }}"
         class="mason-wrapper"
+        data-focus="mason-editor"
         tabindex="-1"
         x-bind:class="{
             'fullscreen': fullscreen,
