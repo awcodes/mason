@@ -102,12 +102,8 @@ return ScreenshotSuite::make()
             ->screenshots(['card-editor', 'card-brick-picker'])
             ->sizes([Size::OpenGraph, Size::GitHubSocial]),
 
-        Card::make('video')
-            ->template('two-up')
-            ->screenshots(['card-editor', 'card-brick-picker'])
-            ->sizes([Size::YouTube]),
-
-        // The Filament plugin directory's 2560x1440 thumbnail.
+        // The Filament plugin directory's 2560x1440 thumbnail. A YouTube card would be the same 16:9 canvas and
+        // template, so it would only ever be a copy of this one.
         Card::make('thumbnail')
             ->template('two-up')
             ->screenshots(['card-editor', 'card-brick-picker'])
