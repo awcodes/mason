@@ -120,6 +120,15 @@ describe('@mason directive', function () {
         expect($html)->toContain('Hello');
     });
 
+    it('accepts the helper\'s named arguments', function () use ($doc) {
+        $html = Blade::render(
+            '@mason(bricks: $bricks, content: $content)',
+            ['content' => $doc('test-brick'), 'bricks' => [TestBrick::class]],
+        );
+
+        expect($html)->toContain('Hello');
+    });
+
     it('passes data given as a third argument', function () {
         $page = Page::factory()->create(['title' => 'Directive Record']);
 
