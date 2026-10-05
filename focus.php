@@ -76,14 +76,14 @@ return ScreenshotSuite::make()
             ->themes([Theme::Light]),
 
         // Share-image sources: the editor and the brick picker, shaped to the card templates' screenshot slots.
-        // The two-up templates show the editor dark and the brick picker light, so the picker is captured in both.
+        // The two-up templates show the editor light as the large screenshot at the back, with the brick picker
+        // dark in front of its lower-left part. Cards render dark, so both are captured in both themes.
         // The whole top of the page at the slot's shape, so the heading is never cut; centring on the editor was.
         Screenshot::make('card-editor')
             ->viewportSize(...$cardSlot)
             ->visit('/admin/pages/1/edit')
             ->hide($formActions)
-            ->viewport()
-            ->themes([Theme::Dark]),
+            ->viewport(),
 
         Screenshot::make('card-brick-picker')
             ->visit('/admin/pages/1/edit')
@@ -94,18 +94,18 @@ return ScreenshotSuite::make()
             ->focus('[data-focus="mason-brick-picker"]')
             ->minSize(...$cardSlot),
     ])
-    ->cardTemplates('https://github.com/awcodes/focus-templates/tree/v1.1.1/dist')
+    ->cardTemplates('https://github.com/awcodes/focus-templates/tree/v2.0.0/dist')
     ->cards([
         // Open Graph and the GitHub social preview share one 2400x1260 template; GitHub crops 30px top and bottom.
         Card::make('social')
             ->template('two-up-wide')
-            ->screenshots(['card-editor', 'card-brick-picker'])
+            ->screenshots(['card-brick-picker', 'card-editor'])
             ->sizes([Size::OpenGraph, Size::GitHubSocial]),
 
         // The Filament plugin directory's 2560x1440 thumbnail. A YouTube card would be the same 16:9 canvas and
         // template, so it would only ever be a copy of this one.
         Card::make('thumbnail')
             ->template('two-up')
-            ->screenshots(['card-editor', 'card-brick-picker'])
+            ->screenshots(['card-brick-picker', 'card-editor'])
             ->sizes([Size::Filament]),
     ]);
