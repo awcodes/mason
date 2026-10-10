@@ -101,6 +101,19 @@ class IframeEntryRenderer
             return view('mason::components.unregistered-brick', ['label' => $id])->render();
         }
 
+        $container = $this->getContainerBrick($id);
+
+        if ($container !== null) {
+            $children = array_values(array_filter(
+                is_array($block['content'] ?? null) ? $block['content'] : [],
+                fn (mixed $child): bool => is_array($child) && $this->canContainBrick($id, (string) ($child['attrs']['id'] ?? '')),
+            ));
+
+            return $container::toHtmlWithChildren($config, new BrickChildren(
+                array_map(fn (array $child): BrickChild => new BrickChild($child, (string) $this->getBlockHtml($child)), $children),
+            ), data: $this->getData());
+        }
+
         return $brick::toHtml($config, data: $this->getData());
     }
 

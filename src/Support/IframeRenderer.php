@@ -52,8 +52,9 @@ class IframeRenderer
      * Get the HTML for a single block
      *
      * @param  array<string, mixed>  $block
+     * @param  string  $path  where the block sits, for the controls of the bricks inside it
      */
-    public function getBlockHtml(array $block): ?string
+    public function getBlockHtml(array $block, string $path = ''): ?string
     {
         if (($block['type'] ?? null) !== 'masonBrick') {
             return null;
@@ -75,6 +76,12 @@ class IframeRenderer
             return view('mason::components.unregistered-brick', ['label' => $id])->render();
         }
 
+        $container = $this->getContainerBrick($id);
+
+        if ($container !== null) {
+            return $container::toHtmlWithChildren($config, $this->getChildren($block, $path));
+        }
+
         return $brick::toHtml($config);
     }
 
@@ -83,19 +90,11 @@ class IframeRenderer
      */
     public function toHtml(?string $layout = null): string
     {
-        $blocks = array_map(function (array $block, int $index): array {
-            $html = $this->getBlockHtml($block);
-            $id = $block['attrs']['id'] ?? null;
-            $config = $block['attrs']['config'] ?? [];
-
-            return [
-                'index' => $index,
-                'id' => $id,
-                'config' => $config,
-                'html' => $html,
-                'label' => $this->getBlockLabel($id),
-            ];
-        }, $this->blocks, array_keys($this->blocks));
+        $blocks = array_map(
+            fn (array $block, int $index): array => $this->getBlockData($block, (string) $index),
+            $this->blocks,
+            array_keys($this->blocks),
+        );
 
         // Use the provided layout, fallback to config, then default
         $layoutToUse = $layout ?? config('mason.preview.layout');
@@ -111,6 +110,55 @@ class IframeRenderer
         return view('mason::iframe-preview', [
             'blocks' => $blocks,
         ])->render();
+    }
+
+    /**
+     * The bricks inside a container, each wrapped in the editor's controls, and the zone to drop more into it.
+     *
+     * @param  array<string, mixed>  $block
+     */
+    protected function getChildren(array $block, string $path): BrickChildren
+    {
+        $content = array_values(array_filter(
+            is_array($block['content'] ?? null) ? $block['content'] : [],
+            fn (mixed $child): bool => is_array($child) && ($child['type'] ?? null) === 'masonBrick',
+        ));
+
+        $children = array_map(function (array $child, int $index) use ($path, $content): BrickChild {
+            $childPath = ltrim($path . '.' . $index, '.');
+
+            return new BrickChild($child, view('mason::components.preview-block', [
+                'block' => $this->getBlockData($child, $childPath),
+                'total' => count($content),
+            ])->render());
+        }, $content, array_keys($content));
+
+        return new BrickChildren($children, view('mason::components.drop-zone', [
+            'parent' => $path,
+            'index' => count($content),
+            'isEmpty' => $content === [],
+        ])->render());
+    }
+
+    /**
+     * What the preview views need to render a block with its controls.
+     *
+     * @param  array<string, mixed>  $block
+     * @return array<string, mixed>
+     */
+    protected function getBlockData(array $block, string $path): array
+    {
+        $id = $block['attrs']['id'] ?? null;
+
+        return [
+            'index' => (int) str($path)->afterLast('.')->toString(),
+            'path' => $path,
+            'id' => $id,
+            'config' => $block['attrs']['config'] ?? [],
+            'html' => $this->getBlockHtml($block, $path),
+            'label' => $this->getBlockLabel($id),
+            'accepts' => $this->isContainerBrick($id) ? $this->getAcceptedBrickIds($id) : null,
+        ];
     }
 
     /**

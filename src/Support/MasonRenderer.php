@@ -82,29 +82,7 @@ class MasonRenderer implements Htmlable
 
     public function toUnsafeHtml(): string
     {
-        $blocks = $this->getBlocks();
-        $html = [];
-
-        foreach ($blocks as $block) {
-            if (($block['type'] ?? null) !== 'masonBrick') {
-                continue;
-            }
-
-            $id = $block['attrs']['id'] ?? null;
-            $config = $block['attrs']['config'] ?? [];
-
-            if (blank($id)) {
-                continue;
-            }
-
-            $brickHtml = $this->getBrickHtml($id, $config);
-
-            if ($brickHtml !== '' && $brickHtml !== '0') {
-                $html[] = $brickHtml;
-            }
-        }
-
-        return implode('', $html);
+        return $this->renderBlocks($this->getBlocks());
     }
 
     public function toHtml(): string
@@ -130,8 +108,9 @@ class MasonRenderer implements Htmlable
 
     /**
      * @param  array<string, mixed>  $config
+     * @param  array<int, mixed>  $content  the bricks inside a container brick
      */
-    public function getBrickHtml(string $id, array $config): string
+    public function getBrickHtml(string $id, array $config, array $content = []): string
     {
         // getBrick() resolves through getCachedBricks(), which unwraps BrickGroups.
         // Walking getBricks() directly and filtering on is_string() skipped every
@@ -143,7 +122,49 @@ class MasonRenderer implements Htmlable
             return '';
         }
 
-        return $brick::toHtml($config, data: $this->getData());
+        $container = $this->getContainerBrick($id);
+
+        if ($container !== null) {
+            $children = array_values(array_filter(
+                $content,
+                fn (mixed $block): bool => is_array($block) && $this->canContainBrick($id, (string) ($block['attrs']['id'] ?? '')),
+            ));
+
+            return (string) $container::toHtmlWithChildren($config, new BrickChildren(
+                array_map(fn (array $block): BrickChild => new BrickChild($block, $this->renderBlocks([$block])), $children),
+            ), data: $this->getData());
+        }
+
+        return (string) $brick::toHtml($config, data: $this->getData());
+    }
+
+    /**
+     * @param  array<int, mixed>  $blocks
+     */
+    protected function renderBlocks(array $blocks): string
+    {
+        $html = [];
+
+        foreach ($blocks as $block) {
+            if (! is_array($block) || ($block['type'] ?? null) !== 'masonBrick') {
+                continue;
+            }
+
+            $id = $block['attrs']['id'] ?? null;
+            $config = $block['attrs']['config'] ?? [];
+
+            if (blank($id)) {
+                continue;
+            }
+
+            $brickHtml = $this->getBrickHtml($id, $config, is_array($block['content'] ?? null) ? $block['content'] : []);
+
+            if ($brickHtml !== '' && $brickHtml !== '0') {
+                $html[] = $brickHtml;
+            }
+        }
+
+        return implode('', $html);
     }
 
     /**

@@ -1,3 +1,58 @@
+// Bricks are addressed by their path: "2" is the third brick at the top level,
+// "2.0" the first brick inside it, "" is the top level itself.
+function toPath(path) {
+    if (path === null || path === undefined || path === '') {
+        return []
+    }
+
+    return String(path).split('.').map(Number)
+}
+
+function isWithin(path, ancestor) {
+    return (
+        ancestor.length > 0 &&
+        ancestor.every((index, depth) => path[depth] === index)
+    )
+}
+
+// The bricks inside the brick at the path, or the top level for []
+function childrenAt(blocks, path, create = false) {
+    let children = blocks
+
+    for (const index of path) {
+        const block = children?.[index]
+
+        if (!block) return null
+
+        if (!Array.isArray(block.content)) {
+            if (!create) return []
+
+            block.content = []
+        }
+
+        children = block.content
+    }
+
+    return children
+}
+
+function findPath(blocks, node, prefix = []) {
+    for (let index = 0; index < blocks.length; index++) {
+        const block = blocks[index]
+        const path = [...prefix, index]
+
+        if (block === node) return path
+
+        if (Array.isArray(block?.content)) {
+            const found = findPath(block.content, node, path)
+
+            if (found) return found
+        }
+    }
+
+    return null
+}
+
 export default function masonComponent({
     key,
     state,
@@ -15,7 +70,7 @@ export default function masonComponent({
     let savedScrollPosition = { x: 0, y: 0 }
     let outlineSortables = []
     // Block to re-select in the preview once it reloads after an outline move
-    let pendingFocusIndex = null
+    let pendingFocusPath = null
 
     return {
         state: state,
@@ -25,7 +80,7 @@ export default function masonComponent({
         sidebarOpen: true,
         sidebarTab: 'bricks',
         outlineSheetOpen: false,
-        selectedBlockIndex: null,
+        selectedBlockPath: null,
         colorMode: hasColorModeToggle
             ? localStorage.getItem('mason-color-mode') || defaultColorMode
             : defaultColorMode,
@@ -33,7 +88,8 @@ export default function masonComponent({
         isInsertingBrick: false,
         previewUrl: null,
         brickPickerOpen: false,
-        brickPickerBlockIndex: null,
+        // { path } inserts next to a brick, { parent, index } at a position in a container
+        brickPickerTarget: null,
         brickPickerPosition: 'below',
 
         // Undo/Redo state
@@ -66,22 +122,49 @@ export default function masonComponent({
                         this.handleEditBlock(data)
                         break
                     case 'deleteBlockRequest':
-                        this.handleDeleteBlock(data.index)
+                        this.handleDeleteBlock(data.path ?? data.index)
                         break
                     case 'insertBlockRequest':
-                        this.handleInsertBlock(data.brickId, data.position)
+                        this.handleInsertBlock(
+                            data.brickId,
+                            data.position,
+                            data.parent ?? '',
+                        )
+                        break
+                    case 'updateBlockAttributes':
+                        this.handleUpdateBlocksAttributes([
+                            { path: data.path, attrs: data.attrs },
+                        ])
+                        break
+                    case 'updateBlocksAttributes':
+                        this.handleUpdateBlocksAttributes(data.updates)
                         break
                     case 'updateBlockRequest':
-                        this.handleUpdateBlock(data.index, data.brick)
+                        this.handleUpdateBlock(
+                            data.path ?? data.index,
+                            data.brick,
+                        )
                         break
                     case 'moveBlockRequest':
-                        this.handleMoveBlock(data.from, data.to)
+                        this.handleMoveBlock(
+                            data.from,
+                            data.toParent ?? '',
+                            data.toIndex,
+                        )
                         break
                     case 'openBrickPicker':
-                        this.openBrickPicker(data.blockIndex)
+                        this.openBrickPicker(
+                            data.path !== undefined ||
+                                data.blockIndex !== undefined
+                                ? { path: String(data.path ?? data.blockIndex) }
+                                : {
+                                      parent: data.parent ?? '',
+                                      index: data.index,
+                                  },
+                        )
                         break
                     case 'blockSelected':
-                        this.selectedBlockIndex = data.index
+                        this.selectedBlockPath = String(data.path ?? data.index)
                         this.scrollOutlineToSelected()
                         break
                     case 'keyboardShortcut':
@@ -144,8 +227,8 @@ export default function masonComponent({
             this.$watch('state', () => {
                 if (isDestroyed) return
                 // The preview reloads and loses its selection
-                if (pendingFocusIndex === null) {
-                    this.selectedBlockIndex = null
+                if (pendingFocusPath === null) {
+                    this.selectedBlockPath = null
                 }
                 this.updateIframeContent()
                 // Update move buttons after iframe updates (with delay for iframe to load)
@@ -204,14 +287,14 @@ export default function masonComponent({
                 }, 100)
 
                 // Runs after restoreScrollPosition so the scroll isn't undone
-                if (pendingFocusIndex !== null) {
-                    const index = pendingFocusIndex
-                    pendingFocusIndex = null
+                if (pendingFocusPath !== null) {
+                    const path = pendingFocusPath
+                    pendingFocusPath = null
 
                     setTimeout(() => {
                         this.sendMessageToIframe({
                             type: 'selectBlock',
-                            index,
+                            path,
                             scroll: true,
                         })
                     }, 150)
@@ -292,14 +375,14 @@ export default function masonComponent({
             }
         },
 
-        async handleInsertBlock(brickId, position) {
+        async handleInsertBlock(brickId, position, parent = '') {
             this.isInsertingBrick = true
             const preInsertState = this.captureState()
 
             try {
                 await this.$wire.mountAction(
                     'handleBrick',
-                    { id: brickId, dragPosition: position, mode: 'insert' },
+                    { id: brickId, parent, position, mode: 'insert' },
                     { schemaComponent: key },
                 )
                 this.pushToUndoStack(preInsertState)
@@ -308,7 +391,7 @@ export default function masonComponent({
             }
         },
 
-        async handleEditBlock({ index, brickId, config }) {
+        async handleEditBlock({ path, index, brickId, config }) {
             this.isUpdatingBrick = true
             const preEditState = this.captureState()
 
@@ -319,7 +402,7 @@ export default function masonComponent({
                         id: brickId,
                         config,
                         mode: 'edit',
-                        blockIndex: index,
+                        blockPath: String(path ?? index),
                     },
                     { schemaComponent: key },
                 )
@@ -329,82 +412,77 @@ export default function masonComponent({
             }
         },
 
-        handleDeleteBlock(index) {
+        handleDeleteBlock(path) {
             const blocks = this.getBlocksFromState()
+            const target = toPath(path)
+            const siblings = childrenAt(blocks, target.slice(0, -1))
+            const index = target.at(-1)
 
-            if (index >= 0 && index < blocks.length) {
+            if (siblings && index >= 0 && index < siblings.length) {
                 this.pushToUndoStack(this.captureState())
-                // Create a new array without the deleted block
-                const newBlocks = blocks.filter((_, i) => i !== index)
+                siblings.splice(index, 1)
 
-                this.updateStateFromBlocks(newBlocks)
+                this.updateStateFromBlocks(blocks)
             }
         },
 
-        handleUpdateBlock(index, brick) {
+        handleUpdateBlock(path, brick) {
             const blocks = this.getBlocksFromState()
+            const target = toPath(path)
+            const siblings = childrenAt(blocks, target.slice(0, -1))
+            const index = target.at(-1)
 
-            if (index >= 0 && index < blocks.length) {
+            if (siblings && index >= 0 && index < siblings.length) {
                 this.pushToUndoStack(this.captureState())
-                // Create a new array with the updated block
-                const newBlocks = blocks.map((block, i) =>
-                    i === index ? brick : block,
-                )
+                siblings[index] = brick
 
-                this.updateStateFromBlocks(newBlocks)
+                this.updateStateFromBlocks(blocks)
             }
         },
 
-        handleMoveBlock(from, to) {
-            const blocks = this.getBlocksFromState()
+        // Merges attributes into bricks, e.g. layout data a container keeps on its
+        // children, as one undo step. A null value removes the attribute; id and
+        // config stay untouched. updates: [{ path, attrs }]
+        handleUpdateBlocksAttributes(updates) {
+            if (!Array.isArray(updates)) return
 
-            // Validate indices
-            if (from < 0 || from >= blocks.length) return
-            // Allow to be up to blocks.length (for moving to the end)
-            if (to < 0 || to > blocks.length) return
-            if (from === to) return
+            const blocks = this.getBlocksFromState()
+            let changed = false
+
+            updates.forEach(({ path, attrs }) => {
+                if (!attrs || typeof attrs !== 'object') return
+
+                const target = toPath(path)
+                const block = childrenAt(blocks, target.slice(0, -1))?.[
+                    target.at(-1)
+                ]
+
+                if (!block) return
+
+                block.attrs = block.attrs ?? {}
+
+                Object.entries(attrs).forEach(([key, value]) => {
+                    if (key === 'id' || key === 'config') return
+
+                    if (value === null) {
+                        delete block.attrs[key]
+                    } else {
+                        block.attrs[key] = value
+                    }
+                })
+
+                changed = true
+            })
+
+            if (!changed) return
 
             this.pushToUndoStack(this.captureState())
+            this.updateStateFromBlocks(blocks)
+        },
 
-            // Create a new array with moved block (blocks are already plain from getBlocksFromState)
-            const newBlocks = blocks.slice() // Use slice instead of spread for safety
-            const moved = newBlocks[from]
-            newBlocks.splice(from, 1)
-
-            // Adjust target index after removing the block
-            // The 'to' index represents the target position in the original array
-            // After removal, indices shift for items after 'from'
-            let adjustedTo
-
-            if (to === blocks.length) {
-                // Moving to the end - insert at the end of the new array
-                adjustedTo = newBlocks.length
-            } else if (to > from) {
-                // Moving down or dragging to a position after the block
-                if (to === from + 1) {
-                    // Move down button: adjacent swap (from=0, to=1)
-                    // After removing block at 'from', insert at 'to' to swap with next block
-                    // Example: [B1(0), B2(1)] -> remove B1: [B2(0)] -> insert at 1: [B2(0), B1(1)]
-                    adjustedTo = to
-                } else {
-                    // Drag and drop: non-adjacent move (from=0, to=2+)
-                    // After removing block at 'from', the drop zone at 'to' shifts to 'to - 1'
-                    // Example: [B1(0), B2(1), B3(2)], drag B1 to drop zone 2
-                    // After removing B1: [B2(0), B3(1)]
-                    // Drop zone 2 is now at position 1, so insert at 1: [B2(0), B1(1), B3(2)]
-                    adjustedTo = to - 1
-                }
-            } else {
-                // Moving up - target is before the removed item, so no shift
-                adjustedTo = to
-            }
-
-            // Clamp to valid range (0 to newBlocks.length)
-            adjustedTo = Math.max(0, Math.min(adjustedTo, newBlocks.length))
-
-            newBlocks.splice(adjustedTo, 0, moved)
-
-            this.updateStateFromBlocks(newBlocks)
+        // toIndex is a drop position: it counts the target's bricks before the moved one is taken out
+        handleMoveBlock(from, toParent, toIndex) {
+            if (this.moveBlock(from, toParent, toIndex) === null) return
 
             // Update move buttons in iframe after move completes
             setTimeout(() => {
@@ -412,38 +490,105 @@ export default function masonComponent({
             }, 150)
         },
 
-        moveBlockTo(from, to) {
+        // Returns the moved brick's new path, or null if nothing moved
+        moveBlock(from, toParent, toIndex) {
             const blocks = this.getBlocksFromState()
+            const fromPath = toPath(from)
+            const parentPath = toPath(toParent)
 
-            if (from < 0 || from >= blocks.length) return
-            if (to < 0 || to >= blocks.length) return
-            if (from === to) return
+            if (fromPath.length === 0) return null
+
+            // A brick can't be moved into itself
+            if (isWithin(parentPath, fromPath)) return null
+
+            const source = childrenAt(blocks, fromPath.slice(0, -1))
+            const fromIndex = fromPath.at(-1)
+            const moved = source?.[fromIndex]
+            const target = childrenAt(blocks, parentPath, true)
+
+            if (!moved || !target) return null
+            if (toIndex < 0 || toIndex > target.length) return null
+            if (
+                source === target &&
+                (toIndex === fromIndex || toIndex === fromIndex + 1)
+            ) {
+                return null
+            }
 
             this.pushToUndoStack(this.captureState())
 
-            const [moved] = blocks.splice(from, 1)
-            blocks.splice(to, 0, moved)
+            // Hold the old place while inserting, so that no index shifts underneath
+            const placeholder = {}
+            source.splice(fromIndex, 1, placeholder)
+            target.splice(toIndex, 0, moved)
+            source.splice(source.indexOf(placeholder), 1)
 
-            this.selectedBlockIndex = to
-            pendingFocusIndex = to
+            const newPath = findPath(blocks, moved).join('.')
 
             this.updateStateFromBlocks(blocks)
+
+            return newPath
         },
 
+        // Moves a brick among its siblings; to is its index afterwards
+        moveBlockTo(from, to) {
+            const fromPath = toPath(from)
+            const siblings = childrenAt(
+                this.getBlocksFromState(),
+                fromPath.slice(0, -1),
+            )
+            const fromIndex = fromPath.at(-1)
+
+            if (!siblings || to < 0 || to >= siblings.length) return
+            if (fromIndex === to) return
+
+            // A position after the brick counts it as still being there
+            const newPath = this.moveBlock(
+                from,
+                fromPath.slice(0, -1).join('.'),
+                to > fromIndex ? to + 1 : to,
+            )
+
+            if (newPath === null) return
+
+            this.selectedBlockPath = newPath
+            pendingFocusPath = newPath
+        },
+
+        // The outline lists nested bricks below their container, indented by depth
         outlineItems() {
-            return this.getBlocksFromState().map((block) => {
-                const brick = outlineBricks[block.attrs?.id]
+            const items = []
 
-                const type =
-                    brick?.label ?? block.attrs?.label ?? block.attrs?.id
-                const outlineLabel = block.attrs?.outlineLabel
+            const visit = (blocks, prefix) => {
+                blocks.forEach((block, index) => {
+                    if (!block || block.type !== 'masonBrick') return
 
-                return {
-                    label: outlineLabel || type,
-                    type: outlineLabel ? type : null,
-                    icon: brick?.icon ?? null,
-                }
-            })
+                    const path = [...prefix, index]
+                    const brick = outlineBricks[block.attrs?.id]
+
+                    const type =
+                        brick?.label ?? block.attrs?.label ?? block.attrs?.id
+                    const outlineLabel = block.attrs?.outlineLabel
+
+                    items.push({
+                        path: path.join('.'),
+                        depth: prefix.length,
+                        index,
+                        siblings: blocks.length,
+                        label: outlineLabel || type,
+                        type: outlineLabel ? type : null,
+                        icon: brick?.icon ?? null,
+                    })
+
+                    if (Array.isArray(block.content)) {
+                        visit(block.content, path)
+                    }
+                })
+            }
+
+            visit(this.getBlocksFromState(), [])
+
+            return items
         },
 
         initOutline(list) {
@@ -456,42 +601,45 @@ export default function masonComponent({
             // on `item` and `index`. x-for renders its rows without the observer.
             list._x_ignoreMutationObserver = true
 
+            let originalNextSibling = null
+
             outlineSortables.push(
+                // Only top level rows are dragged here; nested bricks move with
+                // the keyboard or in the preview
                 window.Sortable.create(list, {
-                    draggable: '[data-outline-item]',
+                    draggable: '[data-outline-item][data-outline-depth="0"]',
                     handle: '[data-outline-handle]',
                     animation: 150,
                     ghostClass: 'mason-outline-ghost',
+                    onStart: ({ item }) => {
+                        originalNextSibling = item.nextSibling
+                    },
                     onEnd: ({ item, oldDraggableIndex, newDraggableIndex }) => {
-                        if (oldDraggableIndex === newDraggableIndex) return
-
                         // Put the row back where Sortable took it from so that
                         // Alpine's x-for stays in charge of the DOM, then let the
                         // state change re-render the list in its new order.
-                        list.removeChild(item)
-                        const rows = list.querySelectorAll(
-                            ':scope > [data-outline-item]',
-                        )
-                        const next = rows[oldDraggableIndex]
-                        list.insertBefore(
-                            item,
-                            next ?? rows[rows.length - 1]?.nextSibling ?? null,
-                        )
+                        list.insertBefore(item, originalNextSibling)
+                        originalNextSibling = null
 
-                        this.moveBlockTo(oldDraggableIndex, newDraggableIndex)
+                        if (oldDraggableIndex === newDraggableIndex) return
+
+                        this.moveBlockTo(
+                            String(oldDraggableIndex),
+                            newDraggableIndex,
+                        )
                     },
                 }),
             )
         },
 
-        moveOutlineBlock(from, to, button) {
+        moveOutlineBlock(path, delta, button) {
             const list = button.closest('.mason-outline-list')
 
-            this.moveBlockTo(from, to)
+            this.moveBlockTo(path, toPath(path).at(-1) + delta)
 
             this.$nextTick(() => {
                 list?.querySelector(
-                    `[data-outline-index="${this.selectedBlockIndex}"] .mason-outline-select`,
+                    `[data-outline-path="${this.selectedBlockPath}"] .mason-outline-select`,
                 )?.focus()
             })
         },
@@ -505,16 +653,20 @@ export default function masonComponent({
                 ?.focus({ preventScroll: true })
         },
 
-        focusBlock(index) {
-            this.selectedBlockIndex = index
-            this.sendMessageToIframe({ type: 'selectBlock', index, scroll: true })
+        focusBlock(path) {
+            this.selectedBlockPath = path
+            this.sendMessageToIframe({
+                type: 'selectBlock',
+                path,
+                scroll: true,
+            })
         },
 
         scrollOutlineToSelected() {
             this.$nextTick(() => {
                 this.$el
                     .querySelectorAll(
-                        `.mason-outline-item[data-outline-index="${this.selectedBlockIndex}"]`,
+                        `.mason-outline-item[data-outline-path="${this.selectedBlockPath}"]`,
                     )
                     .forEach((row) => {
                         const list = row.closest('.mason-outline')
@@ -712,27 +864,37 @@ export default function masonComponent({
 
         deselectAllBlocks() {
             if (this.isUpdatingBrick) return
-            this.selectedBlockIndex = null
+            this.selectedBlockPath = null
             this.sendMessageToIframe({ type: 'deselectAllBlocks' })
         },
 
-        openBrickPicker(blockIndex) {
-            this.brickPickerBlockIndex = blockIndex
+        openBrickPicker(target) {
+            this.brickPickerTarget = target
             this.brickPickerOpen = true
         },
 
         closeBrickPicker() {
             this.brickPickerOpen = false
-            this.brickPickerBlockIndex = null
+            this.brickPickerTarget = null
             this.brickPickerPosition = 'below'
         },
 
         insertFromPicker(brickId) {
-            const position =
-                this.brickPickerPosition === 'above'
-                    ? this.brickPickerBlockIndex
-                    : this.brickPickerBlockIndex + 1
-            this.handleInsertBlock(brickId, position)
+            const target = this.brickPickerTarget ?? { parent: '', index: null }
+
+            if (target.path !== undefined) {
+                const path = toPath(target.path)
+                const index = path.at(-1)
+
+                this.handleInsertBlock(
+                    brickId,
+                    this.brickPickerPosition === 'above' ? index : index + 1,
+                    path.slice(0, -1).join('.'),
+                )
+            } else {
+                this.handleInsertBlock(brickId, target.index, target.parent)
+            }
+
             this.closeBrickPicker()
         },
 

@@ -17,6 +17,7 @@ navigation:
     children:
       - bricks/creating
       - bricks/organizing
+      - bricks/containers
       - bricks/rendering
 
   - faker

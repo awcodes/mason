@@ -8,6 +8,7 @@ use Awcodes\Mason\Actions\BrickAction;
 use Awcodes\Mason\Concerns\HasBricks;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\BrickCommand;
+use Awcodes\Mason\Support\BrickTree;
 use Awcodes\Mason\Support\RenderContext;
 use Closure;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
@@ -57,8 +58,8 @@ class Mason extends Field implements CanBeLengthConstrained
             }
 
             if ($component->hasOutline()) {
-                $state = array_map(function (mixed $block) use ($component): mixed {
-                    if (! is_array($block) || ($block['type'] ?? null) !== 'masonBrick') {
+                $state = BrickTree::map($state, function (array $block) use ($component): array {
+                    if (($block['type'] ?? null) !== 'masonBrick') {
                         return $block;
                     }
 
@@ -68,7 +69,7 @@ class Mason extends Field implements CanBeLengthConstrained
                     );
 
                     return $block;
-                }, $state);
+                });
             }
 
             $component->state($state);
@@ -84,7 +85,7 @@ class Mason extends Field implements CanBeLengthConstrained
             }
 
             // Remove preview data before saving
-            return array_map(function (array $block): array {
+            return BrickTree::map($state, function (array $block): array {
                 if (($block['type'] ?? null) !== 'masonBrick') {
                     return $block;
                 }
@@ -94,7 +95,7 @@ class Mason extends Field implements CanBeLengthConstrained
                 unset($block['attrs']['outlineLabel']);
 
                 return $block;
-            }, $state);
+            });
         });
     }
 
@@ -208,6 +209,34 @@ class Mason extends Field implements CanBeLengthConstrained
     }
 
     /**
+     * The brick at the path, or null for the top level and paths that don't exist.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function getBrickAt(string | int | null $path): ?array
+    {
+        $state = $this->getState();
+
+        return is_array($state) ? BrickTree::get($state, $path) : null;
+    }
+
+    /**
+     * Whether a brick may be placed in the brick at the path (null for the top level).
+     */
+    public function canInsertBrickInto(string | int | null $parent, string $brickId): bool
+    {
+        if (BrickTree::parse($parent) === []) {
+            return $this->canContainBrick(null, $brickId);
+        }
+
+        $container = $this->getBrickAt($parent);
+
+        return $container !== null && $this->canContainBrick($container['attrs']['id'] ?? null, $brickId);
+    }
+
+    /**
+     * Positions are indexes at the top level, or paths like "2.0" for bricks inside container bricks.
+     *
      * @param  array<int, array<string, mixed>>  $state
      * @param  array<string, mixed>  $arguments
      * @return array<int, array<string, mixed>>
@@ -215,15 +244,22 @@ class Mason extends Field implements CanBeLengthConstrained
     protected function executeInsertBrick(array $state, array $arguments): array
     {
         $brick = $arguments['brick'] ?? null;
-        $position = $arguments['position'] ?? count($state);
+        $parent = $arguments['parent'] ?? null;
+        $position = $arguments['position'] ?? null;
 
         if (! $brick) {
             return $state;
         }
 
-        array_splice($state, $position, 0, [$brick]);
+        if (BrickTree::parse($parent) !== []) {
+            $container = BrickTree::get($state, $parent);
 
-        return $state;
+            if ($container === null || ! $this->canContainBrick($container['attrs']['id'] ?? null, (string) ($brick['attrs']['id'] ?? ''))) {
+                return $state;
+            }
+        }
+
+        return BrickTree::insert($state, $parent, $position === null ? null : (int) $position, $brick);
     }
 
     /**
@@ -236,13 +272,27 @@ class Mason extends Field implements CanBeLengthConstrained
         $index = $arguments['index'] ?? null;
         $brick = $arguments['brick'] ?? null;
 
-        if ($index === null || ! isset($state[$index]) || ! $brick) {
+        if ($index === null || ! $brick) {
             return $state;
         }
 
-        $state[$index] = $brick;
+        $current = BrickTree::get($state, $index);
 
-        return $state;
+        if ($current === null) {
+            return $state;
+        }
+
+        // Editing a container brick changes its settings, not the bricks inside it
+        if (! array_key_exists('content', $brick) && array_key_exists('content', $current)) {
+            $brick['content'] = $current['content'];
+        }
+
+        // Nor the attributes set from elsewhere, e.g. layout data its container keeps on it
+        if (is_array($current['attrs'] ?? null) && is_array($brick['attrs'] ?? null)) {
+            $brick['attrs'] = [...$current['attrs'], ...$brick['attrs']];
+        }
+
+        return BrickTree::update($state, $index, $brick);
     }
 
     /**
@@ -254,16 +304,16 @@ class Mason extends Field implements CanBeLengthConstrained
     {
         $index = $arguments['index'] ?? null;
 
-        if ($index === null || ! isset($state[$index])) {
+        if ($index === null) {
             return $state;
         }
 
-        array_splice($state, $index, 1);
-
-        return $state;
+        return BrickTree::remove($state, $index);
     }
 
     /**
+     * Without a parent the brick moves among its siblings, and "to" is its index afterwards.
+     *
      * @param  array<int, array<string, mixed>>  $state
      * @param  array<string, mixed>  $arguments
      * @return array<int, array<string, mixed>>
@@ -273,13 +323,22 @@ class Mason extends Field implements CanBeLengthConstrained
         $from = $arguments['from'] ?? null;
         $to = $arguments['to'] ?? null;
 
-        if ($from === null || $to === null || ! isset($state[$from])) {
+        if ($from === null || $to === null || BrickTree::get($state, $from) === null) {
             return $state;
         }
 
-        $moved = array_splice($state, $from, 1);
-        array_splice($state, $to, 0, $moved);
+        $fromPath = BrickTree::parse($from);
+        $parent = array_key_exists('parent', $arguments) ? $arguments['parent'] : array_slice($fromPath, 0, -1);
 
-        return $state;
+        if (BrickTree::parse($parent) !== []) {
+            $container = BrickTree::get($state, $parent);
+            $brick = BrickTree::get($state, $from);
+
+            if ($container === null || ! $this->canContainBrick($container['attrs']['id'] ?? null, (string) ($brick['attrs']['id'] ?? ''))) {
+                return $state;
+            }
+        }
+
+        return BrickTree::move($state, $fromPath, $parent, (int) $to);
     }
 }

@@ -8,18 +8,17 @@
         x-init="initOutline($el)"
         aria-label="{{ trans('mason::mason.outline.label') }}"
     >
-        <template
-            x-for="(item, index) in outlineItems()"
-            x-bind:key="index"
-        >
+        <template x-for="item in outlineItems()" x-bind:key="item.path">
             <li
                 data-outline-item
                 class="mason-outline-item"
-                x-bind:data-outline-index="index"
-                x-bind:class="{ 'selected': selectedBlockIndex === index }"
+                x-bind:data-outline-path="item.path"
+                x-bind:data-outline-depth="item.depth"
+                x-bind:style="{ '--mason-outline-depth': item.depth }"
+                x-bind:class="{ 'selected': selectedBlockPath === item.path }"
             >
                 <span
-                    data-outline-handle
+                    x-bind:data-outline-handle="item.depth === 0 ? '' : null"
                     class="mason-outline-handle"
                     title="{{ trans('mason::mason.outline.drag') }}"
                     aria-hidden="true"
@@ -38,9 +37,9 @@
                     type="button"
                     class="mason-outline-select"
                     title="{{ trans('mason::mason.outline.keyboard_hint') }}"
-                    x-on:click="focusBlock(index)"
-                    x-on:keydown.alt.arrow-up.prevent="moveOutlineBlock(index, index - 1, $el)"
-                    x-on:keydown.alt.arrow-down.prevent="moveOutlineBlock(index, index + 1, $el)"
+                    x-on:click="focusBlock(item.path)"
+                    x-on:keydown.alt.arrow-up.prevent="moveOutlineBlock(item.path, -1, $el)"
+                    x-on:keydown.alt.arrow-down.prevent="moveOutlineBlock(item.path, 1, $el)"
                 >
                     <span
                         class="mason-outline-icon"

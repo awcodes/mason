@@ -12,7 +12,8 @@ body {
     cursor: move;
     transition: outline 0.2s;
 }
-.mason-block:hover {
+/* Only the innermost hovered block, not every container around it */
+.mason-block:hover:not(.selected):not(:has(.mason-block:hover)) {
     outline: 2px dashed var(--mason-border-color, #0ea5e9);
     outline-offset: 2px;
 }
@@ -45,6 +46,17 @@ body {
 .mason-block-content {
     pointer-events: none;
 }
+/* The bricks inside a container brick stay interactive */
+.mason-block-content .mason-block,
+.mason-block-content .mason-drop-zone {
+    pointer-events: auto;
+}
+.mason-block.mason-drop-before {
+    box-shadow: 0 -3px 0 0 var(--mason-border-color, #0ea5e9);
+}
+.mason-block.mason-drop-after {
+    box-shadow: 0 3px 0 0 var(--mason-border-color, #0ea5e9);
+}
 .mason-block.dragging .mason-block-content * {
     pointer-events: none !important;
     user-select: none !important;
@@ -63,7 +75,7 @@ body {
     background: var(--mason-controls-background, rgba(0, 0, 0, 0.8));
     border-radius: 0.25rem;
 }
-.mason-block.selected .mason-block-controls {
+.mason-block.selected > .mason-block-controls {
     display: flex;
 }
 .mason-block-btn {
@@ -110,6 +122,47 @@ body {
         margin-top: -2rem;
         margin-bottom: 0;
     }
+}
+.mason-drop-zone-nested {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.5rem;
+    margin: 0;
+    border-radius: 0.25rem;
+    color: var(--mason-drop-zone-text, #9ca3af);
+}
+.mason-drop-zone.mason-drop-zone-nested.active {
+    margin: 0;
+}
+.mason-drop-zone-nested.mason-drop-zone-empty {
+    min-height: 4rem;
+    border-color: var(--mason-drop-zone-border, rgba(156, 163, 175, 0.5));
+}
+.mason-drop-zone-add {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 0.25rem;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    svg {
+        width: 1rem;
+        height: 1rem;
+    }
+}
+.mason-drop-zone-empty .mason-drop-zone-add,
+.mason-block:hover > .mason-block-content .mason-drop-zone-add,
+.mason-drop-zone-add:focus-visible {
+    opacity: 1;
 }
 .mason-unregistered-brick {
     display: flex;

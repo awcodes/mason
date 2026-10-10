@@ -22,6 +22,7 @@ class BrickCollection
                     PageMeta::class,
                 ]),
             Section::class,
+            Columns::class,
             Divider::class,
         ];
     }

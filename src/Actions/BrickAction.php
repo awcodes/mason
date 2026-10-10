@@ -6,6 +6,7 @@ namespace Awcodes\Mason\Actions;
 
 use Awcodes\Mason\Mason;
 use Awcodes\Mason\Support\BrickCommand;
+use Awcodes\Mason\Support\BrickTree;
 use Filament\Actions\Action;
 use Filament\Support\Enums\Width;
 
@@ -54,7 +55,7 @@ class BrickAction
                         'config' => $data,
                         'id' => $arguments['id'],
                         'label' => $brick::getLabel(),
-                        'preview' => base64_encode($brick::toHtml($data)),
+                        'preview' => base64_encode((string) $brick::toHtml($data)),
                         'outlineLabel' => $component->getBrickOutlineLabel($arguments['id'], $data),
                     ],
                 ];
@@ -66,21 +67,28 @@ class BrickAction
                     $state = [];
                 }
 
-                // Insert at the dragged position
-                if (filled($arguments['dragPosition'] ?? null)) {
-                    $position = (int) $arguments['dragPosition'];
+                // Edit existing block, addressed by its path ("2.0") or its top level index
+                $blockPath = $arguments['blockPath'] ?? $arguments['blockIndex'] ?? null;
+
+                if ($mode === 'edit' && $blockPath !== null) {
                     $component->executeCommands([
-                        BrickCommand::insertBrick($brickContent, $position),
+                        BrickCommand::updateBrick(is_int($blockPath) ? $blockPath : (string) $blockPath, $brickContent),
                     ]);
 
                     return;
                 }
 
-                // Edit existing block
-                if ($mode === 'edit' && isset($arguments['blockIndex'])) {
-                    $index = (int) $arguments['blockIndex'];
+                // Insert into a container brick, or at the top level without a parent
+                $parent = filled($arguments['parent'] ?? null) ? (string) $arguments['parent'] : null;
+                $position = $arguments['position'] ?? $arguments['dragPosition'] ?? null;
+
+                if (filled($position) || $parent !== null) {
                     $component->executeCommands([
-                        BrickCommand::updateBrick($index, $brickContent),
+                        BrickCommand::insertBrick(
+                            $brickContent,
+                            filled($position) ? (int) $position : count(BrickTree::children($state, $parent)),
+                            $parent,
+                        ),
                     ]);
 
                     return;

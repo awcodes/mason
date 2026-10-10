@@ -16,15 +16,24 @@ class Faker
         return new self;
     }
 
-    public function brick(string $id, array $config): static
+    /**
+     * @param  self|null  $children  the bricks inside a container brick
+     */
+    public function brick(string $id, array $config, ?self $children = null): static
     {
-        $this->output['content'][] = [
+        $brick = [
             'type' => 'masonBrick',
             'attrs' => [
                 'config' => $config,
                 'id' => $id,
             ],
         ];
+
+        if ($children instanceof self) {
+            $brick['content'] = $children->output['content'];
+        }
+
+        $this->output['content'][] = $brick;
 
         return $this;
     }

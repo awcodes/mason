@@ -7,6 +7,7 @@ namespace Awcodes\Mason\Concerns;
 use Awcodes\Mason\Brick;
 use Awcodes\Mason\BrickGroup;
 use Awcodes\Mason\Bricks\Section;
+use Awcodes\Mason\Contracts\ContainsBricks;
 use Closure;
 
 trait HasBricks
@@ -114,5 +115,68 @@ trait HasBricks
     public function getBrick(string $id): ?string
     {
         return $this->getCachedBricks()[$id] ?? null;
+    }
+
+    /**
+     * @return ?class-string<ContainsBricks>
+     */
+    public function getContainerBrick(?string $id): ?string
+    {
+        $brick = filled($id) ? $this->getBrick($id) : null;
+
+        return $brick !== null && is_subclass_of($brick, ContainsBricks::class) ? $brick : null;
+    }
+
+    public function isContainerBrick(?string $id): bool
+    {
+        return $this->getContainerBrick($id) !== null;
+    }
+
+    /**
+     * Whether a brick may be placed in another one. A null parent is the top level.
+     */
+    public function canContainBrick(?string $parentId, string $childId): bool
+    {
+        if ($this->getBrick($childId) === null) {
+            return false;
+        }
+
+        if ($parentId === null) {
+            return true;
+        }
+
+        $container = $this->getContainerBrick($parentId);
+
+        if ($container === null) {
+            return false;
+        }
+
+        $allowed = $container::getAllowedChildren();
+
+        if ($allowed === null) {
+            return true;
+        }
+
+        return in_array($childId, array_map(
+            fn (string $brick): string => is_subclass_of($brick, Brick::class) ? $brick::getId() : $brick,
+            $allowed,
+        ), true);
+    }
+
+    /**
+     * The ids of the bricks a container accepts. Used by the editor while dragging.
+     *
+     * @return list<string>
+     */
+    public function getAcceptedBrickIds(string $parentId): array
+    {
+        if (! $this->isContainerBrick($parentId)) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            array_keys($this->getCachedBricks()),
+            fn (string $id): bool => $this->canContainBrick($parentId, $id),
+        ));
     }
 }
