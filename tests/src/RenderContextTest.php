@@ -86,6 +86,15 @@ describe('iframe routes', function () {
             ->toContain('<div class="test-brick">');
     })->with(['mason.preview', 'mason.entry']);
 
+    it('only takes messages from the editor around the preview', function () use ($blocks) {
+        $response = $this->post(route('mason.preview'), [
+            'blocks' => $blocks,
+            'context' => RenderContext::encode([TestBrick::class], null),
+        ]);
+
+        expect($response->getContent())->toContain('if (event.source !== window.parent) return');
+    });
+
     it('ignores bricks and a layout posted in the clear', function (string $route) use ($blocks) {
         $response = $this->post(route($route), [
             'blocks' => $blocks,

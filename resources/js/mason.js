@@ -45,8 +45,9 @@ export default function masonComponent({
         async init() {
             // Listen for messages from iframe
             const messageHandler = (event) => {
-                // Security: verify origin if needed
-                // if (event.origin !== window.location.origin) return
+                // Only this editor's own preview sends commands. Other windows
+                // that can reach this one, e.g. a page opened from it, cannot.
+                if (!iframe || event.source !== iframe.contentWindow) return
 
                 const { type, instanceId, ...data } = event.data
 
