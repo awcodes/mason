@@ -9,13 +9,17 @@ use Illuminate\Support\Facades\Crypt;
 use JsonException;
 
 /**
- * Carries a field's bricks and layout across the iframe request boundary.
+ * Carries a field's bricks, layout and preview data across the iframe request boundary.
  *
  * The preview and entry render in an iframe fed by a POST to the Mason
  * controller, so the controller cannot see the field that owns them. Both the
  * brick classes and the layout view name decide what code runs server side,
  * so they travel signed: a client can replay what it was given, but cannot
  * name its own classes or views.
+ *
+ * Preview data (Mason::previewData()) is plain JSON for the bricks, e.g. the
+ * language of the record being edited. It is signed, not encrypted, so it must
+ * hold nothing secret.
  *
  * The token is signed rather than encrypted because nothing in it is secret,
  * and it must be deterministic: it lives in the component's x-data, and a
@@ -25,23 +29,25 @@ class RenderContext
 {
     /**
      * @param  array<class-string<Brick>>  $bricks
+     * @param  array<string, mixed>  $data
      */
-    public static function encode(array $bricks, ?string $layout): string
+    public static function encode(array $bricks, ?string $layout, array $data = []): string
     {
-        $json = json_encode([
+        $json = json_encode(array_filter([
             'bricks' => array_values($bricks),
             'layout' => $layout,
-        ], JSON_THROW_ON_ERROR);
+            'data' => $data,
+        ], fn (mixed $value, string $key): bool => $key !== 'data' || $value !== [], ARRAY_FILTER_USE_BOTH), JSON_THROW_ON_ERROR);
 
         return base64_encode($json) . '.' . static::sign($json);
     }
 
     /**
-     * @return array{bricks: array<class-string<Brick>>, layout: ?string}
+     * @return array{bricks: array<class-string<Brick>>, layout: ?string, data: array<string, mixed>}
      */
     public static function decode(mixed $payload): array
     {
-        $empty = ['bricks' => [], 'layout' => null];
+        $empty = ['bricks' => [], 'layout' => null, 'data' => []];
 
         if (! is_string($payload) || ! str_contains($payload, '.')) {
             return $empty;
@@ -76,6 +82,7 @@ class RenderContext
                 fn (mixed $brick): bool => is_string($brick) && is_subclass_of($brick, Brick::class),
             )),
             'layout' => is_string($layout) && $layout !== '' ? $layout : null,
+            'data' => is_array($decoded['data'] ?? null) ? $decoded['data'] : [],
         ];
     }
 

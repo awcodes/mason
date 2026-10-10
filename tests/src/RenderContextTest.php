@@ -7,6 +7,7 @@ use Awcodes\Mason\MasonEntry;
 use Awcodes\Mason\Support\IframeEntryRenderer;
 use Awcodes\Mason\Support\IframeRenderer;
 use Awcodes\Mason\Support\RenderContext;
+use Awcodes\Mason\Tests\Fixtures\PreviewDataBrick;
 use Awcodes\Mason\Tests\Fixtures\SimpleBrick;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
 use Workbench\App\Models\Page;
@@ -19,7 +20,16 @@ describe('RenderContext', function () {
         expect($context)->toBe([
             'bricks' => [TestBrick::class, SimpleBrick::class],
             'layout' => 'fixtures.layout',
+            'data' => [],
         ]);
+    });
+
+    it('round trips preview data and leaves it out when there is none', function () {
+        $context = RenderContext::decode(RenderContext::encode([TestBrick::class], null, ['language' => 2]));
+
+        expect($context['data'])->toBe(['language' => 2])
+            ->and(RenderContext::encode([TestBrick::class], null, []))
+            ->toBe(RenderContext::encode([TestBrick::class], null));
     });
 
     it('is deterministic, so re-renders do not change the component', function () {
@@ -31,11 +41,11 @@ describe('RenderContext', function () {
         [, $signature] = explode('.', RenderContext::encode([TestBrick::class], null));
         $forged = base64_encode(json_encode(['bricks' => [SimpleBrick::class], 'layout' => 'fixtures.layout'])) . '.' . $signature;
 
-        expect(RenderContext::decode($forged))->toBe(['bricks' => [], 'layout' => null]);
+        expect(RenderContext::decode($forged))->toBe(['bricks' => [], 'layout' => null, 'data' => []]);
     });
 
     it('treats a missing or forged context as empty', function (mixed $payload) {
-        expect(RenderContext::decode($payload))->toBe(['bricks' => [], 'layout' => null]);
+        expect(RenderContext::decode($payload))->toBe(['bricks' => [], 'layout' => null, 'data' => []]);
     })->with([
         'null' => [null],
         'empty string' => [''],
@@ -58,10 +68,13 @@ describe('RenderContext', function () {
         expect(RenderContext::decode($field->getRenderContext()))->toBe([
             'bricks' => [TestBrick::class],
             'layout' => 'fixtures.layout',
+            'data' => [],
         ])->and(RenderContext::decode($entry->getRenderContext()))->toBe([
             'bricks' => [SimpleBrick::class],
             'layout' => config('mason.entry.layout'),
-        ]);
+            'data' => [],
+        ])->and(RenderContext::decode($field->previewData(fn (): array => ['language' => 2])->getRenderContext())['data'])
+            ->toBe(['language' => 2]);
     });
 });
 
@@ -85,6 +98,23 @@ describe('iframe routes', function () {
             ->toContain('data-fixture-layout')
             ->toContain('<div class="test-brick">');
     })->with(['mason.preview', 'mason.entry']);
+
+    it('gives the bricks in the preview the signed preview data, and null without', function () {
+        $blocks = json_encode([['type' => 'masonBrick', 'attrs' => ['id' => 'preview-data-brick', 'config' => []]]]);
+
+        $withData = $this->post(route('mason.preview'), [
+            'blocks' => $blocks,
+            'context' => RenderContext::encode([PreviewDataBrick::class], null, ['language' => 2]),
+        ]);
+
+        $withoutData = $this->post(route('mason.preview'), [
+            'blocks' => $blocks,
+            'context' => RenderContext::encode([PreviewDataBrick::class], null),
+        ]);
+
+        expect($withData->getContent())->toContain(e(json_encode(['language' => 2])))
+            ->and($withoutData->getContent())->toContain('no data');
+    });
 
     it('ignores bricks and a layout posted in the clear', function (string $route) use ($blocks) {
         $response = $this->post(route($route), [

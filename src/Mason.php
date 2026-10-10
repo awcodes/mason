@@ -38,6 +38,11 @@ class Mason extends Field implements CanBeLengthConstrained
 
     protected bool | Closure $showColorModeToggle = false;
 
+    /**
+     * @var array<string, mixed> | Closure
+     */
+    protected array | Closure $previewData = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -180,7 +185,30 @@ class Mason extends Field implements CanBeLengthConstrained
      */
     public function getRenderContext(): string
     {
-        return RenderContext::encode($this->getFlatBricks(), $this->getPreviewLayout());
+        return RenderContext::encode($this->getFlatBricks(), $this->getPreviewLayout(), $this->getPreviewData());
+    }
+
+    /**
+     * Data the bricks get in the editor preview as toHtml()'s $data, e.g. the language of the record being edited.
+     * Without it they get null. It travels signed, not encrypted, so it must be JSON and hold nothing secret.
+     *
+     * @param  array<string, mixed> | Closure  $data
+     */
+    public function previewData(array | Closure $data): static
+    {
+        $this->previewData = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getPreviewData(): array
+    {
+        $data = $this->evaluate($this->previewData);
+
+        return is_array($data) ? $data : [];
     }
 
     public function defaultColorMode(string | Closure | null $mode): static

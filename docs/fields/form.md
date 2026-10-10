@@ -80,6 +80,28 @@ The layout is an ordinary Blade view. Include your own CSS, then Mason's preview
 
 `@masonStyles` inlines the editor chrome — drop zones, controls and outlines — and `mason::iframe-preview-content` renders the bricks themselves from the `$blocks` variable Mason passes in.
 
+## Preview data
+
+In the editor preview, bricks get `null` as `toHtml()`'s `$data`, as there is no record to [render against](../bricks/rendering.md#passing-data-to-bricks). Pass what they need with `previewData()`, e.g. the language of the record being edited:
+
+```php
+Mason::make('content')
+    ->previewData(fn (?Post $record): array => ['language' => $record?->language_id]);
+```
+
+```php
+public static function toHtml(array $config, ?array $data = null): ?string
+{
+    $language = $data['language'] ?? null;
+
+    // …
+}
+```
+
+A brick that tells the editor from the front end by `$data === null` has to look at the data instead once the field passes some.
+
+The data travels to the preview's request in the signed render context. It must be JSON, and it is readable in the page, so it must hold nothing secret. Keep it the same between Livewire renders, e.g. from the saved record rather than from a live form field: the editor reads it once.
+
 ## Editor colours
 
 The editor's overlay colours are CSS custom properties, so they can be restyled from your own stylesheet if the default blue clashes:

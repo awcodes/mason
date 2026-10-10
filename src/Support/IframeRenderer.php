@@ -13,6 +13,13 @@ class IframeRenderer
     use HasBricks;
 
     /**
+     * Preview data of the field (Mason::previewData()); null without, as before.
+     *
+     * @var array<string, mixed>|null
+     */
+    protected ?array $data = null;
+
+    /**
      * @param  array<int, array<string, mixed>>  $blocks
      */
     public function __construct(protected array $blocks = [])
@@ -36,6 +43,16 @@ class IframeRenderer
     public function setBlocks(array $blocks): static
     {
         $this->blocks = $blocks;
+
+        return $this;
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $data
+     */
+    public function data(?array $data): static
+    {
+        $this->data = $data === [] ? null : $data;
 
         return $this;
     }
@@ -75,7 +92,7 @@ class IframeRenderer
             return view('mason::components.unregistered-brick', ['label' => $id])->render();
         }
 
-        return $brick::toHtml($config);
+        return $brick::toHtml($config, data: $this->data);
     }
 
     /**
