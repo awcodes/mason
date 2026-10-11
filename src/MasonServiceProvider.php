@@ -64,24 +64,16 @@ class MasonServiceProvider extends PackageServiceProvider
             handler: fn ($expression): string => "<?php echo mason({$expression})->toHtml(); ?>"
         );
 
+        // Read when the view renders, not when it compiles: compiled views are cached and only recompiled when the
+        // view itself changes, so styles inlined at compile time stayed stale after an update of Mason
         Blade::directive(
             name: 'masonStyles',
-            handler: function (): string {
-                $cssPath = __DIR__ . '/../resources/css/preview.css';
-                $css = file_get_contents($cssPath);
-
-                return '<style>' . $css . '</style>';
-            }
+            handler: fn (): string => "<?php echo '<style>' . file_get_contents(" . var_export(realpath(__DIR__ . '/../resources/css/preview.css'), true) . ") . '</style>'; ?>"
         );
 
         Blade::directive(
             name: 'masonEntryStyles',
-            handler: function (): string {
-                $cssPath = __DIR__ . '/../resources/css/entry.css';
-                $css = file_get_contents($cssPath);
-
-                return '<style>' . $css . '</style>';
-            }
+            handler: fn (): string => "<?php echo '<style>' . file_get_contents(" . var_export(realpath(__DIR__ . '/../resources/css/entry.css'), true) . ") . '</style>'; ?>"
         );
 
         Testable::mixin(new TestsMason);
