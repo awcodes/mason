@@ -16,9 +16,21 @@ body {
     outline: 2px dashed var(--mason-border-color, #0ea5e9);
     outline-offset: 2px;
 }
+/*
+ * The selection is drawn on a layer above the brick's content, not as an
+ * inset outline: a positioned child with a background, such as a full-width
+ * section, paints over its parent's outline and hid the selection entirely.
+ */
 .mason-block.selected {
-    outline: 4px solid var(--mason-border-color, #0ea5e9);
-    outline-offset: -4px;
+    outline: none;
+}
+.mason-block.selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    border: 4px solid var(--mason-border-color, #0ea5e9);
+    pointer-events: none;
 }
 .mason-block.dragging {
     opacity: 0.5;
