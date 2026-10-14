@@ -41,10 +41,12 @@ class MasonController
 
         $renderer = $rendererClass::make($blocks)->bricks($context['bricks']);
 
-        // Only the entry carries render data today: the editor preview has no
-        // record in scope, so mason.js posts none.
+        // The entry posts its data encrypted; the editor preview's data comes
+        // with the signed context (Mason::previewData())
         if ($renderer instanceof IframeEntryRenderer) {
             $renderer->data(DataPayload::decode($request->input('data')));
+        } else {
+            $renderer->data($context['data']);
         }
 
         return response($renderer->toHtml($context['layout']))
