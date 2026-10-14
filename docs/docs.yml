@@ -20,3 +20,4 @@ navigation:
       - bricks/rendering
 
   - faker
+  - security
