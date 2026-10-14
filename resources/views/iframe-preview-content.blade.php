@@ -168,8 +168,8 @@
 
         // Listen for messages from parent
         window.addEventListener('message', function (event) {
-            // Security: verify origin if needed
-            // if (event.origin !== window.location.origin) return;
+            // Only the editor around this preview sends commands
+            if (event.source !== window.parent) return
 
             const { type, instanceId: msgInstanceId, ...data } = event.data
 
