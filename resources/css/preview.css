@@ -132,3 +132,80 @@ body {
         height: 1rem;
     }
 }
+
+/* Add line with a centred button in the drop zones: between bricks on hover, after the last one always */
+.mason-inserter {
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.75rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(-50%);
+    transition: opacity 0.15s;
+}
+.mason-inserter::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    border-top: 1px solid var(--mason-border-color, #0ea5e9);
+}
+.mason-inserter-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 9999px;
+    background: var(--mason-border-color, #0ea5e9);
+    color: #fff;
+
+    svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+.mason-drop-zone:hover > .mason-inserter,
+.mason-drop-zone[data-drop-end] > .mason-inserter,
+.mason-inserter:focus-visible {
+    opacity: 1;
+}
+/* After the last brick: room for the line, which is quieter until hovered */
+.mason-drop-zone[data-drop-end] {
+    min-height: 3.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+.mason-drop-zone[data-drop-end] > .mason-inserter::before {
+    border-top-style: dashed;
+    border-top-color: var(--mason-drop-zone-border, rgba(156, 163, 175, 0.7));
+}
+.mason-drop-zone[data-drop-end]:hover > .mason-inserter::before {
+    border-top-style: solid;
+    border-top-color: var(--mason-border-color, #0ea5e9);
+}
+/* Without bricks: the placeholder above the button */
+.mason-drop-zone-start {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 1.5rem;
+    margin: 0;
+    color: var(--mason-drop-zone-text, #9ca3af);
+}
+/* While dragging, the drop zone shows where the brick goes; a disabled editor has no add line */
+.mason-drop-zone.active > .mason-inserter,
+.mason-disabled .mason-inserter {
+    opacity: 0;
+}

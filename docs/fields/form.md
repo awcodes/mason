@@ -28,6 +28,8 @@ Clicking a brick in the preview selects it and shows its controls: move up, move
 
 **Add** opens the brick picker, where the author chooses whether to insert above or below the selected brick, and can search the available bricks.
 
+Bricks can also be added right in the preview: a line with an add button appears between bricks when the pointer is over the gap, and stays visible after the last brick. It opens the brick picker for that position.
+
 ![The Add Brick picker with Insert above and Insert below, a search field, and the Content group of bricks](../assets/brick-picker-light.png#gh-light-mode-only)
 ![The Add Brick picker with Insert above and Insert below, a search field, and the Content group of bricks](../assets/brick-picker-dark.png#gh-dark-mode-only)
 

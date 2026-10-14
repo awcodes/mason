@@ -1,27 +1,22 @@
 <div id="mason-preview-container">
     @if (empty($blocks))
         <div
-            class="mason-drop-zone"
+            class="mason-drop-zone mason-drop-zone-start"
             data-drop-index="0"
-            style="
-                min-height: 4rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #9ca3af;
-                position: absolute;
-                inset: 0;
-                margin: 0;
-            "
+            data-drop-end
         >
-            {{ __('mason::mason.preview.placeholder') }}
+            <span>{{ __('mason::mason.preview.placeholder') }}</span>
+            @include('mason::components.inserter')
         </div>
     @else
+        {{-- Between bricks the add line shows on hover, after the last one always --}}
         <div
             class="mason-drop-zone"
             data-drop-index="0"
             style="min-height: 2rem"
-        ></div>
+        >
+            @include('mason::components.inserter')
+        </div>
         @foreach ($blocks as $block)
             <div
                 class="mason-block"
@@ -146,7 +141,10 @@
             <div
                 class="mason-drop-zone"
                 data-drop-index="{{ $block['index'] + 1 }}"
-            ></div>
+                @if ($loop->last) data-drop-end @endif
+            >
+                @include('mason::components.inserter')
+            </div>
         @endforeach
     @endif
 </div>
@@ -280,6 +278,8 @@
             } else {
                 container.style.pointerEvents = ''
             }
+
+            container.classList.toggle('mason-disabled', isDisabled)
         }
 
         function insertBlock(brick, position) {
@@ -375,6 +375,19 @@
 
         // Handle block clicks for editing
         container.addEventListener('click', function (e) {
+            // The add line of a drop zone opens the brick picker at its position
+            const inserter = e.target.closest('[data-action="add-at"]')
+            if (inserter) {
+                const zone = inserter.closest('.mason-drop-zone')
+
+                postToParent({
+                    type: 'openBrickPicker',
+                    insertIndex: parseInt(zone.getAttribute('data-drop-index')),
+                })
+
+                return
+            }
+
             const block = e.target.closest('.mason-block')
             if (!block) return
 
