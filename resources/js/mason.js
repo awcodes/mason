@@ -723,15 +723,17 @@ export default function masonComponent({
 
         // Either next to a brick (blockIndex, above or below) or at a fixed position (insertIndex)
         openBrickPicker(blockIndex, insertIndex = null) {
+            if (disabled) return
+
             this.brickPickerBlockIndex = blockIndex
             this.brickPickerInsertIndex = insertIndex
             this.brickPickerOpen = true
         },
 
+        // brickPickerInsertIndex stays until the next opening, so "Insert above/below" does not reappear while the picker fades out
         closeBrickPicker() {
             this.brickPickerOpen = false
             this.brickPickerBlockIndex = null
-            this.brickPickerInsertIndex = null
             this.brickPickerPosition = 'below'
         },
 
