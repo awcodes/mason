@@ -34,6 +34,7 @@ export default function masonComponent({
         previewUrl: null,
         brickPickerOpen: false,
         brickPickerBlockIndex: null,
+        brickPickerInsertIndex: null,
         brickPickerPosition: 'below',
 
         // Undo/Redo state
@@ -79,7 +80,10 @@ export default function masonComponent({
                         this.handleMoveBlock(data.from, data.to)
                         break
                     case 'openBrickPicker':
-                        this.openBrickPicker(data.blockIndex)
+                        this.openBrickPicker(
+                            data.blockIndex ?? null,
+                            data.insertIndex ?? null,
+                        )
                         break
                     case 'blockSelected':
                         this.selectedBlockIndex = data.index
@@ -717,11 +721,16 @@ export default function masonComponent({
             this.sendMessageToIframe({ type: 'deselectAllBlocks' })
         },
 
-        openBrickPicker(blockIndex) {
+        // Either next to a brick (blockIndex, above or below) or at a fixed position (insertIndex)
+        openBrickPicker(blockIndex, insertIndex = null) {
+            if (disabled) return
+
             this.brickPickerBlockIndex = blockIndex
+            this.brickPickerInsertIndex = insertIndex
             this.brickPickerOpen = true
         },
 
+        // brickPickerInsertIndex stays until the next opening, so "Insert above/below" does not reappear while the picker fades out
         closeBrickPicker() {
             this.brickPickerOpen = false
             this.brickPickerBlockIndex = null
@@ -730,9 +739,11 @@ export default function masonComponent({
 
         insertFromPicker(brickId) {
             const position =
-                this.brickPickerPosition === 'above'
-                    ? this.brickPickerBlockIndex
-                    : this.brickPickerBlockIndex + 1
+                this.brickPickerInsertIndex !== null
+                    ? this.brickPickerInsertIndex
+                    : this.brickPickerPosition === 'above'
+                      ? this.brickPickerBlockIndex
+                      : this.brickPickerBlockIndex + 1
             this.handleInsertBlock(brickId, position)
             this.closeBrickPicker()
         },

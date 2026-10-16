@@ -99,7 +99,10 @@
             </button>
         </div>
 
-        <div class="mason-brick-picker-position">
+        <div
+            class="mason-brick-picker-position"
+            x-show="brickPickerInsertIndex === null"
+        >
             <button
                 type="button"
                 class="mason-brick-picker-position-btn"

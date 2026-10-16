@@ -11,10 +11,24 @@ body {
     min-height: 2rem;
     cursor: move;
     transition: outline 0.2s;
+    /* Safari starts a text selection instead of dragging the brick when its text can be selected */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: element;
 }
-.mason-block:hover {
-    outline: 2px dashed var(--mason-border-color, #0ea5e9);
-    outline-offset: 2px;
+/*
+ * The hover frame is a layer inside the brick like the selection below, not
+ * an outline: the next brick paints over an outline's bottom edge. Outside the
+ * brick, the layer would widen the page on hover and, with scrollbars always
+ * shown, make it jitter.
+ */
+.mason-block:not(.selected):hover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    border: 2px dashed var(--mason-border-color, #0ea5e9);
+    pointer-events: none;
 }
 /*
  * The selection is drawn on a layer above the brick's content, not as an
@@ -32,10 +46,10 @@ body {
     border: 4px solid var(--mason-border-color, #0ea5e9);
     pointer-events: none;
 }
+/* Without pointer-events: none: Safari never drops a brick that stops taking the pointer once dragged */
 .mason-block.dragging {
     opacity: 0.5;
     cursor: grabbing;
-    pointer-events: none;
     user-select: none;
 }
 .mason-block.dragging * {
@@ -96,6 +110,11 @@ body {
     margin-bottom: -1rem;
     z-index: 10;
     position: relative;
+    /* The zones cover the bricks' edges, so they only catch the pointer while something is dragged */
+    pointer-events: none;
+}
+.mason-dragging .mason-drop-zone {
+    pointer-events: auto;
 }
 .mason-drop-zone.active {
     border-color: var(--mason-border-color, #0ea5e9);
@@ -130,5 +149,122 @@ body {
     .mason-block-btn svg {
         width: 1rem;
         height: 1rem;
+    }
+}
+
+/*
+ * Add line with a centred button in the drop zones: between bricks on hover, after the last one always.
+ * The line is a narrow hover strip along the edge, so thin bricks such as a divider stay clickable;
+ * only the round button takes clicks.
+ */
+.mason-inserter {
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 0.75rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: default;
+    opacity: 0;
+    transform: translateY(-50%);
+    transition: opacity 0.15s;
+    pointer-events: auto;
+}
+.mason-inserter::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    border-top: 1px solid var(--mason-border-color, #0ea5e9);
+}
+.mason-inserter-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background: var(--mason-border-color, #0ea5e9);
+    color: #fff;
+    cursor: pointer;
+    pointer-events: none;
+
+    svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+/* Before the first brick: below the top edge, so the button is not cut off */
+.mason-drop-zone:first-child > .mason-inserter {
+    top: calc(50% + 0.875rem);
+}
+.mason-inserter:hover,
+.mason-drop-zone[data-drop-end] > .mason-inserter,
+.mason-inserter:focus-visible {
+    opacity: 1;
+
+    .mason-inserter-icon {
+        pointer-events: auto;
+    }
+}
+/* Between bricks the strip overlaps their edges: only the button shows, the line once it is hovered */
+.mason-drop-zone:not([data-drop-end]) > .mason-inserter::before {
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.mason-drop-zone > .mason-inserter:has(.mason-inserter-icon:hover)::before,
+.mason-drop-zone > .mason-inserter:focus-visible::before {
+    opacity: 1;
+}
+/*
+ * After the last brick: room for the line, which is quieter until hovered.
+ * It keeps its place as the active drop target too, overriding the margins
+ * of .active:last-of-type, or it moves away under the pointer and flickers.
+ */
+.mason-drop-zone[data-drop-end],
+.mason-drop-zone[data-drop-end].active {
+    min-height: 3.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+.mason-drop-zone[data-drop-end] > .mason-inserter::before {
+    border-top-style: dashed;
+    border-top-color: var(--mason-drop-zone-border, rgba(156, 163, 175, 0.7));
+}
+.mason-drop-zone[data-drop-end] > .mason-inserter:hover::before {
+    border-top-style: solid;
+    border-top-color: var(--mason-border-color, #0ea5e9);
+}
+/* Without bricks: the placeholder above the button, in place while dragging too */
+.mason-drop-zone.mason-drop-zone-start,
+.mason-drop-zone.mason-drop-zone-start.active {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 1.5rem;
+    margin: 0;
+    color: var(--mason-drop-zone-text, #9ca3af);
+}
+/* While dragging, the drop zone shows where the brick goes; a disabled editor has no add line */
+.mason-drop-zone.active > .mason-inserter,
+.mason-dragging .mason-drop-zone > .mason-inserter,
+.mason-disabled .mason-drop-zone > .mason-inserter {
+    pointer-events: none;
+}
+.mason-drop-zone.active > .mason-inserter,
+.mason-disabled .mason-drop-zone > .mason-inserter {
+    opacity: 0;
+
+    .mason-inserter-icon {
+        pointer-events: none;
     }
 }
