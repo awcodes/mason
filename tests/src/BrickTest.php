@@ -122,6 +122,23 @@ describe('Brick', function () {
 
             expect($brick::isEditable())->toBeTrue();
         });
+
+        it('is checked as the edit control opens it, not as an insert', function () {
+            $brick = new class extends Brick
+            {
+                public static function getId(): string
+                {
+                    return 'form-on-edit';
+                }
+
+                public static function configureBrickAction(Action $action): Action
+                {
+                    return $action->modalHidden(fn (array $arguments): bool => ($arguments['mode'] ?? 'insert') === 'insert');
+                }
+            };
+
+            expect($brick::isEditable())->toBeTrue();
+        });
     });
 });
 
