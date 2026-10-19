@@ -82,6 +82,8 @@ class Section extends Brick
 
 `getId()` is what ties stored content to a class, so changing it on a brick that is already in use orphans the existing content.
 
+A brick without settings, such as a divider, keeps the default `configureBrickAction()`, which hides the modal. It is inserted right away, and the editor shows no **Edit** control for it and ignores double-clicks on it. `isEditable()` works this out from the action; override it if your brick needs a different answer.
+
 ## Tags
 
 Tags improve discoverability in the sidebar search. Mason matches the typed term against both the label and every tag, so a search for "marketing" can surface a brick labelled "Hero":

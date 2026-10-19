@@ -33,7 +33,7 @@ Bricks can also be added right in the preview: an add button appears when the po
 ![The Add Brick picker with Insert above and Insert below, a search field, and the Content group of bricks](../assets/brick-picker-light.png#gh-light-mode-only)
 ![The Add Brick picker with Insert above and Insert below, a search field, and the Content group of bricks](../assets/brick-picker-dark.png#gh-dark-mode-only)
 
-**Edit** opens the brick's form. How it opens is up to the brick's `configureBrickAction()`; the hero brick here uses a slide-over.
+**Edit** opens the brick's form. How it opens is up to the brick's `configureBrickAction()`; the hero brick here uses a slide-over. Bricks without a form, such as a divider, have no **Edit** control.
 
 ![The hero brick's form open in a slide-over](../assets/edit-brick-light.png#gh-light-mode-only)
 ![The hero brick's form open in a slide-over](../assets/edit-brick-dark.png#gh-dark-mode-only)

@@ -111,6 +111,7 @@ class IframeRenderer
                 'config' => $config,
                 'html' => $html,
                 'label' => $this->getBlockLabel($id),
+                'editable' => $this->isBlockEditable($id),
             ];
         }, $this->blocks, array_keys($this->blocks));
 
@@ -128,6 +129,16 @@ class IframeRenderer
         return view('mason::iframe-preview', [
             'blocks' => $blocks,
         ])->render();
+    }
+
+    /**
+     * Whether the block's brick has a form to edit; an unregistered brick has none
+     */
+    protected function isBlockEditable(?string $id): bool
+    {
+        $brick = blank($id) ? null : $this->getBrick($id);
+
+        return $brick !== null && $brick::isEditable();
     }
 
     /**

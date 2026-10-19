@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Awcodes\Mason\Brick;
 use Awcodes\Mason\Bricks\Section;
 use Awcodes\Mason\Tests\Fixtures\SimpleBrick;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
@@ -94,6 +95,32 @@ describe('Brick', function () {
             $configured = TestBrick::configureBrickAction($action);
 
             expect($configured)->toBeInstanceOf(Action::class);
+        });
+    });
+    describe('isEditable()', function () {
+        it('is editable with a form', function () {
+            expect(TestBrick::isEditable())->toBeTrue();
+        });
+
+        it('is not editable when its action hides the modal, as by default', function () {
+            expect(SimpleBrick::isEditable())->toBeFalse();
+        });
+
+        it('stays editable when the action cannot be checked', function () {
+            $brick = new class extends Brick
+            {
+                public static function getId(): string
+                {
+                    return 'needs-arguments';
+                }
+
+                public static function configureBrickAction(Action $action): Action
+                {
+                    return $action->modalHidden(fn (array $arguments): bool => $arguments['hidden']);
+                }
+            };
+
+            expect($brick::isEditable())->toBeTrue();
         });
     });
 });
