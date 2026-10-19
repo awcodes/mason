@@ -16,5 +16,8 @@
         "prettier-plugin-blade": "^2.1.21",
         "prettier-plugin-tailwindcss": "^0.6.11",
         "tailwindcss": "^4.3.3"
+    },
+    "overrides": {
+        "postcss-selector-parser": "^7.1.6"
     }
 }
