@@ -297,7 +297,23 @@ export default function masonComponent({
             }
         },
 
+        // Whether this field's brick form is being opened or is open. A second click before
+        // the first modal shows would mount the action again, one modal over the other.
+        isBrickActionBusy() {
+            return (
+                this.isInsertingBrick ||
+                this.isUpdatingBrick ||
+                (this.$wire.mountedActions ?? []).some(
+                    (action) =>
+                        action.name === 'handleBrick' &&
+                        action.context?.schemaComponent === key,
+                )
+            )
+        },
+
         async handleInsertBlock(brickId, position) {
+            if (this.isBrickActionBusy()) return
+
             this.isInsertingBrick = true
             const preInsertState = this.captureState()
 
@@ -314,6 +330,8 @@ export default function masonComponent({
         },
 
         async handleEditBlock({ index, brickId, config }) {
+            if (this.isBrickActionBusy()) return
+
             this.isUpdatingBrick = true
             const preEditState = this.captureState()
 
