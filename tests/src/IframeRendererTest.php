@@ -245,3 +245,25 @@ describe('edit control', function () {
         expect(preg_match_all('/<button[^>]*data-action="edit"/', $html))->toBe(1);
     });
 });
+
+describe('add line in the preview', function () {
+    it('puts an add button between the bricks and after the last one', function () {
+        $html = IframeRenderer::make([
+            ['type' => 'masonBrick', 'attrs' => ['id' => 'simple-brick', 'config' => []]],
+            ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => ['title' => 'Second']]],
+        ])
+            ->bricks([SimpleBrick::class, TestBrick::class])
+            ->toHtml();
+
+        expect(substr_count($html, 'class="mason-inserter"'))->toBe(3)
+            ->and($html)->toMatch('/data-drop-index="2"\s+data-drop-end/');
+    });
+
+    it('offers it without bricks too', function () {
+        $html = IframeRenderer::make([])->bricks([SimpleBrick::class])->toHtml();
+
+        expect($html)->toContain('mason-drop-zone-start')
+            ->toContain('class="mason-inserter"')
+            ->toContain(__('mason::mason.preview.placeholder'));
+    });
+});
