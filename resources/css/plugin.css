@@ -29,11 +29,16 @@
         > .fi-input-wrp-content-ctn {
             @apply flex max-h-[40rem] min-h-[20rem];
 
+            /*
+             * The iframe fills the wrapper as a flex item: Safari does not resolve
+             * min-height: 100% against a wrapper that is only stretched by its row
+             * and kept the iframe at its default height of 150px.
+             */
             .mason-editor-wrapper {
-                @apply relative flex-1;
+                @apply relative flex flex-1 flex-col;
 
                 .mason-iframe {
-                    @apply min-h-full w-full border-0;
+                    @apply w-full flex-1 border-0;
                     background: white;
                 }
             }
