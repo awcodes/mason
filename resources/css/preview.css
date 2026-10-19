@@ -70,7 +70,11 @@ body {
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
-    z-index: 10;
+    /*
+     * Above the drop zones (10): on a thin brick such as a divider the controls
+     * reach past its bottom edge, where the next zone's add line took their clicks.
+     */
+    z-index: 11;
     display: none;
     gap: 0.25rem;
     padding: 0.5rem;
