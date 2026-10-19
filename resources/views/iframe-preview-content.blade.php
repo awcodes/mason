@@ -1,27 +1,22 @@
 <div id="mason-preview-container">
     @if (empty($blocks))
         <div
-            class="mason-drop-zone"
+            class="mason-drop-zone mason-drop-zone-start"
             data-drop-index="0"
-            style="
-                min-height: 4rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #9ca3af;
-                position: absolute;
-                inset: 0;
-                margin: 0;
-            "
+            data-drop-end
         >
-            {{ __('mason::mason.preview.placeholder') }}
+            <span>{{ __('mason::mason.preview.placeholder') }}</span>
+            @include('mason::components.inserter')
         </div>
     @else
+        {{-- Between bricks the add line shows on hover, after the last one always --}}
         <div
             class="mason-drop-zone"
             data-drop-index="0"
             style="min-height: 2rem"
-        ></div>
+        >
+            @include('mason::components.inserter')
+        </div>
         @foreach ($blocks as $block)
             <div
                 class="mason-block"
@@ -81,19 +76,7 @@
                         data-action="add"
                         data-focus-action="mason-add-brick"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            class="size-5"
-                        >
-                            <title>
-                                {{ __('mason::mason.preview.add') }}
-                            </title>
-                            <path
-                                d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"
-                            />
-                        </svg>
+                        @include('mason::components.icons.plus', ['title' => __('mason::mason.preview.add')])
                     </button>
                     <button
                         class="mason-block-btn"
@@ -146,7 +129,10 @@
             <div
                 class="mason-drop-zone"
                 data-drop-index="{{ $block['index'] + 1 }}"
-            ></div>
+                @if ($loop->last) data-drop-end @endif
+            >
+                @include('mason::components.inserter')
+            </div>
         @endforeach
     @endif
 </div>
@@ -280,6 +266,13 @@
             } else {
                 container.style.pointerEvents = ''
             }
+
+            container.classList.toggle('mason-disabled', isDisabled)
+
+            // Out of the tab order too, not only hidden
+            container.querySelectorAll('.mason-inserter').forEach((button) => {
+                button.disabled = isDisabled
+            })
         }
 
         function insertBlock(brick, position) {
@@ -375,6 +368,30 @@
 
         // Handle block clicks for editing
         container.addEventListener('click', function (e) {
+            // The add line of a drop zone opens the brick picker at its position
+            const inserter = e.target.closest('[data-action="add-at"]')
+            if (inserter) {
+                // Only the round button adds, not the hover strip around it; keyboard clicks have no position
+                if (
+                    e.detail !== 0 &&
+                    !e.target.closest('.mason-inserter-icon')
+                ) {
+                    return
+                }
+
+                const insertIndex = parseInt(
+                    inserter
+                        .closest('.mason-drop-zone')
+                        ?.getAttribute('data-drop-index'),
+                )
+
+                if (!isDisabled && !isNaN(insertIndex)) {
+                    postToParent({ type: 'openBrickPicker', insertIndex })
+                }
+
+                return
+            }
+
             const block = e.target.closest('.mason-block')
             if (!block) return
 
@@ -464,13 +481,63 @@
         let draggedBlock = null
         let dragOverIndex = null
 
+        // The drop zones catch the pointer only while something is dragged over the preview,
+        // a brick of the preview or one from the sidebar
+        function setDragging(dragging) {
+            container.classList.toggle('mason-dragging', dragging)
+        }
+
+        // Time of the last drag event; dragover keeps firing while a drag is over the preview
+        let lastDragEvent = 0
+
+        document.addEventListener('dragenter', () => setDragging(true), true)
+        document.addEventListener(
+            'dragover',
+            () => {
+                lastDragEvent = performance.now()
+                setDragging(true)
+            },
+            true,
+        )
+        document.addEventListener(
+            'dragleave',
+            (e) => {
+                // Leaving the preview
+                if (!e.relatedTarget) setDragging(false)
+            },
+            true,
+        )
+        document.addEventListener('drop', () => setDragging(false), true)
+        document.addEventListener('dragend', () => setDragging(false), true)
+        // A drag can end without these, e.g. when cancelled outside the preview: a move without
+        // a pressed button means it is over. Safari sends such moves during a drag too, so only
+        // once no drag event has come for a while.
+        document.addEventListener('pointermove', (e) => {
+            if (e.buttons !== 0 || performance.now() - lastDragEvent < 1000) {
+                return
+            }
+
+            setDragging(false)
+
+            if (draggedBlock) endBlockDrag()
+        })
+
+        let pointerDownTarget = null
+        document.addEventListener(
+            'pointerdown',
+            (e) => {
+                pointerDownTarget = e.target
+            },
+            true,
+        )
+
         // Make blocks draggable for repositioning
         container.addEventListener('dragstart', function (e) {
             const block = e.target.closest('.mason-block')
             if (!block) return
 
-            // Prevent dragging if clicking on controls (but allow drag handle)
-            if (e.target.closest('.mason-block-controls')) {
+            // Prevent dragging from the controls; the event's target is the block itself, so check where the pointer went down
+            if (pointerDownTarget?.closest('.mason-block-controls')) {
                 e.preventDefault()
                 return
             }
@@ -513,7 +580,11 @@
             e.dataTransfer.setData('text/plain', draggedBlockIndex.toString())
         })
 
-        container.addEventListener('dragend', function (e) {
+        container.addEventListener('dragend', endBlockDrag)
+
+        // Ends moving a brick: after dragend, and on drop, which comes before dragend
+        // and could otherwise leave the brick unclickable when it does not move
+        function endBlockDrag() {
             // Re-enable interactions
             document.body.style.userSelect = ''
             document.body.style.webkitUserSelect = ''
@@ -548,7 +619,7 @@
             draggedBlock = null
             draggedBlockIndex = null
             dragOverIndex = null
-        })
+        }
 
         // Handle drag over for drop zones (inserting new blocks from sidebar)
         container.addEventListener('dragover', function (e) {
@@ -608,7 +679,8 @@
             const dropZone = e.target.closest('.mason-drop-zone')
             const block = e.target.closest('.mason-block')
 
-            if (dropZone) {
+            // Moving onto the zone's own placeholder or add line does not leave it
+            if (dropZone && !dropZone.contains(e.relatedTarget)) {
                 dropZone.classList.remove('active')
             }
 
@@ -645,7 +717,9 @@
                     dropZone = e.target
                 }
 
-                const block = e.target.closest('.mason-block')
+                // The dragged brick still takes the pointer (see .dragging), dropping it on itself keeps it in place
+                const target = e.target.closest('.mason-block')
+                const block = target === draggedBlock ? null : target
 
                 let targetIndex = null
 
@@ -687,9 +761,7 @@
                     }
                 }
 
-                // Reset drag state
-                draggedBlockIndex = null
-                draggedBlock = null
+                endBlockDrag()
             } else {
                 // Handle inserting new blocks from sidebar
                 const dropZone = e.target.closest('.mason-drop-zone')
