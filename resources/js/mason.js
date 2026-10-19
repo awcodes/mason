@@ -113,6 +113,11 @@ export default function masonComponent({
             // Keyboard shortcuts for undo/redo
             const keyboardHandler = (event) => {
                 const activeElement = document.activeElement
+
+                // Every Mason field listens on window, so only the one holding focus may act.
+                // Inside the preview, focus is on the iframe and its shortcuts arrive as messages.
+                if (!activeElement || !this.$el.contains(activeElement)) return
+
                 const isInputFocused =
                     activeElement &&
                     (activeElement.tagName === 'INPUT' ||
