@@ -80,6 +80,8 @@ class Section extends Brick
 | `toHtml()` | Renders the brick from its saved `$config`, plus any `$data` passed by the renderer. |
 | `configureBrickAction()` | Builds the form shown when inserting or editing. |
 
+The form does not close when the user clicks outside it, so unsaved changes are not lost by accident. To allow it for a brick, call `closeModalByClickingAway()` in `configureBrickAction()`.
+
 `getId()` is what ties stored content to a class, so changing it on a brick that is already in use orphans the existing content.
 
 A brick without settings, such as a divider, keeps the default `configureBrickAction()`, which hides the modal. It is inserted right away, and the editor shows no **Edit** control for it and ignores double-clicks on it. `isEditable()` works this out from the action; override it if your brick needs a different answer.
