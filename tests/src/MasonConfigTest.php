@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Awcodes\Mason\Actions\BrickAction;
+use Awcodes\Mason\Actions\DuplicateBrickAction;
 use Awcodes\Mason\Mason;
 use Filament\Actions\Action;
 
@@ -63,13 +64,14 @@ describe('Mason field configuration', function () {
     });
 
     describe('getDefaultActions()', function () {
-        it('returns action with BrickAction name', function () {
+        it('returns the brick and duplicate actions', function () {
             $field = Mason::make('content');
             $actions = $field->getDefaultActions();
 
-            expect($actions)->toHaveCount(1)
+            expect($actions)->toHaveCount(2)
                 ->and($actions[0])->toBeInstanceOf(Action::class)
-                ->and($actions[0]->getName())->toBe(BrickAction::NAME);
+                ->and($actions[0]->getName())->toBe(BrickAction::NAME)
+                ->and($actions[1]->getName())->toBe(DuplicateBrickAction::NAME);
         });
     });
 });

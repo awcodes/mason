@@ -78,6 +78,17 @@
                     >
                         @include('mason::components.icons.plus', ['title' => __('mason::mason.preview.add')])
                     </button>
+                    {{-- An unregistered brick cannot be rendered again, so it is not copied --}}
+                    @if ($block['registered'] ?? true)
+                        <button
+                            class="mason-block-btn"
+                            title="{{ __('mason::mason.preview.duplicate') }}"
+                            data-action="duplicate"
+                        >
+                            @include('mason::components.icons.duplicate', ['title' => __('mason::mason.preview.duplicate')])
+                        </button>
+                    @endif
+
                     {{-- Bricks without a form have nothing to edit --}}
                     @if ($block['editable'] ?? true)
                         <button
@@ -414,6 +425,11 @@
                         index,
                         brickId,
                         config,
+                    })
+                } else if (actionType === 'duplicate') {
+                    postToParent({
+                        type: 'duplicateBlockRequest',
+                        index,
                     })
                 } else if (actionType === 'delete') {
                     postToParent({
