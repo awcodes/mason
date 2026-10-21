@@ -48,7 +48,7 @@ Mason::make('content')
 
 ## Outline
 
-For long documents, add an outline of the content to the sidebar. It lists every brick in order. Drag a brick's handle to move it, or focus a brick and press <kbd>Alt</kbd> + <kbd>↑</kbd> or <kbd>↓</kbd>. Selecting a brick in the outline scrolls the preview to it.
+For long documents, add an outline of the content to the sidebar. It lists every brick in order. Drag a brick's handle to move it, or focus a brick and press <kbd>Alt</kbd> + <kbd>↑</kbd> or <kbd>↓</kbd>. The button at the end of a row duplicates the brick. Selecting a brick in the outline scrolls the preview to it.
 
 ```php
 Mason::make('content')
