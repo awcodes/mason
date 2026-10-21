@@ -70,6 +70,9 @@ export default function masonComponent({
                     case 'deleteBlockRequest':
                         this.handleDeleteBlock(data.index)
                         break
+                    case 'duplicateBlockRequest':
+                        this.handleDuplicateBlock(data.index)
+                        break
                     case 'insertBlockRequest':
                         this.handleInsertBlock(data.brickId, data.position)
                         break
@@ -354,6 +357,34 @@ export default function masonComponent({
                 this.pushToUndoStack(preEditState)
             } finally {
                 this.isUpdatingBrick = false
+            }
+        },
+
+        // The copy is made on the server, where the brick's duplicateConfig() runs
+        async handleDuplicateBlock(index) {
+            if (disabled || this.isBrickActionBusy()) return
+
+            const blocks = this.getBlocksFromState()
+            if (index < 0 || index >= blocks.length) return
+
+            const preDuplicateState = this.captureState()
+            // Select the copy once the preview reloads with it
+            this.selectedBlockIndex = index + 1
+            pendingFocusIndex = index + 1
+
+            try {
+                await this.$wire.mountAction(
+                    'duplicateBrick',
+                    { index },
+                    { schemaComponent: key },
+                )
+            } finally {
+                if (this.getBlocksFromState().length > blocks.length) {
+                    this.pushToUndoStack(preDuplicateState)
+                } else {
+                    pendingFocusIndex = null
+                    this.selectedBlockIndex = index
+                }
             }
         },
 
