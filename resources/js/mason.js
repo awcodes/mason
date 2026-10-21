@@ -583,9 +583,14 @@ export default function masonComponent({
 
             // Update the state with new blocks array
             this.state = plainBlocks
-            // Use the statePath from the component
-            const path = this.statePath
-            this.$wire.set(path, plainBlocks, false)
+            // Livewire gets its own copy: it updates its data in place when the server
+            // changes the state, which would bypass Alpine's reactivity on a shared array
+            // and leave the outline showing the old bricks
+            this.$wire.set(
+                this.statePath,
+                JSON.parse(JSON.stringify(plainBlocks)),
+                false,
+            )
         },
 
         toggleFullscreen() {
