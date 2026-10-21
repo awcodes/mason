@@ -71,5 +71,15 @@ describe('Mason field configuration', function () {
                 ->and($actions[0])->toBeInstanceOf(Action::class)
                 ->and($actions[0]->getName())->toBe(BrickAction::NAME);
         });
+
+        it('keeps the brick form open when clicking outside it', function () {
+            expect(BrickAction::make()->isModalClosedByClickingAway())->toBeFalse();
+        });
+
+        it('lets a brick close its form by clicking outside it', function () {
+            $action = BrickAction::make()->closeModalByClickingAway();
+
+            expect($action->isModalClosedByClickingAway())->toBeTrue();
+        });
     });
 });
