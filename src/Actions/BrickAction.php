@@ -36,6 +36,8 @@ class BrickAction
                 return $brick::getLabel();
             })
             ->modalWidth(Width::Large)
+            // Clicking outside the form would discard its changes; a brick can allow it in configureBrickAction()
+            ->closeModalByClickingAway(false)
             ->modalSubmitActionLabel(fn (array $arguments): ?string => match ($arguments['mode']) {
                 'insert' => __('mason::mason.actions.brick.modal.actions.insert.label'),
                 'edit' => __('mason::mason.actions.brick.modal.actions.save.label'),
