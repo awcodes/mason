@@ -601,6 +601,31 @@ export default function masonComponent({
             }
         },
 
+        // Escape first closes what lies above the editor: its brick picker or outline
+        // sheet, or a modal such as a brick's form. Only then does it leave fullscreen,
+        // and then only that: it runs in the capture phase so that a modal the field
+        // sits in does not close as well
+        exitFullscreenOnEscape(event) {
+            if (
+                !this.fullscreen ||
+                this.brickPickerOpen ||
+                this.outlineSheetOpen
+            ) {
+                return
+            }
+
+            const topModal = [
+                ...document.querySelectorAll('.fi-modal.fi-modal-open'),
+            ].at(-1)
+
+            if (topModal && !topModal.contains(this.$el)) {
+                return
+            }
+
+            event.stopImmediatePropagation()
+            this.fullscreen = false
+        },
+
         toggleViewport(viewport) {
             if (this.viewport === viewport) {
                 this.viewport = 'desktop'
