@@ -65,6 +65,7 @@
                 <button
                     type="button"
                     class="mason-outline-duplicate"
+                    x-show="item.registered"
                     title="{{ trans('mason::mason.outline.duplicate') }}"
                     aria-label="{{ trans('mason::mason.outline.duplicate') }}"
                     x-on:click="handleDuplicateBlock(index)"

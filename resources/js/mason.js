@@ -31,6 +31,7 @@ export default function masonComponent({
             : defaultColorMode,
         isUpdatingBrick: false,
         isInsertingBrick: false,
+        isDuplicatingBrick: false,
         previewUrl: null,
         brickPickerOpen: false,
         brickPickerBlockIndex: null,
@@ -305,12 +306,14 @@ export default function masonComponent({
             }
         },
 
-        // Whether this field's brick form is being opened or is open. A second click before
-        // the first modal shows would mount the action again, one modal over the other.
+        // Whether this field's brick form is being opened or is open, or a copy is being made.
+        // A second click before the first finishes would mount the action again: one modal
+        // over the other, or a second copy.
         isBrickActionBusy() {
             return (
                 this.isInsertingBrick ||
                 this.isUpdatingBrick ||
+                this.isDuplicatingBrick ||
                 (this.$wire.mountedActions ?? []).some(
                     (action) =>
                         action.name === 'handleBrick' &&
@@ -367,6 +370,7 @@ export default function masonComponent({
             const blocks = this.getBlocksFromState()
             if (index < 0 || index >= blocks.length) return
 
+            this.isDuplicatingBrick = true
             const preDuplicateState = this.captureState()
             // Select the copy once the preview reloads with it
             this.selectedBlockIndex = index + 1
@@ -385,6 +389,8 @@ export default function masonComponent({
                     pendingFocusIndex = null
                     this.selectedBlockIndex = index
                 }
+
+                this.isDuplicatingBrick = false
             }
         },
 
@@ -501,6 +507,7 @@ export default function masonComponent({
                     label: outlineLabel || type,
                     type: outlineLabel ? type : null,
                     icon: brick?.icon ?? null,
+                    registered: brick !== undefined,
                 }
             })
         },
