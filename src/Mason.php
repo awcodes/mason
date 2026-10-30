@@ -6,6 +6,7 @@ namespace Awcodes\Mason;
 
 use Awcodes\Mason\Actions\BrickAction;
 use Awcodes\Mason\Concerns\HasBricks;
+use Awcodes\Mason\Concerns\HasHeight;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\BrickCommand;
 use Awcodes\Mason\Support\RenderContext;
@@ -23,6 +24,7 @@ class Mason extends Field implements CanBeLengthConstrained
     use HasBricks;
     use HasExtraAlpineAttributes;
     use HasExtraInputAttributes;
+    use HasHeight;
     use HasPlaceholder;
     use HasSidebar;
 

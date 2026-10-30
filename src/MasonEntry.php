@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Awcodes\Mason;
 
 use Awcodes\Mason\Concerns\HasBricks;
+use Awcodes\Mason\Concerns\HasHeight;
 use Awcodes\Mason\Support\DataPayload;
 use Awcodes\Mason\Support\RenderContext;
 use Closure;
@@ -16,6 +17,7 @@ class MasonEntry extends Entry
 {
     use HasBricks;
     use HasExtraInputAttributes;
+    use HasHeight;
 
     protected string $view = 'mason::mason-entry';
 
