@@ -7,17 +7,20 @@ description: Adjust the Mason editor's height, sidebar position, action layout a
 
 ## Height
 
-Both the field and the entry take Filament's `extraInputAttributes()`, which is the way to change the editor's height:
+The editor is between `20rem` and `40rem` high, the entry at least `30rem`. Change this with `minHeight()` and `maxHeight()`, as on Filament's rich editor. Both take any CSS length:
 
 ```php
 Mason::make('content')
-    ->extraInputAttributes(['style' => 'min-height: 30rem;'])
+    ->minHeight('30rem')
+    ->maxHeight('60rem')
     ->bricks([...]);
 
 MasonEntry::make('content')
-    ->extraInputAttributes(['style' => 'min-height: 40rem;'])
+    ->minHeight('40rem')
     ->bricks([...]);
 ```
+
+From `minHeight()`, the editor grows with its sidebar up to `maxHeight()`, so give both the same value for a fixed height. A `minHeight()` above the default maximum wins over it, so `minHeight('60rem')` alone is enough for a taller editor. In fullscreen the editor always fills the screen.
 
 ## Sidebar position
 
@@ -80,4 +83,4 @@ For this to work your application's CSS must support manually toggling dark mode
 ```
 
 > [!NOTE]
-> `sidebarPosition()`, `displayActionsAsGrid()`, `outline()` and the colour mode methods are editor-only. `MasonEntry` has no sidebar, though it does accept `extraInputAttributes()`.
+> `sidebarPosition()`, `displayActionsAsGrid()`, `outline()` and the colour mode methods are editor-only. `MasonEntry` has no sidebar, though it does accept `minHeight()`, `maxHeight()` and `extraInputAttributes()`.

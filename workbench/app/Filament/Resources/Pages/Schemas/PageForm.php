@@ -25,7 +25,7 @@ class PageForm
                     ->previewLayout('layouts.mason-preview')
                     ->doubleClickToEdit()
                     ->outline()
-                    ->extraInputAttributes(['style' => 'min-height: 30rem;'])
+                    ->minHeight('30rem')
                     ->columnSpanFull(),
             ]);
     }

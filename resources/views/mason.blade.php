@@ -87,6 +87,7 @@
                     ->class([
                         'mason-input-wrapper',
                     ])
+                    ->style($getHeightStyles())
             "
         >
             <div
