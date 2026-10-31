@@ -10,12 +10,14 @@ use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\BrickCommand;
 use Awcodes\Mason\Support\RenderContext;
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Contracts\CanBeLengthConstrained;
 use Filament\Forms\Components\Field;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Concerns\HasPlaceholder;
 use Livewire\Component;
+use LogicException;
 
 class Mason extends Field implements CanBeLengthConstrained
 {
@@ -37,6 +39,8 @@ class Mason extends Field implements CanBeLengthConstrained
     protected string | Closure | null $defaultColorMode = null;
 
     protected bool | Closure $showColorModeToggle = false;
+
+    protected ?Closure $modifyBrickActionUsing = null;
 
     /**
      * @var array<string, mixed> | Closure
@@ -153,6 +157,42 @@ class Mason extends Field implements CanBeLengthConstrained
         $this->state($state);
 
         return $state;
+    }
+
+    /**
+     * Customizes the action behind the brick form for this field, e.g. a slide-over or a width, after the brick's own
+     * configureBrickAction(). The callback changes the action it receives; it may return it or null.
+     */
+    public function brickAction(?Closure $callback): static
+    {
+        $this->modifyBrickActionUsing = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @param  class-string<Brick>  $brick
+     */
+    public function modifyBrickAction(Action $action, string $brick): Action
+    {
+        if (! $this->modifyBrickActionUsing instanceof Closure) {
+            return $action;
+        }
+
+        $result = $this->evaluate($this->modifyBrickActionUsing, [
+            'action' => $action,
+            'arguments' => $action->getArguments(),
+            'brick' => $brick,
+        ], [
+            Action::class => $action,
+        ]);
+
+        // The callback runs as the mounted action boots, which cannot be swapped for another instance
+        if ($result instanceof Action && $result !== $action) {
+            throw new LogicException('The brickAction() callback returned a different action. Change the action it receives instead.');
+        }
+
+        return $action;
     }
 
     public function doubleClickToEdit(bool | Closure $condition = true): static
