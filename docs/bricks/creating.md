@@ -110,6 +110,24 @@ public static function getOutlineLabel(array $config): ?string
 
 Returning `null` or an empty string falls back to the brick's label. It is only called when the outline is enabled, and the result is never saved with the content. The built-in Section brick uses the first 60 characters of its text.
 
+## Limiting how often a brick is used
+
+Some bricks belong on a page only once, such as a hero or a brick holding the page's meta data. `getMaxInstances()` sets how often the brick may be used in a field:
+
+```php
+public static function getMaxInstances(): ?int
+{
+    return 1;
+}
+```
+
+The sidebar and the brick picker show how often a limited brick is used, e.g. `0/1`. Once the limit is reached, the brick is greyed out there, with a hint, and can't be dragged in or picked. The server refuses to insert it as well, and saving the field fails validation if the content still has too many, e.g. from an older version or a request made outside the editor. The default, `null`, puts no limit on the brick.
+
+> [!WARNING]
+> Adding a limit to a brick that is already in use affects existing content: a record that has more of the brick than the new limit can't be saved until an author removes the extra ones.
+
+The limit applies per field. A Mason field in a brick's own form counts only its own bricks, so a brick limited to one can still appear once in each of them. To keep a brick on the top level only, leave it out of the inner field's `bricks()`.
+
 ## Rendering from the record
 
 `toHtml()` takes a second argument holding whatever context the renderer was given — most usefully the record the content belongs to. It is empty unless something passes it, so guard the keys you read:

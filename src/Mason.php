@@ -79,6 +79,22 @@ class Mason extends Field implements CanBeLengthConstrained
             $component->state($state);
         });
 
+        // The editor stops inserts at the limit, but its state comes from the browser
+        $this->rule(fn (Mason $component): Closure => function (string $attribute, mixed $value, Closure $fail) use ($component): void {
+            if (! is_array($value)) {
+                return;
+            }
+
+            foreach ($component->getBrickLimits() as $id => $max) {
+                if ($component->countBrickInstances($id, $value) > $max) {
+                    $fail(trans_choice('mason::mason.max_instances.exceeded', $max, [
+                        'label' => $component->getBrick($id)::getLabel(),
+                        'max' => $max,
+                    ]));
+                }
+            }
+        });
+
         $this->afterStateUpdated(function (Mason $component, Component $livewire): void {
             $livewire->validateOnly($component->getStatePath());
         });
@@ -236,6 +252,56 @@ class Mason extends Field implements CanBeLengthConstrained
     }
 
     /**
+     * @param  array<int, mixed> | null  $state  the field's state if omitted
+     */
+    public function countBrickInstances(string $id, ?array $state = null): int
+    {
+        $state ??= $this->getState();
+
+        if (! is_array($state)) {
+            return 0;
+        }
+
+        return count(array_filter(
+            $state,
+            fn (mixed $block): bool => is_array($block)
+                && ($block['type'] ?? null) === 'masonBrick'
+                && ($block['attrs']['id'] ?? null) === $id,
+        ));
+    }
+
+    /**
+     * Whether one more of the brick would go over its getMaxInstances()
+     *
+     * @param  array<int, mixed> | null  $state  the field's state if omitted
+     */
+    public function hasReachedMaxInstances(string $id, ?array $state = null): bool
+    {
+        $brick = $this->getBrick($id);
+        $max = filled($brick) ? $brick::getMaxInstances() : null;
+
+        return $max !== null && $this->countBrickInstances($id, $state) >= $max;
+    }
+
+    /**
+     * Limits of the bricks that have one, for the editor
+     *
+     * @return array<string, int>
+     */
+    public function getBrickLimits(): array
+    {
+        $limits = [];
+
+        foreach ($this->getFlatBricks() as $brick) {
+            if (($max = $brick::getMaxInstances()) !== null) {
+                $limits[$brick::getId()] = $max;
+            }
+        }
+
+        return $limits;
+    }
+
+    /**
      * @param  array<int, array<string, mixed>>  $state
      * @param  array<string, mixed>  $arguments
      * @return array<int, array<string, mixed>>
@@ -245,7 +311,7 @@ class Mason extends Field implements CanBeLengthConstrained
         $brick = $arguments['brick'] ?? null;
         $position = $arguments['position'] ?? count($state);
 
-        if (! $brick) {
+        if (! $brick || $this->hasReachedMaxInstances($brick['attrs']['id'] ?? '', $state)) {
             return $state;
         }
 

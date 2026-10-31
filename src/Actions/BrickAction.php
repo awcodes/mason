@@ -25,6 +25,9 @@ class BrickAction
 
                 return $brick::configureBrickAction($action);
             })
+            // A brick at its getMaxInstances() can't be inserted again; Filament then doesn't mount the action
+            ->disabled(fn (array $arguments, Mason $component): bool => ($arguments['mode'] ?? 'insert') === 'insert'
+                && $component->hasReachedMaxInstances($arguments['id'] ?? ''))
             ->fillForm(fn (array $arguments): ?array => $arguments['config'] ?? null)
             ->modalHeading(function (array $arguments, Mason $component) {
                 $brick = $component->getBrick($arguments['id']);

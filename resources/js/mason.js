@@ -7,6 +7,7 @@ export default function masonComponent({
     context = null,
     defaultColorMode = 'light',
     hasColorModeToggle = false,
+    brickLimits = {},
     outlineBricks = {},
 }) {
     let iframe = null
@@ -316,8 +317,27 @@ export default function masonComponent({
             )
         },
 
+        brickCount(brickId) {
+            const blocks = Array.isArray(this.state) ? this.state : []
+
+            return blocks.filter(
+                (block) =>
+                    block?.type === 'masonBrick' && block.attrs?.id === brickId,
+            ).length
+        },
+
+        // Whether one more of the brick stays within its getMaxInstances(); the server checks it again
+        isBrickAvailable(brickId) {
+            const max = brickLimits[brickId]
+
+            if (max === undefined || max === null) return true
+
+            return this.brickCount(brickId) < max
+        },
+
         async handleInsertBlock(brickId, position) {
-            if (this.isBrickActionBusy()) return
+            if (this.isBrickActionBusy() || !this.isBrickAvailable(brickId))
+                return
 
             this.isInsertingBrick = true
             const preInsertState = this.captureState()

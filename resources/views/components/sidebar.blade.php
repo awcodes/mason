@@ -138,7 +138,12 @@
                             >
                                 @foreach ($item->getBricks() as $brick)
                                     <div
-                                        draggable="true"
+                                        @if ($brick::getMaxInstances() !== null)
+                                            x-bind:draggable="isBrickAvailable(@js($brick::getId())) ? 'true' : 'false'"
+                                            x-bind:title="isBrickAvailable(@js($brick::getId())) ? null : @js(trans_choice('mason::mason.max_instances.reached', $brick::getMaxInstances(), ['max' => $brick::getMaxInstances()]))"
+                                        @else
+                                            draggable="true"
+                                        @endif
                                         x-on:dragstart="
                                             $event.dataTransfer.setData('brick', @js($brick::getId()))
                                             $el.classList.add('dragging')
@@ -149,6 +154,7 @@
                                         x-on:run-mason-commands.window="isLoading = false"
                                         x-bind:class="{
                                             'filtered': ! filterActions().includes(@js($brick::getLabel())),
+                                            'unavailable': ! isBrickAvailable(@js($brick::getId())),
                                         }"
                                     >
                                         @if (filled($brick::getIcon()))
@@ -159,13 +165,20 @@
                                         @endif
 
                                         <span class="mason-actions-brick-label">{{ $brick::getLabel() }}</span>
+
+                                        <x-mason::brick-count :brick="$brick" />
                                     </div>
                                 @endforeach
                             </div>
                         </div>
                     @else
                         <div
-                            draggable="true"
+                            @if ($item::getMaxInstances() !== null)
+                                x-bind:draggable="isBrickAvailable(@js($item::getId())) ? 'true' : 'false'"
+                                x-bind:title="isBrickAvailable(@js($item::getId())) ? null : @js(trans_choice('mason::mason.max_instances.reached', $item::getMaxInstances(), ['max' => $item::getMaxInstances()]))"
+                            @else
+                                draggable="true"
+                            @endif
                             x-on:dragstart="
                                 $event.dataTransfer.setData('brick', @js($item::getId()))
                                 $el.classList.add('dragging')
@@ -176,6 +189,7 @@
                             x-on:run-mason-commands.window="isLoading = false"
                             x-bind:class="{
                                 'filtered': ! filterActions().includes(@js($item::getLabel())),
+                                'unavailable': ! isBrickAvailable(@js($item::getId())),
                             }"
                         >
                             @if (filled($item::getIcon()))
@@ -186,6 +200,8 @@
                             @endif
 
                             <span class="mason-actions-brick-label">{{ $item::getLabel() }}</span>
+
+                            <x-mason::brick-count :brick="$item" />
                         </div>
                     @endif
                 @endforeach
