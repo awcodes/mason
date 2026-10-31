@@ -79,5 +79,42 @@ For this to work your application's CSS must support manually toggling dark mode
 @custom-variant dark (&:where(.dark, .dark *));
 ```
 
+## Showing the layout
+
+A [preview layout](form.md#preview-layout) can wrap the bricks in more than the content area, such as the site's header and footer, an email frame or the rest of a product page. Authors mostly want to see the bricks alone, so Mason can hide those parts and add a toggle to the editor toolbar that shows them:
+
+```php
+Mason::make('content')
+    ->previewLayout('layouts.mason-preview')
+    ->layoutToggle()
+    ->bricks([...]);
+```
+
+Mark the parts in the preview layout with `data-mason-layout`. They stay hidden until an author switches the toggle on, and their choice is kept in local storage for later visits:
+
+```blade
+<body>
+    <div data-mason-layout>
+        @include('partials.header')
+    </div>
+
+    <main>
+        @include('mason::iframe-preview-content', ['blocks' => $blocks])
+    </main>
+
+    <div data-mason-layout>
+        @include('partials.footer')
+    </div>
+</body>
+```
+
+The toggle is labelled "Show layout". Name what it shows with `layoutToggleLabel()`:
+
+```php
+Mason::make('content')
+    ->layoutToggle()
+    ->layoutToggleLabel('Show header and footer')
+```
+
 > [!NOTE]
-> `sidebarPosition()`, `displayActionsAsGrid()`, `outline()` and the colour mode methods are editor-only. `MasonEntry` has no sidebar, though it does accept `extraInputAttributes()`.
+> `sidebarPosition()`, `displayActionsAsGrid()`, `outline()`, the colour mode methods and `layoutToggle()` are editor-only. `MasonEntry` has no sidebar, though it does accept `extraInputAttributes()`.

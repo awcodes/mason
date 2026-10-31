@@ -1,5 +1,6 @@
 @props([
     'hasColorModeToggle' => false,
+    'layoutToggleLabel' => null,
 ])
 
 <div class="mason-controls" data-focus="mason-toolbar">
@@ -100,6 +101,21 @@
             </x-slot>
         </x-filament::icon-button>
     @endif
+
+    @if (filled($layoutToggleLabel))
+        <x-filament::icon-button
+            icon="heroicon-o-window"
+            color="gray"
+            x-on:click="toggleLayout()"
+            size="sm"
+            x-bind:class="{'active': showLayout}"
+            x-bind:aria-pressed="showLayout"
+            class="mason-layout-toggle"
+            :label="$layoutToggleLabel"
+            :title="$layoutToggleLabel"
+        />
+    @endif
+
     <x-filament::icon-button
         color="gray"
         x-on:click="clearAllBlocks()"

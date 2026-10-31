@@ -7,6 +7,7 @@ export default function masonComponent({
     context = null,
     defaultColorMode = 'light',
     hasColorModeToggle = false,
+    hasLayoutToggle = false,
     outlineBricks = {},
 }) {
     let iframe = null
@@ -29,6 +30,10 @@ export default function masonComponent({
         colorMode: hasColorModeToggle
             ? localStorage.getItem('mason-color-mode') || defaultColorMode
             : defaultColorMode,
+        // The preview also reads this key itself (iframe-preview-content)
+        showLayout:
+            hasLayoutToggle &&
+            localStorage.getItem('mason-show-layout') === '1',
         isUpdatingBrick: false,
         isInsertingBrick: false,
         previewUrl: null,
@@ -204,6 +209,11 @@ export default function masonComponent({
                 this.sendMessageToIframe({
                     type: 'setColorMode',
                     mode: this.colorMode,
+                })
+
+                this.sendMessageToIframe({
+                    type: 'setShowLayout',
+                    show: this.showLayout,
                 })
 
                 // Update move buttons after iframe loads
@@ -622,6 +632,18 @@ export default function masonComponent({
             this.sendMessageToIframe({
                 type: 'setColorMode',
                 mode: this.colorMode,
+            })
+        },
+
+        toggleLayout() {
+            this.showLayout = !this.showLayout
+            localStorage.setItem(
+                'mason-show-layout',
+                this.showLayout ? '1' : '0',
+            )
+            this.sendMessageToIframe({
+                type: 'setShowLayout',
+                show: this.showLayout,
             })
         },
 

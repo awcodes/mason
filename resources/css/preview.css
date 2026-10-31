@@ -258,6 +258,18 @@ body {
     margin: 0;
     color: var(--mason-drop-zone-text, #9ca3af);
 }
+/*
+ * Parts of the preview layout marked with data-mason-layout, such as the
+ * site's header and footer, show only when switched on with layoutToggle()
+ */
+html:not(.mason-show-layout) [data-mason-layout] {
+    display: none;
+}
+/* With the layout shown, the placeholder fills only the content area instead of lying over the header */
+.mason-show-layout #mason-preview-container:has(> .mason-drop-zone-start) {
+    position: relative;
+    min-height: 16rem;
+}
 /* While dragging, the drop zone shows where the brick goes; a disabled editor has no add line */
 .mason-drop-zone.active > .mason-inserter,
 .mason-dragging .mason-drop-zone > .mason-inserter,

@@ -151,6 +151,14 @@
         let isDisabled = false
         let instanceId = null // Store instance ID for multi-instance support
 
+        // Show the layout before the editor's first message, which comes after the scroll position is restored and would push the content down
+        try {
+            document.documentElement.classList.toggle(
+                'mason-show-layout',
+                localStorage.getItem('mason-show-layout') === '1',
+            )
+        } catch (e) {}
+
         // Helper to send messages back to parent with instanceId
         function postToParent(message) {
             window.parent.postMessage({ ...message, instanceId }, '*')
@@ -217,6 +225,12 @@
                     } else {
                         document.documentElement.classList.remove('dark')
                     }
+                    break
+                case 'setShowLayout':
+                    document.documentElement.classList.toggle(
+                        'mason-show-layout',
+                        data.show,
+                    )
                     break
             }
         })

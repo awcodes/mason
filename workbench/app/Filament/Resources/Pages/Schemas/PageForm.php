@@ -23,6 +23,7 @@ class PageForm
                 Mason::make('content')
                     ->bricks(BrickCollection::make())
                     ->previewLayout('layouts.mason-preview')
+                    ->layoutToggle()
                     ->doubleClickToEdit()
                     ->outline()
                     ->extraInputAttributes(['style' => 'min-height: 30rem;'])

@@ -1,14 +1,20 @@
 .mason-wrapper {
     .mason-topbar {
-        @apply flex items-center justify-between rounded-t-lg shadow-sm ring-1 ring-gray-950/10 transition duration-75 md:hidden dark:ring-white/20;
+        @apply flex items-start justify-between gap-3 rounded-t-lg p-3 shadow-sm ring-1 ring-gray-950/10 transition duration-75 md:hidden dark:ring-white/20;
 
         + .mason-input-wrapper {
             @apply rounded-t-none md:rounded-t-lg;
         }
+
+        /* Narrow screens: closer buttons keep them in one row, and below about 290px they wrap instead of overflowing */
+        .mason-controls {
+            @apply flex-wrap gap-2 p-0;
+        }
     }
 
+    /* Stays in the first row when the controls wrap */
     .mason-outline-sheet-trigger {
-        @apply me-3;
+        @apply m-0 size-fit;
     }
 
     .mason-controls {
