@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Awcodes\Mason;
 
 use Awcodes\Mason\Concerns\HasBricks;
+use Awcodes\Mason\Concerns\HasMinHeight;
 use Awcodes\Mason\Support\DataPayload;
 use Awcodes\Mason\Support\RenderContext;
 use Closure;
@@ -16,6 +17,7 @@ class MasonEntry extends Entry
 {
     use HasBricks;
     use HasExtraInputAttributes;
+    use HasMinHeight;
 
     protected string $view = 'mason::mason-entry';
 
@@ -25,6 +27,18 @@ class MasonEntry extends Entry
      * @var array<string, mixed> | Closure | null
      */
     protected array | Closure | null $data = null;
+
+    /**
+     * The entry's iframe keeps its default height, so it only takes a minimum; without one, the stylesheet's default applies
+     *
+     * @return array<string>
+     */
+    public function getHeightStyles(): array
+    {
+        $minHeight = $this->getMinHeight();
+
+        return filled($minHeight) ? ["--mason-min-height: {$minHeight}"] : [];
+    }
 
     public function previewLayout(string | Closure | null $layout): static
     {
