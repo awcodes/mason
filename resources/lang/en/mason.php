@@ -47,6 +47,11 @@ return [
         'open' => 'Show outline',
         'close' => 'Close outline',
     ],
+    'max_instances' => [
+        'used' => ':count of :max used',
+        'reached' => '{1} Can only be used once|[2,*] Can only be used :max times',
+        'exceeded' => '{1} The ":label" brick can only be used once.|[2,*] The ":label" brick can only be used :max times.',
+    ],
     'entry' => [
         'empty' => 'No content',
     ],
