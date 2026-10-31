@@ -132,6 +132,58 @@ See [Rendering](rendering.md#passing-data-to-bricks) for how to supply it.
 > [!WARNING]
 > The editor preview does not supply `$data`. It renders in an iframe that has no record in scope, so a record-dependent brick renders its fallback there. Write the fallback so the brick still reads sensibly while it is being edited.
 
+## Parts
+
+A brick with a long form can let authors jump straight to the field they mean. Mark elements of the brick's view as parts with `mason_part()`, named after the key of a component in the brick's form: a field name, or the `key()` of a section or tab:
+
+```blade
+<section {{ mason_part('design') }}>
+    <h1 {{ mason_part('heading') }}>{{ $heading }}</h1>
+</section>
+```
+
+```php
+Tabs::make()->tabs([
+    Tab::make('Content')->key('content')->schema([
+        TextInput::make('heading'), // part "heading"
+    ]),
+    Tab::make('Design')->key('design')->schema([...]), // part "design"
+])
+```
+
+For repeated content, name the path through the repeater or builder with the item's position, starting at `0`. `cards.1.heading` opens the heading of the second card, `cards.1` the card itself:
+
+```blade
+@foreach ($cards as $card)
+    <article {{ mason_part("cards.{$loop->index}") }}>
+        <h3 {{ mason_part("cards.{$loop->index}.heading") }}>{{ $card['heading'] }}</h3>
+    </article>
+@endforeach
+```
+
+In the preview, the first click on a brick still selects it. A click on a part of the selected brick, or a double-click on it with [double-click to edit](../fields/form.md#editing-on-double-click), opens the brick's form there: tabs switch, collapsed sections and repeater items open, and the component scrolls into view with its first input focused. Parts can be nested, and the innermost one wins. The whole form is still submitted, so validation and dependent fields work as before. A part whose key isn't in the form, or is hidden, opens the form as usual. The brick's content still takes no clicks in the preview, so links, embeds and videos inside a part stay inert. An `afterFormFilled()` the brick sets in `configureBrickAction()` runs first, and the form still opens at the part.
+
+A bare key matches the first component with that key in the order of the form, which can be a field inside a repeater rather than a field of the same name further down. Give such components distinct keys, or name the path, e.g. `cards.0.title`.
+
+`mason_part()` outputs `data-mason-part` only in the editor preview, so nothing reaches the front end or an entry. A brick that caches its rendered HTML should therefore not reuse the preview's HTML elsewhere, or the other way round: skip the cache while `Mason::isRenderingPreview()` is true, or make it part of the cache key.
+
+## Rendering in the editor
+
+`Mason::isRenderingPreview()` tells a brick that it is being rendered for the editor preview, e.g. to show a placeholder where the front end would show nothing:
+
+```php
+public static function toHtml(array $config, ?array $data = null): ?string
+{
+    if (blank($config['items'] ?? null) && ! Mason::isRenderingPreview()) {
+        return null;
+    }
+
+    // ...
+}
+```
+
+Unlike a `null` `$data`, it holds when the field passes [preview data](../fields/form.md#preview-data) too.
+
 ## Bricks without a form
 
 For a brick that needs no configuration — a divider, a fixed callout — return the view from `toHtml()` and hide the modal, so inserting it adds it immediately:

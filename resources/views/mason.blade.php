@@ -57,6 +57,7 @@
             'display-desktop': viewport === 'desktop',
         }"
         x-on:keydown.escape.window="fullscreen = false"
+        x-on:mason-reveal-part.window="revealPart($event.detail)"
         x-on:click.away="deselectAllBlocks()"
     >
         @if (! $isDisabled)
