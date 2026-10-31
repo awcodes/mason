@@ -91,9 +91,11 @@ npm install
 npm run build:workbench
 ```
 
-The compiled output is committed under `workbench/resources/dist/`, in the same way
-`resources/dist/` holds the package's compiled JavaScript, so `composer serve`
-works from a clean checkout without Node. Rebuild it after changing
+The compiled output in `workbench/resources/dist/` is not committed: it depends on
+the Filament version installed locally, so a committed copy would drift with every
+contributor's setup. `composer build` (and so `composer serve`) runs
+`npm run build:workbench` first, which means the Workbench needs Node and an
+`npm install`. Rebuild it while the Workbench is running after changing
 `resources/css/plugin.css`, a Mason Blade view, or a Workbench view.
 
 ## Requirements

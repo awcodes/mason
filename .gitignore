@@ -10,3 +10,4 @@ node_modules
 phpunit.xml
 phpstan.neon
 vendor
+workbench/resources/dist
