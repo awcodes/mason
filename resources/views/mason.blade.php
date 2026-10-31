@@ -56,7 +56,7 @@
             'display-tablet': viewport === 'tablet',
             'display-desktop': viewport === 'desktop',
         }"
-        x-on:keydown.escape.window.capture="exitFullscreenOnEscape($event)"
+        x-on:keydown.escape.window.capture="handleEscape($event)"
         x-on:click.away="deselectAllBlocks()"
     >
         @if (! $isDisabled)

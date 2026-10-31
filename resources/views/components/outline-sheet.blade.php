@@ -9,7 +9,6 @@
     x-transition:leave-end="opacity-0"
     class="mason-outline-sheet-overlay"
     x-on:click.self="closeOutlineSheet()"
-    x-on:keydown.escape.window="closeOutlineSheet()"
 >
     <div
         x-show="outlineSheetOpen"
