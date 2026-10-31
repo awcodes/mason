@@ -61,6 +61,12 @@ it('keeps the action when the callback returns null', function () {
         ->getModalHeading()->toBe('From the brick');
 });
 
+it('fails when the callback returns a different action', function () {
+    LivewireBrickActionForm::$modifyBrickActionUsing = fn (): Action => Action::make('other')->slideOver();
+
+    mountedBrickAction('edit');
+})->throws(LogicException::class, 'brickAction()');
+
 it('passes the brick class and the arguments to the callback', function (string $mode) {
     LivewireBrickActionForm::$modifyBrickActionUsing = fn (Action $action, string $brick, array $arguments): Action => $action
         ->modalHeading("{$brick}:{$arguments['mode']}");

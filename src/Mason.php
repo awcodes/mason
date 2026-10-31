@@ -17,6 +17,7 @@ use Filament\Forms\Components\Field;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Concerns\HasPlaceholder;
 use Livewire\Component;
+use LogicException;
 
 class Mason extends Field implements CanBeLengthConstrained
 {
@@ -160,7 +161,7 @@ class Mason extends Field implements CanBeLengthConstrained
 
     /**
      * Customizes the action behind the brick form for this field, e.g. a slide-over or a width, after the brick's own
-     * configureBrickAction(). Returning null keeps the action.
+     * configureBrickAction(). The callback changes the action it receives; it may return it or null.
      */
     public function brickAction(?Closure $callback): static
     {
@@ -178,13 +179,20 @@ class Mason extends Field implements CanBeLengthConstrained
             return $action;
         }
 
-        return $this->evaluate($this->modifyBrickActionUsing, [
+        $result = $this->evaluate($this->modifyBrickActionUsing, [
             'action' => $action,
             'arguments' => $action->getArguments(),
             'brick' => $brick,
         ], [
             Action::class => $action,
-        ]) ?? $action;
+        ]);
+
+        // The callback runs as the mounted action boots, which cannot be swapped for another instance
+        if ($result instanceof Action && $result !== $action) {
+            throw new LogicException('The brickAction() callback returned a different action. Change the action it receives instead.');
+        }
+
+        return $action;
     }
 
     public function doubleClickToEdit(bool | Closure $condition = true): static

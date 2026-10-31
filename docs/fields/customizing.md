@@ -62,7 +62,7 @@ To tell apart several bricks of the same type, give them [outline labels](../bri
 
 ## Brick form
 
-Each brick builds its form in [`configureBrickAction()`](../bricks/creating.md). To change that form's action for one field only, without touching every brick, pass a callback to `brickAction()`. It runs after the brick's own configuration, so the field gets the last word:
+Each brick builds its form in [`configureBrickAction()`](../bricks/creating.md). To change that form's action for one field only, without touching every brick, pass a callback to `brickAction()`. It runs after the brick's own configuration, so the field gets the last word. The callback changes the `$action` it receives and may return it or `null`:
 
 ```php
 use Filament\Actions\Action;
@@ -74,7 +74,7 @@ Mason::make('content')
     ->bricks([...]);
 ```
 
-The callback also receives the brick's class as `$brick` and the action's `$arguments`, whose `mode` is `insert` or `edit`. Returning `null` keeps the action as it is. This is useful for a field that sits somewhere special, such as a Mason field in a brick's own form, whose brick forms should open beside the outer one rather than over it:
+The callback also receives the brick's class as `$brick` and the action's `$arguments`, whose `mode` is `insert` or `edit`. It cannot replace the action with a new one, such as `Action::make()`, because the action is already mounted when the callback runs; returning a different action throws an exception. This is useful for a field that sits somewhere special, such as a Mason field in a brick's own form, whose brick forms should open beside the outer one rather than over it:
 
 ```php
 Mason::make('columns')
