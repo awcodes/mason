@@ -7,7 +7,7 @@ export default function masonComponent({
     context = null,
     defaultColorMode = 'light',
     hasColorModeToggle = false,
-    maxInstances = {},
+    brickLimits = {},
     outlineBricks = {},
 }) {
     let iframe = null
@@ -328,7 +328,7 @@ export default function masonComponent({
 
         // Whether one more of the brick stays within its getMaxInstances(); the server checks it again
         isBrickAvailable(brickId) {
-            const max = maxInstances[brickId]
+            const max = brickLimits[brickId]
 
             if (max === undefined || max === null) return true
 

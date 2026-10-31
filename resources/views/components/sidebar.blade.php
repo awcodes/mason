@@ -140,7 +140,6 @@
                                     <div
                                         @if ($brick::getMaxInstances() !== null)
                                             x-bind:draggable="isBrickAvailable(@js($brick::getId())) ? 'true' : 'false'"
-                                            x-bind:aria-disabled="! isBrickAvailable(@js($brick::getId()))"
                                             x-bind:title="isBrickAvailable(@js($brick::getId())) ? null : @js(trans_choice('mason::mason.max_instances.reached', $brick::getMaxInstances(), ['max' => $brick::getMaxInstances()]))"
                                         @else
                                             draggable="true"
@@ -176,7 +175,6 @@
                         <div
                             @if ($item::getMaxInstances() !== null)
                                 x-bind:draggable="isBrickAvailable(@js($item::getId())) ? 'true' : 'false'"
-                                x-bind:aria-disabled="! isBrickAvailable(@js($item::getId()))"
                                 x-bind:title="isBrickAvailable(@js($item::getId())) ? null : @js(trans_choice('mason::mason.max_instances.reached', $item::getMaxInstances(), ['max' => $item::getMaxInstances()]))"
                             @else
                                 draggable="true"

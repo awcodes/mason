@@ -123,6 +123,9 @@ public static function getMaxInstances(): ?int
 
 The sidebar and the brick picker show how often a limited brick is used, e.g. `0/1`. Once the limit is reached, the brick is greyed out there, with a hint, and can't be dragged in or picked. The server refuses to insert it as well, and saving the field fails validation if the content still has too many, e.g. from an older version or a request made outside the editor. The default, `null`, puts no limit on the brick.
 
+> [!WARNING]
+> Adding a limit to a brick that is already in use affects existing content: a record that has more of the brick than the new limit can't be saved until an author removes the extra ones.
+
 The limit applies per field. A Mason field in a brick's own form counts only its own bricks, so a brick limited to one can still appear once in each of them. To keep a brick on the top level only, leave it out of the inner field's `bricks()`.
 
 ## Rendering from the record

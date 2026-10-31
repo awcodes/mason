@@ -85,7 +85,7 @@ class Mason extends Field implements CanBeLengthConstrained
                 return;
             }
 
-            foreach ($component->getMaxInstances() as $id => $max) {
+            foreach ($component->getBrickLimits() as $id => $max) {
                 if ($component->countBrickInstances($id, $value) > $max) {
                     $fail(trans_choice('mason::mason.max_instances.exceeded', $max, [
                         'label' => $component->getBrick($id)::getLabel(),
@@ -288,7 +288,7 @@ class Mason extends Field implements CanBeLengthConstrained
      *
      * @return array<string, int>
      */
-    public function getMaxInstances(): array
+    public function getBrickLimits(): array
     {
         $limits = [];
 

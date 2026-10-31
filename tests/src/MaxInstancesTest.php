@@ -34,7 +34,7 @@ it('puts no limit on a brick by default', function () {
 it('passes only the limited bricks to the editor', function () {
     $field = Mason::make('content')->bricks([LimitedBrick::class, SimpleBrick::class]);
 
-    expect($field->getMaxInstances())->toBe(['limited-brick' => 1]);
+    expect($field->getBrickLimits())->toBe(['limited-brick' => 1]);
 });
 
 it('inserts a limited brick while it is below its limit', function () {
