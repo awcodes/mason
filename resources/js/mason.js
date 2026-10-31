@@ -334,7 +334,7 @@ export default function masonComponent({
             }
         },
 
-        async handleEditBlock({ index, brickId, config }) {
+        async handleEditBlock({ index, brickId, config, part = null }) {
             if (this.isBrickActionBusy()) return
 
             this.isUpdatingBrick = true
@@ -348,6 +348,7 @@ export default function masonComponent({
                         config,
                         mode: 'edit',
                         blockIndex: index,
+                        ...(part ? { part } : {}),
                     },
                     { schemaComponent: key },
                 )
@@ -355,6 +356,98 @@ export default function masonComponent({
             } finally {
                 this.isUpdatingBrick = false
             }
+        },
+
+        // The brick form opened at a part clicked in the preview: reveal its component the way Filament reveals a
+        // validation error (an `expand` event up the tree switches tabs and opens sections), then scroll and focus
+        revealPart({ field, target }) {
+            if (field !== key) return
+
+            const escaped = CSS.escape(target)
+            const findElement = () =>
+                document.querySelector(
+                    `[wire\\:key="${escaped}"], [wire\\:key="${escaped}.container"], [wire\\:key="${escaped}.item"]`,
+                )
+
+            const reveal = () => {
+                const element = findElement()
+
+                if (!element) return
+
+                let elementToExpand = element
+
+                while (elementToExpand) {
+                    elementToExpand.dispatchEvent(new CustomEvent('expand'))
+                    elementToExpand = elementToExpand.parentNode
+                }
+
+                requestAnimationFrame(() =>
+                    requestAnimationFrame(() => {
+                        element.scrollIntoView({
+                            block: 'center',
+                            behavior: 'smooth',
+                        })
+                        let input = element.querySelector(
+                            'input:not([type="hidden"]), textarea, select, [contenteditable="true"]',
+                        )
+
+                        // In a radio group, the chosen option takes the focus, as with the keyboard
+                        if (input?.type === 'radio') {
+                            input =
+                                input
+                                    .closest('[role="radiogroup"]')
+                                    ?.querySelector('input:checked') ?? input
+                        }
+
+                        input?.focus({ preventScroll: true })
+
+                        // Place the cursor at the end of the text, to carry on writing
+                        if (input?.isContentEditable) {
+                            const range = document.createRange()
+                            range.selectNodeContents(input)
+                            range.collapse(false)
+                            window.getSelection()?.removeAllRanges()
+                            window.getSelection()?.addRange(range)
+                        } else if (typeof input?.value === 'string') {
+                            try {
+                                input.setSelectionRange(
+                                    input.value.length,
+                                    input.value.length,
+                                )
+                            } catch (e) {
+                                // e.g. number and email inputs have no selection
+                            }
+                        }
+                    }),
+                )
+            }
+
+            const afterFrames = () =>
+                requestAnimationFrame(() => requestAnimationFrame(reveal))
+
+            // While the modal is still opening, its focus trap would take the focus back afterwards
+            if (
+                findElement()
+                    ?.closest('.fi-modal')
+                    ?.classList.contains('fi-modal-open')
+            ) {
+                afterFrames()
+
+                return
+            }
+
+            const onOpened = () => {
+                clearTimeout(timeout)
+                afterFrames()
+            }
+            const timeout = setTimeout(
+                () => document.removeEventListener('x-modal-opened', onOpened),
+                2000,
+            )
+
+            document.addEventListener('x-modal-opened', onOpened, {
+                once: true,
+            })
         },
 
         handleDeleteBlock(index) {

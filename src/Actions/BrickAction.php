@@ -7,7 +7,11 @@ namespace Awcodes\Mason\Actions;
 use Awcodes\Mason\Mason;
 use Awcodes\Mason\Support\BrickCommand;
 use Filament\Actions\Action;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
+use Livewire\Component as LivewireComponent;
 
 class BrickAction
 {
@@ -26,6 +30,23 @@ class BrickAction
                 return $brick::configureBrickAction($action);
             })
             ->fillForm(fn (array $arguments): ?array => $arguments['config'] ?? null)
+            // A click on a part in the preview (mason_part()) opens the form at the component with that key
+            ->afterFormFilled(function (Action $action, array $arguments, Mason $component, HasSchemas & LivewireComponent $livewire): void {
+                $part = $arguments['part'] ?? null;
+
+                if (! is_string($part) || blank($part)) {
+                    return;
+                }
+
+                $schema = $livewire->getSchema("mountedActionSchema{$action->getNestingIndex()}");
+                $target = $schema instanceof Schema ? static::findPart($schema, $part) : null;
+
+                if (! $target) {
+                    return;
+                }
+
+                $livewire->dispatch('mason-reveal-part', field: $component->getKey(), target: $target->getLivewireKey());
+            })
             ->modalHeading(function (array $arguments, Mason $component) {
                 $brick = $component->getBrick($arguments['id']);
 
@@ -94,5 +115,48 @@ class BrickAction
                     BrickCommand::insertBrick($brickContent, $position),
                 ]);
             });
+    }
+
+    /**
+     * The component or repeater item a part names: a component key, e.g. "heading", or a path through repeaters and
+     * builders with the item's position, e.g. "cards.1.heading" or "cards.1"
+     */
+    protected static function findPart(Schema $schema, string $part): Component | Schema | null
+    {
+        $segments = explode('.', $part);
+        $found = null;
+        $schemas = [$schema];
+
+        while ($segments !== []) {
+            $segment = array_shift($segments);
+
+            if ($found instanceof Component && ctype_digit($segment) && method_exists($found, 'getItems')) {
+                $found = array_values($found->getItems())[(int) $segment] ?? null;
+                $schemas = $found ? [$found] : [];
+
+                continue;
+            }
+
+            $found = null;
+
+            foreach ($schemas as $searchedSchema) {
+                $found = $searchedSchema->getComponent(
+                    fn (mixed $schemaComponent): bool => $schemaComponent instanceof Component
+                        && $schemaComponent->getKey(isAbsolute: false) === $segment,
+                );
+
+                if ($found) {
+                    break;
+                }
+            }
+
+            if (! $found instanceof Component) {
+                return null;
+            }
+
+            $schemas = $found->getChildSchemas();
+        }
+
+        return $found;
     }
 }

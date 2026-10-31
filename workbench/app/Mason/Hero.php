@@ -9,6 +9,8 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 use Throwable;
@@ -63,17 +65,23 @@ class Hero extends Brick
                 'text' => $arguments['config']['text'] ?? null,
             ])
             ->schema([
-                Radio::make('background_color')
-                    ->options([
-                        'white' => 'White',
-                        'gray' => 'Gray',
-                        'primary' => 'Primary',
-                    ])
-                    ->inline()
-                    ->inlineLabel(false),
-                TextInput::make('heading')
-                    ->required(),
-                RichEditor::make('text'),
+                Tabs::make()->tabs([
+                    Tab::make('Content')->key('content')->schema([
+                        TextInput::make('heading')
+                            ->required(),
+                        RichEditor::make('text'),
+                    ]),
+                    Tab::make('Design')->key('design')->schema([
+                        Radio::make('background_color')
+                            ->options([
+                                'white' => 'White',
+                                'gray' => 'Gray',
+                                'primary' => 'Primary',
+                            ])
+                            ->inline()
+                            ->inlineLabel(false),
+                    ]),
+                ]),
             ]);
     }
 }

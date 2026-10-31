@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Awcodes\Mason\Mason;
 use Awcodes\Mason\Support\MasonRenderer;
+use Illuminate\Support\HtmlString;
 
 if (! function_exists(function: 'mason')) {
     /**
@@ -14,5 +16,16 @@ if (! function_exists(function: 'mason')) {
         return MasonRenderer::make($content)
             ->bricks($bricks)
             ->data($data);
+    }
+}
+
+if (! function_exists(function: 'mason_part')) {
+    /**
+     * Marks an element of a brick's view as a part: in the editor preview, clicking it on the selected brick opens the
+     * brick's form at the component with this key. Outputs nothing outside the preview.
+     */
+    function mason_part(string $key): HtmlString
+    {
+        return new HtmlString(Mason::isRenderingPreview() ? 'data-mason-part="' . e($key) . '"' : '');
     }
 }

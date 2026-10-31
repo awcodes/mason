@@ -443,12 +443,44 @@
                     })
                 }
             } else {
-                // Click on block content - select it
                 const index = parseInt(block.getAttribute('data-block-index'))
+                const part = getPart(e.target, block)
+
+                // A part of the brick that is already selected opens its form there; any other click selects it
+                if (part && block.classList.contains('selected')) {
+                    // A link or button inside the part must not act in the preview
+                    e.preventDefault()
+
+                    postToParent({
+                        type: 'editBlock',
+                        index,
+                        brickId: block.getAttribute('data-brick-id'),
+                        config: JSON.parse(
+                            block.getAttribute('data-config') || '{}',
+                        ),
+                        part,
+                    })
+
+                    return
+                }
+
                 selectBlock(index)
                 postToParent({ type: 'blockSelected', index })
             }
         })
+
+        // The innermost part (mason_part()) around the target, if the brick can be edited
+        function getPart(target, block) {
+            if (isDisabled || !block.querySelector('[data-action="edit"]')) {
+                return null
+            }
+
+            const part = target.closest('[data-mason-part]')
+
+            return part && block.contains(part)
+                ? part.getAttribute('data-mason-part')
+                : null
+        }
 
         // Handle double-click to edit
         container.addEventListener('dblclick', function (e) {
@@ -480,6 +512,7 @@
                 index,
                 brickId,
                 config,
+                part: getPart(e.target, block),
             })
         })
 

@@ -272,3 +272,20 @@ body {
         pointer-events: none;
     }
 }
+/*
+ * Parts (mason_part()) of the selected brick open its form there, so they take
+ * the pointer the brick's content otherwise doesn't; only the innermost hovered
+ * one is framed
+ */
+.mason-block.selected [data-mason-part] {
+    pointer-events: auto;
+    cursor: pointer;
+}
+.mason-block.selected
+    [data-mason-part]:hover:not(:has([data-mason-part]:hover)) {
+    outline: 2px dashed var(--mason-border-color, #0ea5e9);
+    outline-offset: 2px;
+}
+.mason-disabled .mason-block.selected [data-mason-part] {
+    pointer-events: none;
+}
