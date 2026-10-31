@@ -372,9 +372,6 @@ export default function masonComponent({
 
             this.isDuplicatingBrick = true
             const preDuplicateState = this.captureState()
-            // Select the copy once the preview reloads with it
-            this.selectedBlockIndex = index + 1
-            pendingFocusIndex = index + 1
 
             try {
                 await this.$wire.mountAction(
@@ -383,18 +380,22 @@ export default function masonComponent({
                     { schemaComponent: key },
                 )
             } finally {
+                // Select the copy only once it is in the state; otherwise the selection stays
                 if (this.getBlocksFromState().length > blocks.length) {
                     this.pushToUndoStack(preDuplicateState)
-                } else {
-                    pendingFocusIndex = null
-                    this.selectedBlockIndex = index
+                    this.selectedBlockIndex = index + 1
+                    pendingFocusIndex = index + 1
                 }
 
                 this.isDuplicatingBrick = false
             }
         },
 
+        // While a copy is being made, other changes would land under its undo entry
+        // and be overwritten by the server's response
         handleDeleteBlock(index) {
+            if (this.isDuplicatingBrick) return
+
             const blocks = this.getBlocksFromState()
 
             if (index >= 0 && index < blocks.length) {
@@ -407,6 +408,8 @@ export default function masonComponent({
         },
 
         handleUpdateBlock(index, brick) {
+            if (this.isDuplicatingBrick) return
+
             const blocks = this.getBlocksFromState()
 
             if (index >= 0 && index < blocks.length) {
@@ -421,6 +424,8 @@ export default function masonComponent({
         },
 
         handleMoveBlock(from, to) {
+            if (this.isDuplicatingBrick) return
+
             const blocks = this.getBlocksFromState()
 
             // Validate indices
@@ -478,6 +483,8 @@ export default function masonComponent({
         },
 
         moveBlockTo(from, to) {
+            if (this.isDuplicatingBrick) return
+
             const blocks = this.getBlocksFromState()
 
             if (from < 0 || from >= blocks.length) return
@@ -830,7 +837,7 @@ export default function masonComponent({
         },
 
         undo() {
-            if (this.undoStack.length === 0) return
+            if (this.isDuplicatingBrick || this.undoStack.length === 0) return
 
             this.redoStack.push(this.captureState())
             if (this.redoStack.length > this.maxHistorySize) {
@@ -844,7 +851,7 @@ export default function masonComponent({
         },
 
         redo() {
-            if (this.redoStack.length === 0) return
+            if (this.isDuplicatingBrick || this.redoStack.length === 0) return
 
             this.undoStack.push(this.captureState())
             if (this.undoStack.length > this.maxHistorySize) {
@@ -866,6 +873,8 @@ export default function masonComponent({
         },
 
         clearAllBlocks() {
+            if (this.isDuplicatingBrick) return
+
             if (this.state && this.state.length > 0) {
                 this.pushToUndoStack(this.captureState())
             }
