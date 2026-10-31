@@ -34,8 +34,7 @@ class LivewireHeightForm extends LivewireForm
             ->schema([
                 MasonEntry::make('content')
                     ->state([])
-                    ->minHeight($this->minHeight)
-                    ->maxHeight($this->maxHeight),
+                    ->minHeight($this->minHeight),
             ]);
     }
 

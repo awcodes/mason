@@ -400,7 +400,6 @@
         .mason-entry-iframe {
             @apply w-full border-0;
             min-height: var(--mason-min-height, 30rem);
-            max-height: var(--mason-max-height, none);
             background: white;
         }
     }
