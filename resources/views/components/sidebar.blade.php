@@ -2,6 +2,7 @@
     'bricks' => [],
     'hasGridActions' => false,
     'hasColorModeToggle' => false,
+    'layoutToggleLabel' => null,
     'hasOutline' => false,
 ])
 
@@ -35,7 +36,10 @@
     data-focus="mason-sidebar"
     {{ $attributes }}
 >
-    <x-mason::controls :has-color-mode-toggle="$hasColorModeToggle" />
+    <x-mason::controls
+        :has-color-mode-toggle="$hasColorModeToggle"
+        :layout-toggle-label="$layoutToggleLabel"
+    />
     @if ($hasOutline)
         <div class="mason-sidebar-tabs" role="tablist">
             <button

@@ -38,6 +38,10 @@ class Mason extends Field implements CanBeLengthConstrained
 
     protected bool | Closure $showColorModeToggle = false;
 
+    protected bool | Closure $showLayoutToggle = false;
+
+    protected string | Closure | null $layoutToggleLabel = null;
+
     /**
      * @var array<string, mixed> | Closure
      */
@@ -233,6 +237,30 @@ class Mason extends Field implements CanBeLengthConstrained
     public function hasColorModeToggle(): bool
     {
         return (bool) $this->evaluate($this->showColorModeToggle);
+    }
+
+    public function layoutToggle(bool | Closure $condition = true): static
+    {
+        $this->showLayoutToggle = $condition;
+
+        return $this;
+    }
+
+    public function hasLayoutToggle(): bool
+    {
+        return (bool) $this->evaluate($this->showLayoutToggle);
+    }
+
+    public function layoutToggleLabel(string | Closure | null $label): static
+    {
+        $this->layoutToggleLabel = $label;
+
+        return $this;
+    }
+
+    public function getLayoutToggleLabel(): string
+    {
+        return $this->evaluate($this->layoutToggleLabel) ?? __('mason::mason.controls.layout_toggle');
     }
 
     /**

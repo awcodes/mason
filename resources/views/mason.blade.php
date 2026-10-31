@@ -11,6 +11,8 @@
     $flatBricks = $getFlatBricks();
     $defaultColorMode = $getDefaultColorMode();
     $hasColorModeToggle = $hasColorModeToggle();
+    $hasLayoutToggle = $hasLayoutToggle();
+    $layoutToggleLabel = $hasLayoutToggle ? $getLayoutToggleLabel() : null;
     $hasOutline = ! $isDisabled && filled($bricks) && $hasOutline();
 
     $outlineBricks = [];
@@ -44,6 +46,7 @@
                     context: @js($getRenderContext()),
                     defaultColorMode: @js($defaultColorMode),
                     hasColorModeToggle: @js($hasColorModeToggle),
+                    hasLayoutToggle: @js($hasLayoutToggle),
                     outlineBricks: @js($outlineBricks),
                 })"
         id="{{ "mason-wrapper-" . $statePath }}"
@@ -63,6 +66,7 @@
             <div class="mason-topbar">
                 <x-mason::controls
                     :has-color-mode-toggle="$hasColorModeToggle"
+                    :layout-toggle-label="$layoutToggleLabel"
                 />
 
                 @if ($hasOutline)
@@ -130,6 +134,7 @@
                         :bricks="$bricks"
                         :has-grid-actions="$hasGridActions()"
                         :has-color-mode-toggle="$hasColorModeToggle"
+                        :layout-toggle-label="$layoutToggleLabel"
                         :has-outline="$hasOutline"
                         wire:key="sidebar-{{ hash('sha256', json_encode($flatBricks)) }}"
                     />

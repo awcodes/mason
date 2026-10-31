@@ -47,6 +47,9 @@ return [
         'open' => 'Show outline',
         'close' => 'Close outline',
     ],
+    'controls' => [
+        'layout_toggle' => 'Show layout',
+    ],
     'entry' => [
         'empty' => 'No content',
     ],
