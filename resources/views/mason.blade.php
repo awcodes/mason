@@ -44,6 +44,7 @@
                     context: @js($getRenderContext()),
                     defaultColorMode: @js($defaultColorMode),
                     hasColorModeToggle: @js($hasColorModeToggle),
+                    maxInstances: @js((object) $getMaxInstances()),
                     outlineBricks: @js($outlineBricks),
                 })"
         id="{{ "mason-wrapper-" . $statePath }}"

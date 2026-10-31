@@ -116,6 +116,15 @@
                             &.dragging {
                                 @apply opacity-50;
                             }
+
+                            /* Used as often as its getMaxInstances() allows */
+                            &.unavailable {
+                                @apply cursor-not-allowed opacity-50;
+                            }
+
+                            .mason-brick-count {
+                                @apply ms-auto;
+                            }
                         }
                     }
                 }
@@ -141,6 +150,10 @@
 
                         .mason-actions-brick {
                             @apply flex-col justify-center text-center;
+
+                            .mason-brick-count {
+                                @apply ms-0;
+                            }
                         }
                     }
                 }
@@ -388,6 +401,19 @@
     &.filtered {
         display: none !important;
     }
+
+    .mason-brick-count {
+        @apply ms-auto;
+    }
+
+    &:disabled {
+        @apply cursor-not-allowed opacity-50 hover:border-gray-200 hover:bg-white dark:hover:border-gray-700 dark:hover:bg-gray-800;
+    }
+}
+
+/* Used and allowed count of a brick with getMaxInstances(), in the sidebar and the picker */
+.mason-brick-count {
+    @apply shrink-0 text-xs tabular-nums text-gray-500 dark:text-gray-400;
 }
 
 .mason-entry-wrapper {
