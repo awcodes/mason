@@ -273,19 +273,13 @@ body {
     }
 }
 /*
- * Parts (mason_part()) of the selected brick open its form there, so they take
- * the pointer the brick's content otherwise doesn't; only the innermost hovered
- * one is framed
+ * Parts (mason_part()) of the selected brick open its form there. The brick's content still takes no
+ * pointer events, so the preview finds the part under the pointer and frames only the innermost one.
  */
-.mason-block.selected [data-mason-part] {
-    pointer-events: auto;
+.mason-block.selected.mason-part-hovered {
     cursor: pointer;
 }
-.mason-block.selected
-    [data-mason-part]:hover:not(:has([data-mason-part]:hover)) {
+.mason-block.selected .mason-part-hover {
     outline: 2px dashed var(--mason-border-color, #0ea5e9);
     outline-offset: 2px;
-}
-.mason-disabled .mason-block.selected [data-mason-part] {
-    pointer-events: none;
 }

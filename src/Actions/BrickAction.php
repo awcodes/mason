@@ -19,7 +19,7 @@ class BrickAction
 
     public static function make(): Action
     {
-        return Action::make(static::NAME)
+        return BrickFormAction::make(static::NAME)
             ->bootUsing(function (Action $action, array $arguments, Mason $component): ?Action {
                 $brick = $component->getBrick($arguments['id']);
 
@@ -30,8 +30,9 @@ class BrickAction
                 return $brick::configureBrickAction($action);
             })
             ->fillForm(fn (array $arguments): ?array => $arguments['config'] ?? null)
-            // A click on a part in the preview (mason_part()) opens the form at the component with that key
-            ->afterFormFilled(function (Action $action, array $arguments, Mason $component, HasSchemas & LivewireComponent $livewire): void {
+            // A click on a part in the preview (mason_part()) opens the form at the component with that key.
+            // It runs after afterFormFilled(), which a brick may set for itself.
+            ->revealPartUsing(function (Action $action, array $arguments, Mason $component, HasSchemas & LivewireComponent $livewire): void {
                 $part = $arguments['part'] ?? null;
 
                 if (! is_string($part) || blank($part)) {

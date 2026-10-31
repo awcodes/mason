@@ -444,13 +444,15 @@
                 }
             } else {
                 const index = parseInt(block.getAttribute('data-block-index'))
-                const part = getPart(e.target, block)
+                const part = getPart(e, block)
 
-                // A part of the brick that is already selected opens its form there; any other click selects it
-                if (part && block.classList.contains('selected')) {
-                    // A link or button inside the part must not act in the preview
-                    e.preventDefault()
-
+                // A part of the brick that is already selected opens its form there; any other click selects it.
+                // The second click of a double-click doesn't, so that only doubleClickToEdit() opens on one.
+                if (
+                    part &&
+                    block.classList.contains('selected') &&
+                    e.detail <= 1
+                ) {
                     postToParent({
                         type: 'editBlock',
                         index,
@@ -466,21 +468,74 @@
 
                 selectBlock(index)
                 postToParent({ type: 'blockSelected', index })
+                updatePartHover(e)
             }
         })
 
-        // The innermost part (mason_part()) around the target, if the brick can be edited
-        function getPart(target, block) {
+        // The innermost part (mason_part()) under the pointer, if the brick can be edited. The brick's content
+        // takes no pointer events, so neither the target nor elementsFromPoint() reaches it: the parts' boxes
+        // are compared with the pointer's position instead.
+        function getPartElement(e, block) {
             if (isDisabled || !block.querySelector('[data-action="edit"]')) {
                 return null
             }
 
-            const part = target.closest('[data-mason-part]')
+            const hits = [
+                ...block.querySelectorAll(
+                    '.mason-block-content [data-mason-part]',
+                ),
+            ].filter((part) =>
+                [...part.getClientRects()].some(
+                    (rect) =>
+                        e.clientX >= rect.left &&
+                        e.clientX <= rect.right &&
+                        e.clientY >= rect.top &&
+                        e.clientY <= rect.bottom,
+                ),
+            )
 
-            return part && block.contains(part)
-                ? part.getAttribute('data-mason-part')
-                : null
+            return (
+                hits.findLast(
+                    (part) =>
+                        !hits.some(
+                            (other) => other !== part && part.contains(other),
+                        ),
+                ) ?? null
+            )
         }
+
+        function getPart(e, block) {
+            return (
+                getPartElement(e, block)?.getAttribute('data-mason-part') ??
+                null
+            )
+        }
+
+        // Frames the part a click on the selected brick would open
+        let hoveredPart = null
+
+        function updatePartHover(e) {
+            const block = e.target.closest?.('.mason-block.selected')
+            const part =
+                block && !e.target.closest('.mason-block-controls')
+                    ? getPartElement(e, block)
+                    : null
+
+            if (part === hoveredPart) return
+
+            hoveredPart?.classList.remove('mason-part-hover')
+            hoveredPart
+                ?.closest('.mason-block')
+                ?.classList.remove('mason-part-hovered')
+            part?.classList.add('mason-part-hover')
+            block?.classList.toggle('mason-part-hovered', part !== null)
+            hoveredPart = part
+        }
+
+        container.addEventListener('pointermove', updatePartHover)
+        container.addEventListener('pointerleave', () =>
+            updatePartHover({ target: container }),
+        )
 
         // Handle double-click to edit
         container.addEventListener('dblclick', function (e) {
@@ -512,7 +567,7 @@
                 index,
                 brickId,
                 config,
-                part: getPart(e.target, block),
+                part: getPart(e, block),
             })
         })
 

@@ -99,6 +99,27 @@ describe('opening the form at a part', function () {
         'the second item' => ['items.1', ''],
     ]);
 
+    it('still reveals the part when the brick sets its own afterFormFilled()', function () {
+        $called = false;
+        PartsBrick::$afterFormFilled = function () use (&$called): void {
+            $called = true;
+        };
+
+        try {
+            $component = Livewire::test(LivewirePartsForm::class)->mountAction(editPartsBrick('color'));
+        } finally {
+            PartsBrick::$afterFormFilled = null;
+        }
+
+        expect($called)->toBeTrue();
+
+        $component->assertDispatched(
+            'mason-reveal-part',
+            field: 'form.content',
+            target: "{$component->id()}.mountedActionSchema0.design.color",
+        );
+    });
+
     it('opens the form as usual without a part, or one that is missing or hidden', function (?string $part) {
         Livewire::test(LivewirePartsForm::class)
             ->mountAction(editPartsBrick($part))

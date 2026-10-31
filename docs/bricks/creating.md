@@ -161,9 +161,11 @@ For repeated content, name the path through the repeater or builder with the ite
 @endforeach
 ```
 
-In the preview, the first click on a brick still selects it. A click on a part of the selected brick, or a double-click on it with [double-click to edit](../fields/form.md#editing-on-double-click), opens the brick's form there: tabs switch, collapsed sections and repeater items open, and the component scrolls into view with its first input focused. Parts can be nested, and the innermost one wins. The whole form is still submitted, so validation and dependent fields work as before. A part whose key isn't in the form, or is hidden, opens the form as usual.
+In the preview, the first click on a brick still selects it. A click on a part of the selected brick, or a double-click on it with [double-click to edit](../fields/form.md#editing-on-double-click), opens the brick's form there: tabs switch, collapsed sections and repeater items open, and the component scrolls into view with its first input focused. Parts can be nested, and the innermost one wins. The whole form is still submitted, so validation and dependent fields work as before. A part whose key isn't in the form, or is hidden, opens the form as usual. The brick's content still takes no clicks in the preview, so links, embeds and videos inside a part stay inert. An `afterFormFilled()` the brick sets in `configureBrickAction()` runs first, and the form still opens at the part.
 
-`mason_part()` outputs `data-mason-part` only in the editor preview, so nothing reaches the front end or an entry.
+A bare key matches the first component with that key in the order of the form, which can be a field inside a repeater rather than a field of the same name further down. Give such components distinct keys, or name the path, e.g. `cards.0.title`.
+
+`mason_part()` outputs `data-mason-part` only in the editor preview, so nothing reaches the front end or an entry. A brick that caches its rendered HTML should therefore not reuse the preview's HTML elsewhere, or the other way round: skip the cache while `Mason::isRenderingPreview()` is true, or make it part of the cache key.
 
 ## Rendering in the editor
 

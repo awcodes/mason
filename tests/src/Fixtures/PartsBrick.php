@@ -6,6 +6,7 @@ namespace Awcodes\Mason\Tests\Fixtures;
 
 use Awcodes\Mason\Brick;
 use Awcodes\Mason\Mason;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
@@ -16,6 +17,8 @@ use RuntimeException;
 
 class PartsBrick extends Brick
 {
+    public static ?Closure $afterFormFilled = null;
+
     public static function getId(): string
     {
         return 'parts-brick';
@@ -34,6 +37,10 @@ class PartsBrick extends Brick
 
     public static function configureBrickAction(Action $action): Action
     {
+        if (static::$afterFormFilled) {
+            $action->afterFormFilled(static::$afterFormFilled);
+        }
+
         return $action->schema([
             Tabs::make()->tabs([
                 Tab::make('Content')->key('content')->schema([
