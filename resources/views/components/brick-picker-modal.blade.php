@@ -33,7 +33,6 @@
     x-transition:leave-end="opacity-0"
     class="mason-brick-picker-overlay"
     x-on:click.self="closeBrickPicker()"
-    x-on:keydown.escape.window="closeBrickPicker()"
 >
     <div
         x-show="brickPickerOpen"

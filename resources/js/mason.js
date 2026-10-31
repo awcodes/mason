@@ -601,6 +601,32 @@ export default function masonComponent({
             }
         },
 
+        // Escape closes one thing at a time. A modal above the editor, such as a brick's
+        // form, closes itself; otherwise the brick picker, the outline sheet or fullscreen.
+        // It runs in the capture phase and stops there, so that a modal the field sits in
+        // does not close as well
+        handleEscape(event) {
+            const topModal = [
+                ...document.querySelectorAll('.fi-modal.fi-modal-open'),
+            ].at(-1)
+
+            if (topModal && !topModal.contains(this.$el)) {
+                return
+            }
+
+            if (this.brickPickerOpen) {
+                this.closeBrickPicker()
+            } else if (this.outlineSheetOpen) {
+                this.closeOutlineSheet()
+            } else if (this.fullscreen) {
+                this.fullscreen = false
+            } else {
+                return
+            }
+
+            event.stopImmediatePropagation()
+        },
+
         toggleViewport(viewport) {
             if (this.viewport === viewport) {
                 this.viewport = 'desktop'
