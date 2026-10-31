@@ -165,6 +165,11 @@
                                     type="button"
                                     class="mason-brick-picker-brick"
                                     x-on:click="insertFromPicker(@js($brick::getId()))"
+                                    @if ($brick::getMaxInstances() !== null)
+                                        x-bind:disabled="! isBrickAvailable(@js($brick::getId()))"
+                                        x-bind:aria-disabled="! isBrickAvailable(@js($brick::getId()))"
+                                        x-bind:title="isBrickAvailable(@js($brick::getId())) ? null : @js(trans_choice('mason::mason.max_instances.reached', $brick::getMaxInstances(), ['max' => $brick::getMaxInstances()]))"
+                                    @endif
                                     x-bind:class="{
                                         'filtered': ! filterActions().includes(@js($brick::getLabel())),
                                     }"
@@ -177,6 +182,8 @@
                                     @endif
 
                                     <span>{{ $brick::getLabel() }}</span>
+
+                                    <x-mason::brick-count :brick="$brick" />
                                 </button>
                             @endforeach
                         </div>
@@ -186,6 +193,11 @@
                         type="button"
                         class="mason-brick-picker-brick"
                         x-on:click="insertFromPicker(@js($item::getId()))"
+                        @if ($item::getMaxInstances() !== null)
+                            x-bind:disabled="! isBrickAvailable(@js($item::getId()))"
+                            x-bind:aria-disabled="! isBrickAvailable(@js($item::getId()))"
+                            x-bind:title="isBrickAvailable(@js($item::getId())) ? null : @js(trans_choice('mason::mason.max_instances.reached', $item::getMaxInstances(), ['max' => $item::getMaxInstances()]))"
+                        @endif
                         x-bind:class="{
                             'filtered': ! filterActions().includes(@js($item::getLabel())),
                         }"
@@ -198,6 +210,8 @@
                         @endif
 
                         <span>{{ $item::getLabel() }}</span>
+
+                        <x-mason::brick-count :brick="$item" />
                     </button>
                 @endif
             @endforeach

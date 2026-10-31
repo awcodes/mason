@@ -33,6 +33,11 @@ class Hero extends Brick
         return ['hero', 'banner', 'header', 'landing page', 'marketing'];
     }
 
+    public static function getMaxInstances(): ?int
+    {
+        return 1;
+    }
+
     public static function getOutlineLabel(array $config): ?string
     {
         return $config['heading'] ?? null;
