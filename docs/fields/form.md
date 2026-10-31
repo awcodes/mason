@@ -38,6 +38,8 @@ Bricks can also be added right in the preview: an add button appears when the po
 ![The hero brick's form open in a slide-over](../assets/edit-brick-light.png#gh-light-mode-only)
 ![The hero brick's form open in a slide-over](../assets/edit-brick-dark.png#gh-dark-mode-only)
 
+**Duplicate** inserts a copy of the brick right after it and selects the copy. The outline has the same control on each row. A brick can change what the copy gets, see [duplicating](../bricks/creating.md#duplicating).
+
 The sidebar toolbar switches the preview between mobile and tablet widths and toggles fullscreen, so authors can check responsive layouts while they work. It also has clear all, undo, and redo.
 
 ![The editor previewing the page at mobile width](../assets/mobile-preview-light.png#gh-light-mode-only)
