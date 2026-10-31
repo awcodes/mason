@@ -11,6 +11,9 @@
     $flatBricks = $getFlatBricks();
     $defaultColorMode = $getDefaultColorMode();
     $hasColorModeToggle = $hasColorModeToggle();
+    $isAddable = $isAddable();
+    $isReorderable = $isReorderable();
+    $isDeletable = $isDeletable();
     $hasOutline = ! $isDisabled && filled($bricks) && $hasOutline();
 
     $outlineBricks = [];
@@ -44,6 +47,9 @@
                     context: @js($getRenderContext()),
                     defaultColorMode: @js($defaultColorMode),
                     hasColorModeToggle: @js($hasColorModeToggle),
+                    addable: @js($isAddable),
+                    reorderable: @js($isReorderable),
+                    deletable: @js($isDeletable),
                     outlineBricks: @js($outlineBricks),
                 })"
         id="{{ "mason-wrapper-" . $statePath }}"
@@ -63,6 +69,7 @@
             <div class="mason-topbar">
                 <x-mason::controls
                     :has-color-mode-toggle="$hasColorModeToggle"
+                    :is-deletable="$isDeletable"
                 />
 
                 @if ($hasOutline)
@@ -130,6 +137,8 @@
                         :bricks="$bricks"
                         :has-grid-actions="$hasGridActions()"
                         :has-color-mode-toggle="$hasColorModeToggle"
+                        :is-addable="$isAddable"
+                        :is-deletable="$isDeletable"
                         :has-outline="$hasOutline"
                         wire:key="sidebar-{{ hash('sha256', json_encode($flatBricks)) }}"
                     />
@@ -137,7 +146,7 @@
             </div>
         </x-filament::input.wrapper>
 
-        @if (! $isDisabled && filled($bricks))
+        @if (! $isDisabled && $isAddable && filled($bricks))
             <x-mason::brick-picker-modal :bricks="$bricks" />
         @endif
 

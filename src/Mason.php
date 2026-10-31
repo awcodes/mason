@@ -38,6 +38,12 @@ class Mason extends Field implements CanBeLengthConstrained
 
     protected bool | Closure $showColorModeToggle = false;
 
+    protected bool | Closure $isAddable = true;
+
+    protected bool | Closure $isReorderable = true;
+
+    protected bool | Closure $isDeletable = true;
+
     /**
      * @var array<string, mixed> | Closure
      */
@@ -141,6 +147,11 @@ class Mason extends Field implements CanBeLengthConstrained
         }
 
         foreach ($commands as $command) {
+            // Turned-off commands are refused here too, not only in the editor
+            if (! $this->allowsCommand($command->name)) {
+                continue;
+            }
+
             $state = match ($command->name) {
                 'insertBrick' => $this->executeInsertBrick($state, $command->arguments),
                 'updateBrick' => $this->executeUpdateBrick($state, $command->arguments),
@@ -153,6 +164,61 @@ class Mason extends Field implements CanBeLengthConstrained
         $this->state($state);
 
         return $state;
+    }
+
+    /**
+     * Whether authors may add bricks. Editing them stays possible.
+     */
+    public function addable(bool | Closure $condition = true): static
+    {
+        $this->isAddable = $condition;
+
+        return $this;
+    }
+
+    public function isAddable(): bool
+    {
+        return (bool) $this->evaluate($this->isAddable);
+    }
+
+    /**
+     * Whether authors may move bricks.
+     */
+    public function reorderable(bool | Closure $condition = true): static
+    {
+        $this->isReorderable = $condition;
+
+        return $this;
+    }
+
+    public function isReorderable(): bool
+    {
+        return (bool) $this->evaluate($this->isReorderable);
+    }
+
+    /**
+     * Whether authors may delete bricks, one by one or all at once.
+     */
+    public function deletable(bool | Closure $condition = true): static
+    {
+        $this->isDeletable = $condition;
+
+        return $this;
+    }
+
+    public function isDeletable(): bool
+    {
+        return (bool) $this->evaluate($this->isDeletable);
+    }
+
+    public function allowsCommand(string $name): bool
+    {
+        return match ($name) {
+            'insertBrick' => $this->isAddable(),
+            'moveBrick' => $this->isReorderable(),
+            'deleteBrick' => $this->isDeletable(),
+            default => true,
+        };
     }
 
     public function doubleClickToEdit(bool | Closure $condition = true): static

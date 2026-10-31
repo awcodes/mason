@@ -7,6 +7,9 @@ export default function masonComponent({
     context = null,
     defaultColorMode = 'light',
     hasColorModeToggle = false,
+    addable = true,
+    reorderable = true,
+    deletable = true,
     outlineBricks = {},
 }) {
     let iframe = null
@@ -29,6 +32,9 @@ export default function masonComponent({
         colorMode: hasColorModeToggle
             ? localStorage.getItem('mason-color-mode') || defaultColorMode
             : defaultColorMode,
+        isAddable: addable,
+        isReorderable: reorderable,
+        isDeletable: deletable,
         isUpdatingBrick: false,
         isInsertingBrick: false,
         previewUrl: null,
@@ -198,6 +204,7 @@ export default function masonComponent({
                     blocks: this.getBlocksFromState(),
                     dblClickToEdit: dblClickToEdit,
                     disabled: disabled,
+                    commands: { addable, reorderable, deletable },
                 })
 
                 // Send initial color mode to iframe
@@ -272,6 +279,7 @@ export default function masonComponent({
                 type: 'setConfig',
                 dblClickToEdit: dblClickToEdit,
                 disabled: disabled,
+                commands: { addable, reorderable, deletable },
             })
         },
 
@@ -317,7 +325,7 @@ export default function masonComponent({
         },
 
         async handleInsertBlock(brickId, position) {
-            if (this.isBrickActionBusy()) return
+            if (!addable || this.isBrickActionBusy()) return
 
             this.isInsertingBrick = true
             const preInsertState = this.captureState()
@@ -358,6 +366,8 @@ export default function masonComponent({
         },
 
         handleDeleteBlock(index) {
+            if (!deletable) return
+
             const blocks = this.getBlocksFromState()
 
             if (index >= 0 && index < blocks.length) {
@@ -384,6 +394,8 @@ export default function masonComponent({
         },
 
         handleMoveBlock(from, to) {
+            if (!reorderable) return
+
             const blocks = this.getBlocksFromState()
 
             // Validate indices
@@ -441,6 +453,8 @@ export default function masonComponent({
         },
 
         moveBlockTo(from, to) {
+            if (!reorderable) return
+
             const blocks = this.getBlocksFromState()
 
             if (from < 0 || from >= blocks.length) return
@@ -488,6 +502,7 @@ export default function masonComponent({
                 window.Sortable.create(list, {
                     draggable: '[data-outline-item]',
                     handle: '[data-outline-handle]',
+                    disabled: !reorderable,
                     animation: 150,
                     ghostClass: 'mason-outline-ghost',
                     onEnd: ({ item, oldDraggableIndex, newDraggableIndex }) => {
@@ -751,7 +766,7 @@ export default function masonComponent({
 
         // Either next to a brick (blockIndex, above or below) or at a fixed position (insertIndex)
         openBrickPicker(blockIndex, insertIndex = null) {
-            if (disabled) return
+            if (disabled || !addable) return
 
             this.brickPickerBlockIndex = blockIndex
             this.brickPickerInsertIndex = insertIndex
@@ -828,6 +843,8 @@ export default function masonComponent({
         },
 
         clearAllBlocks() {
+            if (!deletable) return
+
             if (this.state && this.state.length > 0) {
                 this.pushToUndoStack(this.captureState())
             }

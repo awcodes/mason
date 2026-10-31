@@ -149,6 +149,8 @@
         let selectedBlock = null
         let dblClickToEdit = false
         let isDisabled = false
+        // Commands the field allows (addable(), reorderable(), deletable())
+        let commands = { addable: true, reorderable: true, deletable: true }
         let instanceId = null // Store instance ID for multi-instance support
 
         // Helper to send messages back to parent with instanceId
@@ -180,6 +182,7 @@
                     }
 
                     shouldBeDisabled(data)
+                    applyCommands(data)
 
                     updateContent(data.blocks)
                     break
@@ -189,6 +192,7 @@
                     }
 
                     shouldBeDisabled(data)
+                    applyCommands(data)
                     break
                 case 'insertBlock':
                     insertBlock(data.brick, data.position)
@@ -277,6 +281,23 @@
             container.querySelectorAll('.mason-inserter').forEach((button) => {
                 button.disabled = isDisabled
             })
+        }
+
+        // Hidden controls (preview.css) are out of the tab order too; the editor refuses the commands as well
+        function applyCommands(data) {
+            if (data.commands !== undefined) {
+                commands = { ...commands, ...data.commands }
+            }
+
+            container.classList.toggle('mason-not-addable', !commands.addable)
+            container.classList.toggle(
+                'mason-not-reorderable',
+                !commands.reorderable,
+            )
+            container.classList.toggle(
+                'mason-not-deletable',
+                !commands.deletable,
+            )
         }
 
         function insertBlock(brick, position) {
@@ -545,6 +566,11 @@
 
             // Prevent dragging from the controls; the event's target is the block itself, so check where the pointer went down
             if (pointerDownTarget?.closest('.mason-block-controls')) {
+                e.preventDefault()
+                return
+            }
+
+            if (!commands.reorderable) {
                 e.preventDefault()
                 return
             }

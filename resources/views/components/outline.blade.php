@@ -19,6 +19,7 @@
                 x-bind:class="{ 'selected': selectedBlockIndex === index }"
             >
                 <span
+                    x-show="isReorderable"
                     data-outline-handle
                     class="mason-outline-handle"
                     title="{{ trans('mason::mason.outline.drag') }}"

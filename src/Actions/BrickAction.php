@@ -25,6 +25,9 @@ class BrickAction
 
                 return $brick::configureBrickAction($action);
             })
+            // Without addable(), Filament doesn't mount the action to insert a brick; editing stays possible
+            ->disabled(fn (array $arguments, Mason $component): bool => ($arguments['mode'] ?? 'insert') === 'insert'
+                && ! $component->isAddable())
             ->fillForm(fn (array $arguments): ?array => $arguments['config'] ?? null)
             ->modalHeading(function (array $arguments, Mason $component) {
                 $brick = $component->getBrick($arguments['id']);

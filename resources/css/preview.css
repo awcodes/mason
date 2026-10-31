@@ -272,3 +272,15 @@ body {
         pointer-events: none;
     }
 }
+/* Commands the field turns off (addable(), reorderable(), deletable()) */
+.mason-not-addable .mason-inserter,
+.mason-not-addable .mason-drop-zone-start > span,
+.mason-not-addable .mason-block-btn[data-action='add'],
+.mason-not-reorderable
+    .mason-block-btn:is([data-action='move-up'], [data-action='move-down']),
+.mason-not-deletable .mason-block-btn[data-action='delete'] {
+    display: none;
+}
+.mason-not-reorderable .mason-block {
+    cursor: auto;
+}

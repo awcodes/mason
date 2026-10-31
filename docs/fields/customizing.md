@@ -1,6 +1,6 @@
 ---
 title: Customizing
-description: Adjust the Mason editor's height, sidebar position, action layout and colour mode.
+description: Adjust the Mason editor's height, sidebar position, action layout, allowed commands and colour mode.
 ---
 
 # Customizing
@@ -59,6 +59,26 @@ Mason::make('content')
 The outline sits in an **Outline** tab next to the brick list. On wide screens in fullscreen mode, it moves into its own column on the other side of the preview, so both are visible at once. On small screens, where the sidebar is hidden, an outline button in the editor toolbar opens it as a panel from the bottom of the screen.
 
 To tell apart several bricks of the same type, give them [outline labels](../bricks/creating.md#outline-labels).
+
+## Adding, moving and deleting
+
+Authors can add, move and delete bricks by default. As on Filament's repeater, each can be turned off, e.g. for a page whose structure is fixed and only its content may change:
+
+```php
+Mason::make('content')
+    ->addable(false)
+    ->reorderable(false)
+    ->deletable(false)
+    ->bricks([...]);
+```
+
+All three take a closure as well, e.g. to decide by the user's role. Editing bricks always stays possible.
+
+- Without `addable()`, the sidebar offers no bricks, and the add buttons and the brick picker are gone. With the [outline](#outline) enabled, the sidebar shows it without tabs.
+- Without `reorderable()`, bricks can't be dragged in the preview or the outline, and their move controls and Alt + Up or Down do nothing.
+- Without `deletable()`, the delete controls and **Clear all** are gone.
+
+The server refuses turned-off commands too, both in `executeCommands()` and when the brick form is opened to insert. Moving and deleting happen in the browser, though, and its state reaches the server as a whole, so validate the saved content yourself where the structure must not change.
 
 ## Light and dark mode
 
