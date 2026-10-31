@@ -1,6 +1,6 @@
 ---
 title: Customizing
-description: Adjust the Mason editor's height, sidebar position, action layout and colour mode.
+description: Adjust the Mason editor's height, sidebar position, action layout, brick form and colour mode.
 ---
 
 # Customizing
@@ -59,6 +59,29 @@ Mason::make('content')
 The outline sits in an **Outline** tab next to the brick list. On wide screens in fullscreen mode, it moves into its own column on the other side of the preview, so both are visible at once. On small screens, where the sidebar is hidden, an outline button in the editor toolbar opens it as a panel from the bottom of the screen.
 
 To tell apart several bricks of the same type, give them [outline labels](../bricks/creating.md#outline-labels).
+
+## Brick form
+
+Each brick builds its form in [`configureBrickAction()`](../bricks/creating.md). To change that form's action for one field only, without touching every brick, pass a callback to `brickAction()`. It runs after the brick's own configuration, so the field gets the last word:
+
+```php
+use Filament\Actions\Action;
+
+Mason::make('content')
+    ->brickAction(fn (Action $action): Action => $action
+        ->slideOver()
+        ->modalWidth(Width::ThreeExtraLarge))
+    ->bricks([...]);
+```
+
+The callback also receives the brick's class as `$brick` and the action's `$arguments`, whose `mode` is `insert` or `edit`. Returning `null` keeps the action as it is. This is useful for a field that sits somewhere special, such as a Mason field in a brick's own form, whose brick forms should open beside the outer one rather than over it:
+
+```php
+Mason::make('columns')
+    ->brickAction(fn (Action $action): Action => $action
+        ->overlayParentActions()
+        ->extraModalWindowAttributes(['class' => 'nested-brick-form'], merge: true))
+```
 
 ## Light and dark mode
 

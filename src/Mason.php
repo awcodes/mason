@@ -10,6 +10,7 @@ use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\BrickCommand;
 use Awcodes\Mason\Support\RenderContext;
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Contracts\CanBeLengthConstrained;
 use Filament\Forms\Components\Field;
@@ -37,6 +38,8 @@ class Mason extends Field implements CanBeLengthConstrained
     protected string | Closure | null $defaultColorMode = null;
 
     protected bool | Closure $showColorModeToggle = false;
+
+    protected ?Closure $modifyBrickActionUsing = null;
 
     /**
      * @var array<string, mixed> | Closure
@@ -153,6 +156,35 @@ class Mason extends Field implements CanBeLengthConstrained
         $this->state($state);
 
         return $state;
+    }
+
+    /**
+     * Customizes the action behind the brick form for this field, e.g. a slide-over or a width, after the brick's own
+     * configureBrickAction(). Returning null keeps the action.
+     */
+    public function brickAction(?Closure $callback): static
+    {
+        $this->modifyBrickActionUsing = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @param  class-string<Brick>  $brick
+     */
+    public function modifyBrickAction(Action $action, string $brick): Action
+    {
+        if (! $this->modifyBrickActionUsing instanceof Closure) {
+            return $action;
+        }
+
+        return $this->evaluate($this->modifyBrickActionUsing, [
+            'action' => $action,
+            'arguments' => $action->getArguments(),
+            'brick' => $brick,
+        ], [
+            Action::class => $action,
+        ]) ?? $action;
     }
 
     public function doubleClickToEdit(bool | Closure $condition = true): static
