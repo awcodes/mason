@@ -31,6 +31,7 @@ export default function masonComponent({
             : defaultColorMode,
         isUpdatingBrick: false,
         isInsertingBrick: false,
+        isDuplicatingBrick: false,
         previewUrl: null,
         brickPickerOpen: false,
         brickPickerBlockIndex: null,
@@ -69,6 +70,9 @@ export default function masonComponent({
                         break
                     case 'deleteBlockRequest':
                         this.handleDeleteBlock(data.index)
+                        break
+                    case 'duplicateBlockRequest':
+                        this.handleDuplicateBlock(data.index)
                         break
                     case 'insertBlockRequest':
                         this.handleInsertBlock(data.brickId, data.position)
@@ -302,12 +306,14 @@ export default function masonComponent({
             }
         },
 
-        // Whether this field's brick form is being opened or is open. A second click before
-        // the first modal shows would mount the action again, one modal over the other.
+        // Whether this field's brick form is being opened or is open, or a copy is being made.
+        // A second click before the first finishes would mount the action again: one modal
+        // over the other, or a second copy.
         isBrickActionBusy() {
             return (
                 this.isInsertingBrick ||
                 this.isUpdatingBrick ||
+                this.isDuplicatingBrick ||
                 (this.$wire.mountedActions ?? []).some(
                     (action) =>
                         action.name === 'handleBrick' &&
@@ -450,7 +456,39 @@ export default function masonComponent({
             })
         },
 
+        // The copy is made on the server, where the brick's duplicateConfig() runs
+        async handleDuplicateBlock(index) {
+            if (disabled || this.isBrickActionBusy()) return
+
+            const blocks = this.getBlocksFromState()
+            if (index < 0 || index >= blocks.length) return
+
+            this.isDuplicatingBrick = true
+            const preDuplicateState = this.captureState()
+
+            try {
+                await this.$wire.mountAction(
+                    'duplicateBrick',
+                    { index },
+                    { schemaComponent: key },
+                )
+            } finally {
+                // Select the copy only once it is in the state; otherwise the selection stays
+                if (this.getBlocksFromState().length > blocks.length) {
+                    this.pushToUndoStack(preDuplicateState)
+                    this.selectedBlockIndex = index + 1
+                    pendingFocusIndex = index + 1
+                }
+
+                this.isDuplicatingBrick = false
+            }
+        },
+
+        // While a copy is being made, other changes would land under its undo entry
+        // and be overwritten by the server's response
         handleDeleteBlock(index) {
+            if (this.isDuplicatingBrick) return
+
             const blocks = this.getBlocksFromState()
 
             if (index >= 0 && index < blocks.length) {
@@ -463,6 +501,8 @@ export default function masonComponent({
         },
 
         handleUpdateBlock(index, brick) {
+            if (this.isDuplicatingBrick) return
+
             const blocks = this.getBlocksFromState()
 
             if (index >= 0 && index < blocks.length) {
@@ -477,6 +517,8 @@ export default function masonComponent({
         },
 
         handleMoveBlock(from, to) {
+            if (this.isDuplicatingBrick) return
+
             const blocks = this.getBlocksFromState()
 
             // Validate indices
@@ -534,6 +576,8 @@ export default function masonComponent({
         },
 
         moveBlockTo(from, to) {
+            if (this.isDuplicatingBrick) return
+
             const blocks = this.getBlocksFromState()
 
             if (from < 0 || from >= blocks.length) return
@@ -563,6 +607,7 @@ export default function masonComponent({
                     label: outlineLabel || type,
                     type: outlineLabel ? type : null,
                     icon: brick?.icon ?? null,
+                    registered: brick !== undefined,
                 }
             })
         },
@@ -692,6 +737,32 @@ export default function masonComponent({
             if (!this.fullscreen) {
                 this.viewport = 'desktop'
             }
+        },
+
+        // Escape closes one thing at a time. A modal above the editor, such as a brick's
+        // form, closes itself; otherwise the brick picker, the outline sheet or fullscreen.
+        // It runs in the capture phase and stops there, so that a modal the field sits in
+        // does not close as well
+        handleEscape(event) {
+            const topModal = [
+                ...document.querySelectorAll('.fi-modal.fi-modal-open'),
+            ].at(-1)
+
+            if (topModal && !topModal.contains(this.$el)) {
+                return
+            }
+
+            if (this.brickPickerOpen) {
+                this.closeBrickPicker()
+            } else if (this.outlineSheetOpen) {
+                this.closeOutlineSheet()
+            } else if (this.fullscreen) {
+                this.fullscreen = false
+            } else {
+                return
+            }
+
+            event.stopImmediatePropagation()
         },
 
         toggleViewport(viewport) {
@@ -885,7 +956,7 @@ export default function masonComponent({
         },
 
         undo() {
-            if (this.undoStack.length === 0) return
+            if (this.isDuplicatingBrick || this.undoStack.length === 0) return
 
             this.redoStack.push(this.captureState())
             if (this.redoStack.length > this.maxHistorySize) {
@@ -899,7 +970,7 @@ export default function masonComponent({
         },
 
         redo() {
-            if (this.redoStack.length === 0) return
+            if (this.isDuplicatingBrick || this.redoStack.length === 0) return
 
             this.undoStack.push(this.captureState())
             if (this.undoStack.length > this.maxHistorySize) {
@@ -921,6 +992,8 @@ export default function masonComponent({
         },
 
         clearAllBlocks() {
+            if (this.isDuplicatingBrick) return
+
             if (this.state && this.state.length > 0) {
                 this.pushToUndoStack(this.captureState())
             }

@@ -49,6 +49,18 @@ abstract class Brick
         return null;
     }
 
+    /**
+     * The config of a copy made with the duplicate control. Override it to reset
+     * values that must stay unique, such as anchors, IDs or slugs.
+     *
+     * @param  array<string, mixed>  $config
+     * @return array<string, mixed>
+     */
+    public static function duplicateConfig(array $config): array
+    {
+        return $config;
+    }
+
     public static function configureBrickAction(Action $action): Action
     {
         return $action->modalHidden();

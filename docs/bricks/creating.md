@@ -110,6 +110,19 @@ public static function getOutlineLabel(array $config): ?string
 
 Returning `null` or an empty string falls back to the brick's label. It is only called when the outline is enabled, and the result is never saved with the content. The built-in Section brick uses the first 60 characters of its text.
 
+## Duplicating
+
+The **Duplicate** control copies a brick's config as it is. When a value must stay unique on the page, such as an anchor, an ID or a slug, reset it in `duplicateConfig()`:
+
+```php
+public static function duplicateConfig(array $config): array
+{
+    return [...$config, 'anchor' => null];
+}
+```
+
+The copy is rendered from the returned config, so the preview and the outline label match it.
+
 ## Rendering from the record
 
 `toHtml()` takes a second argument holding whatever context the renderer was given — most usefully the record the content belongs to. It is empty unless something passes it, so guard the keys you read:

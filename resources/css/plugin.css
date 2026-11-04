@@ -27,7 +27,10 @@
         @apply overflow-hidden;
 
         > .fi-input-wrp-content-ctn {
-            @apply flex max-h-[40rem] min-h-[20rem];
+            @apply flex;
+            /* Set by minHeight() and maxHeight() */
+            min-height: var(--mason-min-height, 20rem);
+            max-height: var(--mason-max-height, 40rem);
 
             /*
              * The iframe fills the wrapper as a flex item: Safari does not resolve
@@ -218,6 +221,14 @@
                 @apply truncate text-[0.6875rem] text-gray-500 dark:text-gray-400;
             }
         }
+
+        .mason-outline-duplicate {
+            @apply flex shrink-0 items-center self-stretch px-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300;
+
+            svg {
+                @apply size-4;
+            }
+        }
     }
 
     .mason-outline-sheet-overlay {
@@ -268,7 +279,7 @@
             @apply h-full rounded-none;
 
             .fi-input-wrp-content-ctn {
-                @apply h-full max-h-full;
+                @apply h-full max-h-full min-h-0;
             }
         }
 
@@ -395,7 +406,8 @@
         @apply h-full w-full overflow-hidden rounded-lg border border-gray-950/10 dark:border-white/5;
 
         .mason-entry-iframe {
-            @apply min-h-[30rem] w-full border-0;
+            @apply w-full border-0;
+            min-height: var(--mason-min-height, 30rem);
             background: white;
         }
     }
