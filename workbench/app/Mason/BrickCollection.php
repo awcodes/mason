@@ -19,6 +19,7 @@ class BrickCollection
                 ->bricks([
                     Hero::class,
                     CardGrid::class,
+                    CallToAction::class,
                     PageMeta::class,
                 ]),
             Section::class,

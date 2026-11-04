@@ -20,6 +20,11 @@ class IframeRenderer
     protected ?array $data = null;
 
     /**
+     * Bricks being rendered for the editor preview; a counter, as a brick may render a nested Mason field's preview
+     */
+    protected static int $renderingPreview = 0;
+
+    /**
      * @param  array<int, array<string, mixed>>  $blocks
      */
     public function __construct(protected array $blocks = [])
@@ -35,6 +40,11 @@ class IframeRenderer
     public static function make(array $blocks = []): static
     {
         return app(static::class, ['blocks' => $blocks]);
+    }
+
+    public static function isRenderingPreview(): bool
+    {
+        return static::$renderingPreview > 0;
     }
 
     /**
@@ -92,7 +102,13 @@ class IframeRenderer
             return view('mason::components.unregistered-brick', ['label' => $id])->render();
         }
 
-        return $brick::toHtml($config, data: $this->data);
+        static::$renderingPreview++;
+
+        try {
+            return $brick::toHtml($config, data: $this->data);
+        } finally {
+            static::$renderingPreview--;
+        }
     }
 
     /**

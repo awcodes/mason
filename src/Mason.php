@@ -11,6 +11,7 @@ use Awcodes\Mason\Concerns\HasMaxHeight;
 use Awcodes\Mason\Concerns\HasMinHeight;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\BrickCommand;
+use Awcodes\Mason\Support\IframeRenderer;
 use Awcodes\Mason\Support\RenderContext;
 use Closure;
 use Filament\Actions\Action;
@@ -110,6 +111,15 @@ class Mason extends Field implements CanBeLengthConstrained
                 return $block;
             }, $state);
         });
+    }
+
+    /**
+     * Whether a brick is being rendered for the editor preview, e.g. to mark parts of it or to render it differently
+     * there. Unlike a null $data in toHtml(), this holds with previewData() as well.
+     */
+    public static function isRenderingPreview(): bool
+    {
+        return IframeRenderer::isRenderingPreview();
     }
 
     /**
