@@ -112,6 +112,7 @@ class IframeRenderer
                 'html' => $html,
                 'label' => $this->getBlockLabel($id),
                 'editable' => $this->isBlockEditable($id),
+                'registered' => ! blank($id) && $this->getBrick($id) !== null,
             ];
         }, $this->blocks, array_keys($this->blocks));
 

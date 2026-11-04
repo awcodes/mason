@@ -26,6 +26,7 @@ return [
         'move_down' => 'Move Down',
         'add' => 'Add Brick',
         'edit' => 'Edit',
+        'duplicate' => 'Duplicate',
         'delete' => 'Delete',
     ],
     'brick_picker' => [
@@ -43,6 +44,7 @@ return [
         'label' => 'Outline',
         'empty' => 'No bricks yet',
         'drag' => 'Drag to reorder',
+        'duplicate' => 'Duplicate brick',
         'keyboard_hint' => 'Select to show in the preview. Alt + Up or Down moves the brick.',
         'open' => 'Show outline',
         'close' => 'Close outline',

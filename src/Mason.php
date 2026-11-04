@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Awcodes\Mason;
 
 use Awcodes\Mason\Actions\BrickAction;
+use Awcodes\Mason\Actions\DuplicateBrickAction;
 use Awcodes\Mason\Concerns\HasBricks;
 use Awcodes\Mason\Concerns\HasMaxHeight;
 use Awcodes\Mason\Concerns\HasMinHeight;
@@ -131,6 +132,7 @@ class Mason extends Field implements CanBeLengthConstrained
     {
         return [
             BrickAction::make(),
+            DuplicateBrickAction::make(),
         ];
     }
 
