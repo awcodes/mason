@@ -80,8 +80,8 @@ jobs:
   # builds assets for suites that need them, and checks nothing.)
   #
   # Only the root resources/dist counts. workbench/resources/dist holds the local demo
-  # app's Tailwind theme, built by the separate `build:workbench` script, and is not
-  # shipped to consumers.
+  # app's Tailwind theme, built by the separate `build:workbench` script, and is
+  # git-ignored.
   assets:
     name: Assets
     runs-on: ubuntu-latest

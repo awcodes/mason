@@ -21,9 +21,11 @@
         id="{{ "mason-entry-wrapper-" . $statePath }}"
         data-focus="mason-entry"
         {{
-            \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class([
-                "mason-entry-wrapper",
-            ])
+            \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
+                ->class([
+                    "mason-entry-wrapper",
+                ])
+                ->style($getHeightStyles())
         }}
     >
         <div class="mason">

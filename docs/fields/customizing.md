@@ -1,23 +1,26 @@
 ---
 title: Customizing
-description: Adjust the Mason editor's height, sidebar position, action layout and colour mode.
+description: Adjust the Mason editor's height, sidebar position, action layout, brick form and colour mode.
 ---
 
 # Customizing
 
 ## Height
 
-Both the field and the entry take Filament's `extraInputAttributes()`, which is the way to change the editor's height:
+The editor is between `20rem` and `40rem` high, the entry at least `30rem`. Change this with `minHeight()` and `maxHeight()`, as on Filament's rich editor. Both take any CSS length. The entry keeps its height and only takes `minHeight()`:
 
 ```php
 Mason::make('content')
-    ->extraInputAttributes(['style' => 'min-height: 30rem;'])
+    ->minHeight('30rem')
+    ->maxHeight('60rem')
     ->bricks([...]);
 
 MasonEntry::make('content')
-    ->extraInputAttributes(['style' => 'min-height: 40rem;'])
+    ->minHeight('40rem')
     ->bricks([...]);
 ```
+
+From `minHeight()`, the editor grows with its sidebar up to `maxHeight()`, so give both the same value for a fixed height. A `minHeight()` above the default maximum wins over it, so `minHeight('60rem')` alone is enough for a taller editor. In fullscreen the editor always fills the screen.
 
 ## Sidebar position
 
@@ -60,6 +63,29 @@ The outline sits in an **Outline** tab next to the brick list. On wide screens i
 
 To tell apart several bricks of the same type, give them [outline labels](../bricks/creating.md#outline-labels).
 
+## Brick form
+
+Each brick builds its form in [`configureBrickAction()`](../bricks/creating.md). To change that form's action for one field only, without touching every brick, pass a callback to `brickAction()`. It runs after the brick's own configuration, so the field gets the last word. The callback changes the `$action` it receives and may return it or `null`:
+
+```php
+use Filament\Actions\Action;
+
+Mason::make('content')
+    ->brickAction(fn (Action $action): Action => $action
+        ->slideOver()
+        ->modalWidth(Width::ThreeExtraLarge))
+    ->bricks([...]);
+```
+
+The callback also receives the brick's class as `$brick` and the action's `$arguments`, whose `mode` is `insert` or `edit`. It cannot replace the action with a new one, such as `Action::make()`, because the action is already mounted when the callback runs; returning a different action throws an exception. This is useful for a field that sits somewhere special, such as a Mason field in a brick's own form, whose brick forms should open beside the outer one rather than over it:
+
+```php
+Mason::make('columns')
+    ->brickAction(fn (Action $action): Action => $action
+        ->overlayParentActions()
+        ->extraModalWindowAttributes(['class' => 'nested-brick-form'], merge: true))
+```
+
 ## Light and dark mode
 
 Add a toggle to the editor sidebar so authors can preview both modes:
@@ -80,4 +106,4 @@ For this to work your application's CSS must support manually toggling dark mode
 ```
 
 > [!NOTE]
-> `sidebarPosition()`, `displayActionsAsGrid()`, `outline()` and the colour mode methods are editor-only. `MasonEntry` has no sidebar, though it does accept `extraInputAttributes()`.
+> `sidebarPosition()`, `displayActionsAsGrid()`, `outline()` and the colour mode methods are editor-only. `MasonEntry` has no sidebar, though it does accept `minHeight()` and `extraInputAttributes()`.

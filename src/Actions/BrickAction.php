@@ -23,7 +23,8 @@ class BrickAction
                     return null;
                 }
 
-                return $brick::configureBrickAction($action);
+                // The field's brickAction() comes last: it knows the context, e.g. a field nested in a slide-over
+                return $component->modifyBrickAction($brick::configureBrickAction($action), $brick);
             })
             ->fillForm(fn (array $arguments): ?array => $arguments['config'] ?? null)
             ->modalHeading(function (array $arguments, Mason $component) {
