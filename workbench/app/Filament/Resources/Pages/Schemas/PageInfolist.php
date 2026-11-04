@@ -21,7 +21,7 @@ class PageInfolist
                 MasonEntry::make('content')
                     ->bricks(BrickCollection::make())
                     ->previewLayout('layouts.mason-entry')
-                    ->extraInputAttributes(['style' => 'min-height: 40rem;'])
+                    ->minHeight('40rem')
                     ->columnSpanFull(),
             ]);
     }

@@ -6,6 +6,8 @@ namespace Awcodes\Mason;
 
 use Awcodes\Mason\Actions\BrickAction;
 use Awcodes\Mason\Concerns\HasBricks;
+use Awcodes\Mason\Concerns\HasMaxHeight;
+use Awcodes\Mason\Concerns\HasMinHeight;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\BrickCommand;
 use Awcodes\Mason\Support\RenderContext;
@@ -25,6 +27,8 @@ class Mason extends Field implements CanBeLengthConstrained
     use HasBricks;
     use HasExtraAlpineAttributes;
     use HasExtraInputAttributes;
+    use HasMaxHeight;
+    use HasMinHeight;
     use HasPlaceholder;
     use HasSidebar;
 
@@ -193,6 +197,22 @@ class Mason extends Field implements CanBeLengthConstrained
         }
 
         return $action;
+    }
+
+    /**
+     * The heights as CSS variables; without one, the stylesheet's default applies
+     *
+     * @return array<string>
+     */
+    public function getHeightStyles(): array
+    {
+        $minHeight = $this->getMinHeight();
+        $maxHeight = $this->getMaxHeight();
+
+        return array_values(array_filter([
+            filled($minHeight) ? "--mason-min-height: {$minHeight}" : null,
+            filled($maxHeight) ? "--mason-max-height: {$maxHeight}" : null,
+        ]));
     }
 
     public function doubleClickToEdit(bool | Closure $condition = true): static
