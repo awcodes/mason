@@ -66,6 +66,7 @@ class CardGrid extends Brick
             ->schema([
                 Repeater::make('cards')
                     ->collapsible()
+                    ->collapsed()
                     ->itemLabel(fn (array $state): ?string => $state['heading'] ?? null)
                     ->schema([
                         TextInput::make('heading')

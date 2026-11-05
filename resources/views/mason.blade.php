@@ -57,7 +57,8 @@
             'display-tablet': viewport === 'tablet',
             'display-desktop': viewport === 'desktop',
         }"
-        x-on:keydown.escape.window="fullscreen = false"
+        x-on:keydown.escape.window.capture="handleEscape($event)"
+        x-on:mason-reveal-part.window="revealPart($event.detail)"
         x-on:click.away="deselectAllBlocks()"
     >
         @if (! $isDisabled)
@@ -88,6 +89,7 @@
                     ->class([
                         'mason-input-wrapper',
                     ])
+                    ->style($getHeightStyles())
             "
         >
             <div

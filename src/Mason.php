@@ -5,17 +5,23 @@ declare(strict_types=1);
 namespace Awcodes\Mason;
 
 use Awcodes\Mason\Actions\BrickAction;
+use Awcodes\Mason\Actions\DuplicateBrickAction;
 use Awcodes\Mason\Concerns\HasBricks;
+use Awcodes\Mason\Concerns\HasMaxHeight;
+use Awcodes\Mason\Concerns\HasMinHeight;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\BrickCommand;
+use Awcodes\Mason\Support\IframeRenderer;
 use Awcodes\Mason\Support\RenderContext;
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Contracts\CanBeLengthConstrained;
 use Filament\Forms\Components\Field;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Concerns\HasPlaceholder;
 use Livewire\Component;
+use LogicException;
 
 class Mason extends Field implements CanBeLengthConstrained
 {
@@ -23,6 +29,8 @@ class Mason extends Field implements CanBeLengthConstrained
     use HasBricks;
     use HasExtraAlpineAttributes;
     use HasExtraInputAttributes;
+    use HasMaxHeight;
+    use HasMinHeight;
     use HasPlaceholder;
     use HasSidebar;
 
@@ -37,6 +45,8 @@ class Mason extends Field implements CanBeLengthConstrained
     protected string | Closure | null $defaultColorMode = null;
 
     protected bool | Closure $showColorModeToggle = false;
+
+    protected ?Closure $modifyBrickActionUsing = null;
 
     /**
      * @var array<string, mixed> | Closure
@@ -120,6 +130,15 @@ class Mason extends Field implements CanBeLengthConstrained
     }
 
     /**
+     * Whether a brick is being rendered for the editor preview, e.g. to mark parts of it or to render it differently
+     * there. Unlike a null $data in toHtml(), this holds with previewData() as well.
+     */
+    public static function isRenderingPreview(): bool
+    {
+        return IframeRenderer::isRenderingPreview();
+    }
+
+    /**
      * @param  array<string, mixed>  $config
      */
     public function getBrickOutlineLabel(string $id, array $config): ?string
@@ -139,6 +158,7 @@ class Mason extends Field implements CanBeLengthConstrained
     {
         return [
             BrickAction::make(),
+            DuplicateBrickAction::make(),
         ];
     }
 
@@ -169,6 +189,58 @@ class Mason extends Field implements CanBeLengthConstrained
         $this->state($state);
 
         return $state;
+    }
+
+    /**
+     * Customizes the action behind the brick form for this field, e.g. a slide-over or a width, after the brick's own
+     * configureBrickAction(). The callback changes the action it receives; it may return it or null.
+     */
+    public function brickAction(?Closure $callback): static
+    {
+        $this->modifyBrickActionUsing = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @param  class-string<Brick>  $brick
+     */
+    public function modifyBrickAction(Action $action, string $brick): Action
+    {
+        if (! $this->modifyBrickActionUsing instanceof Closure) {
+            return $action;
+        }
+
+        $result = $this->evaluate($this->modifyBrickActionUsing, [
+            'action' => $action,
+            'arguments' => $action->getArguments(),
+            'brick' => $brick,
+        ], [
+            Action::class => $action,
+        ]);
+
+        // The callback runs as the mounted action boots, which cannot be swapped for another instance
+        if ($result instanceof Action && $result !== $action) {
+            throw new LogicException('The brickAction() callback returned a different action. Change the action it receives instead.');
+        }
+
+        return $action;
+    }
+
+    /**
+     * The heights as CSS variables; without one, the stylesheet's default applies
+     *
+     * @return array<string>
+     */
+    public function getHeightStyles(): array
+    {
+        $minHeight = $this->getMinHeight();
+        $maxHeight = $this->getMaxHeight();
+
+        return array_values(array_filter([
+            filled($minHeight) ? "--mason-min-height: {$minHeight}" : null,
+            filled($maxHeight) ? "--mason-max-height: {$maxHeight}" : null,
+        ]));
     }
 
     public function doubleClickToEdit(bool | Closure $condition = true): static

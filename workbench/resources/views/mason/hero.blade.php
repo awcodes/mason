@@ -5,6 +5,7 @@
 ])
 
 <section
+    {{ mason_part('design') }}
     @class([
         'hero font-body branded @container',
         match ($background_color) {
@@ -16,13 +17,14 @@
 >
     <div class="@3xl:py-20 mx-auto w-full max-w-5xl px-6 py-12 text-center">
         @if ($heading)
-            <h1 class="@3xl:text-5xl font-display text-3xl font-semibold tracking-tight">
+            <h1 {{ mason_part('heading') }} class="@3xl:text-5xl font-display text-3xl font-semibold tracking-tight">
                 {{ $heading }}
             </h1>
         @endif
 
         @if ($text)
             <div
+                {{ mason_part('text') }}
                 @class([
                     'prose mx-auto mt-6 max-w-2xl',
                     'prose-invert prose-p:text-white' => $background_color === 'primary',

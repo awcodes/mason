@@ -246,6 +246,20 @@ describe('edit control', function () {
     });
 });
 
+describe('duplicate control', function () {
+    it('offers duplicating for registered bricks, with or without a form', function () {
+        $html = IframeRenderer::make([
+            ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => []]],
+            ['type' => 'masonBrick', 'attrs' => ['id' => 'simple-brick', 'config' => []]],
+            ['type' => 'masonBrick', 'attrs' => ['id' => 'unknown-brick', 'config' => []]],
+        ])
+            ->bricks([TestBrick::class, SimpleBrick::class])
+            ->toHtml();
+
+        expect(preg_match_all('/<button[^>]*data-action="duplicate"/', $html))->toBe(2);
+    });
+});
+
 describe('add line in the preview', function () {
     it('puts an add button between the bricks and after the last one', function () {
         $html = IframeRenderer::make([
