@@ -22,6 +22,13 @@ it('renders the outline when enabled', function () {
         ->assertSeeHtml('outlineBricks');
 });
 
+it('shows an item\'s Duplicate only while the brick can be copied', function () {
+    // duplicable is false for an unregistered brick and for one at its getMaxInstances()
+    Livewire::test(LivewireOutlineForm::class)
+        ->assertSeeHtml('x-show="item.duplicable"')
+        ->assertDontSeeHtml('item.registered');
+});
+
 function sectionBrick(string $text): array
 {
     return [

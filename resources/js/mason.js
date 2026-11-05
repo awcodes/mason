@@ -7,6 +7,7 @@ export default function masonComponent({
     context = null,
     defaultColorMode = 'light',
     hasColorModeToggle = false,
+    brickLimits = {},
     outlineBricks = {},
 }) {
     let iframe = null
@@ -322,8 +323,27 @@ export default function masonComponent({
             )
         },
 
+        brickCount(brickId) {
+            const blocks = Array.isArray(this.state) ? this.state : []
+
+            return blocks.filter(
+                (block) =>
+                    block?.type === 'masonBrick' && block.attrs?.id === brickId,
+            ).length
+        },
+
+        // Whether one more of the brick stays within its getMaxInstances(); the server checks it again
+        isBrickAvailable(brickId) {
+            const max = brickLimits[brickId]
+
+            if (max === undefined || max === null) return true
+
+            return this.brickCount(brickId) < max
+        },
+
         async handleInsertBlock(brickId, position) {
-            if (this.isBrickActionBusy()) return
+            if (this.isBrickActionBusy() || !this.isBrickAvailable(brickId))
+                return
 
             this.isInsertingBrick = true
             const preInsertState = this.captureState()
@@ -462,6 +482,7 @@ export default function masonComponent({
 
             const blocks = this.getBlocksFromState()
             if (index < 0 || index >= blocks.length) return
+            if (!this.isBrickAvailable(blocks[index].attrs?.id)) return
 
             this.isDuplicatingBrick = true
             const preDuplicateState = this.captureState()
@@ -607,7 +628,9 @@ export default function masonComponent({
                     label: outlineLabel || type,
                     type: outlineLabel ? type : null,
                     icon: brick?.icon ?? null,
-                    registered: brick !== undefined,
+                    duplicable:
+                        brick !== undefined &&
+                        this.isBrickAvailable(block.attrs.id),
                 }
             })
         },

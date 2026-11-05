@@ -30,6 +30,9 @@ class BrickAction
                 // The field's brickAction() comes last: it knows the context, e.g. a field nested in a slide-over
                 return $component->modifyBrickAction($brick::configureBrickAction($action), $brick);
             })
+            // A brick at its getMaxInstances() can't be inserted again; Filament then doesn't mount the action
+            ->disabled(fn (array $arguments, Mason $component): bool => ($arguments['mode'] ?? 'insert') === 'insert'
+                && $component->hasReachedMaxInstances($arguments['id'] ?? ''))
             ->fillForm(fn (array $arguments): ?array => $arguments['config'] ?? null)
             // A click on a part in the preview (mason_part()) opens the form at the component with that key.
             // It runs after afterFormFilled(), which a brick may set for itself.

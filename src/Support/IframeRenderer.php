@@ -128,7 +128,7 @@ class IframeRenderer
                 'html' => $html,
                 'label' => $this->getBlockLabel($id),
                 'editable' => $this->isBlockEditable($id),
-                'registered' => ! blank($id) && $this->getBrick($id) !== null,
+                'duplicable' => $this->isBlockDuplicable($id),
             ];
         }, $this->blocks, array_keys($this->blocks));
 
@@ -146,6 +146,27 @@ class IframeRenderer
         return view('mason::iframe-preview', [
             'blocks' => $blocks,
         ])->render();
+    }
+
+    /**
+     * Whether the block's brick can be copied: an unregistered brick can't be rendered again, and a brick at its
+     * getMaxInstances() can't be added again
+     */
+    protected function isBlockDuplicable(?string $id): bool
+    {
+        $brick = blank($id) ? null : $this->getBrick($id);
+
+        if ($brick === null) {
+            return false;
+        }
+
+        $max = $brick::getMaxInstances();
+
+        return $max === null || count(array_filter(
+            $this->blocks,
+            fn (array $block): bool => ($block['type'] ?? null) === 'masonBrick'
+                && ($block['attrs']['id'] ?? null) === $id,
+        )) < $max;
     }
 
     /**

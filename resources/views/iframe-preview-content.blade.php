@@ -78,8 +78,8 @@
                     >
                         @include('mason::components.icons.plus', ['title' => __('mason::mason.preview.add')])
                     </button>
-                    {{-- An unregistered brick cannot be rendered again, so it is not copied --}}
-                    @if ($block['registered'] ?? true)
+                    {{-- Neither an unregistered brick nor one at its getMaxInstances() is copied --}}
+                    @if ($block['duplicable'] ?? true)
                         <button
                             class="mason-block-btn"
                             title="{{ __('mason::mason.preview.duplicate') }}"
