@@ -482,6 +482,7 @@ export default function masonComponent({
 
             const blocks = this.getBlocksFromState()
             if (index < 0 || index >= blocks.length) return
+            if (!this.isBrickAvailable(blocks[index].attrs?.id)) return
 
             this.isDuplicatingBrick = true
             const preDuplicateState = this.captureState()
@@ -627,7 +628,9 @@ export default function masonComponent({
                     label: outlineLabel || type,
                     type: outlineLabel ? type : null,
                     icon: brick?.icon ?? null,
-                    registered: brick !== undefined,
+                    duplicable:
+                        brick !== undefined &&
+                        this.isBrickAvailable(block.attrs.id),
                 }
             })
         },

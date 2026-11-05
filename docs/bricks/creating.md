@@ -121,7 +121,7 @@ public static function getMaxInstances(): ?int
 }
 ```
 
-The sidebar and the brick picker show how often a limited brick is used, e.g. `0/1`. Once the limit is reached, the brick is greyed out there, with a hint, and can't be dragged in or picked. The server refuses to insert it as well, and saving the field fails validation if the content still has too many, e.g. from an older version or a request made outside the editor. The default, `null`, puts no limit on the brick.
+The sidebar and the brick picker show how often a limited brick is used, e.g. `0/1`. Once the limit is reached, the brick is greyed out there, with a hint, and can't be dragged in or picked; the **Duplicate** control is hidden for it in the preview and the outline. The server refuses to insert it as well, and saving the field fails validation if the content still has too many, e.g. from an older version or a request made outside the editor. The default, `null`, puts no limit on the brick.
 
 > [!WARNING]
 > Adding a limit to a brick that is already in use affects existing content: a record that has more of the brick than the new limit can't be saved until an author removes the extra ones.

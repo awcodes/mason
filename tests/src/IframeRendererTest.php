@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Awcodes\Mason\BrickGroup;
 use Awcodes\Mason\Support\IframeRenderer;
+use Awcodes\Mason\Tests\Fixtures\LimitedBrick;
 use Awcodes\Mason\Tests\Fixtures\SimpleBrick;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
 
@@ -257,6 +258,17 @@ describe('duplicate control', function () {
             ->toHtml();
 
         expect(preg_match_all('/<button[^>]*data-action="duplicate"/', $html))->toBe(2);
+    });
+
+    it('offers no duplicating for a brick at its getMaxInstances()', function () {
+        $html = IframeRenderer::make([
+            ['type' => 'masonBrick', 'attrs' => ['id' => 'limited-brick', 'config' => []]],
+            ['type' => 'masonBrick', 'attrs' => ['id' => 'simple-brick', 'config' => []]],
+        ])
+            ->bricks([LimitedBrick::class, SimpleBrick::class])
+            ->toHtml();
+
+        expect(preg_match_all('/<button[^>]*data-action="duplicate"/', $html))->toBe(1);
     });
 });
 
