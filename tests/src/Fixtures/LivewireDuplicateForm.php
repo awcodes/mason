@@ -31,7 +31,7 @@ class LivewireDuplicateForm extends LivewireForm implements HasActions
             ->model(Page::class)
             ->schema([
                 Mason::make('content')
-                    ->bricks([Section::class, AnchorBrick::class])
+                    ->bricks([Section::class, AnchorBrick::class, LimitedBrick::class])
                     ->outline()
                     ->disabled($this->isDisabled),
             ]);

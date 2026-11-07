@@ -35,6 +35,14 @@ abstract class Brick
     }
 
     /**
+     * How often the brick may be used in one Mason field, e.g. 1 for a hero. Null puts no limit on it.
+     */
+    public static function getMaxInstances(): ?int
+    {
+        return null;
+    }
+
+    /**
      * Distinguishes this brick from others of the same type in the editor outline.
      *
      * @param  array<string, mixed>  $config

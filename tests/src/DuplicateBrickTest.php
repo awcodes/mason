@@ -67,6 +67,14 @@ it('does not copy an unregistered brick', function () {
     expect($component->get('data.content'))->toHaveCount(1);
 });
 
+it('does not copy a brick at its getMaxInstances()', function () {
+    $component = Livewire::test(LivewireDuplicateForm::class, [
+        'initialContent' => [brickWithConfig('limited-brick', [])],
+    ])->callAction(duplicateBrickAction(0));
+
+    expect($component->get('data.content'))->toHaveCount(1);
+});
+
 it('ignores an index outside the content', function () {
     $component = Livewire::test(LivewireDuplicateForm::class, [
         'initialContent' => [brickWithConfig('section', ['text' => '<p>Only</p>'])],
