@@ -9,12 +9,12 @@
         "format:check": "prettier --check 'resources/**/*.blade.php' 'resources/**/*.css' 'resources/**/*.js'"
     },
     "devDependencies": {
-        "@tailwindcss/cli": "^4.3.3",
+        "@tailwindcss/cli": "^4.3.5",
         "@tailwindcss/typography": "^0.5.20",
-        "esbuild": "^0.28.1",
-        "prettier": "^3.5.3",
+        "esbuild": "^0.28.2",
+        "prettier": "^3.9.10",
         "prettier-plugin-blade": "^2.1.21",
-        "prettier-plugin-tailwindcss": "^0.6.11",
+        "prettier-plugin-tailwindcss": "^0.8.1",
         "tailwindcss": "^4.3.3"
     },
     "overrides": {
