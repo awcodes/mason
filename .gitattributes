@@ -7,7 +7,7 @@
 /.gitignore             export-ignore
 /.idea                  export-ignore
 /.prettierrc            export-ignore
-/.package-lock.json     export-ignore
+/package-lock.json      export-ignore
 /.editorconfig          export-ignore
 /.php_cs.dist.php       export-ignore
 /.vscode                export-ignore
